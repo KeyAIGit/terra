@@ -5,3 +5,4 @@ runs/
 logs/
 *.tar.gz
 .playwright/
+export_ue/

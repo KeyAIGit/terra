@@ -744,6 +744,35 @@ def _render(payload: dict) -> str:
             "<script>\n" + _APP_JS + "\n</script>\n</body></html>\n")
 
 
+def build_scene_data(run_dir: str | Path, kinds: list | None = None) -> dict:
+    """Собрать данные сцен прогона — общая точка для play.html и export_ue.
+
+    Возвращает {"run_id": ..., "scenes": [сцена, ...]}: каждая сцена — тот же
+    словарь, что вшивается в play.html (планировка, здания, улицы, жители,
+    река/море, сид). Сид сцены канонический — по её месту в ПОЛНОМ списке
+    (capital=11, bronze=12, neolithic=13), поэтому сцена собирается одинаково
+    и в полном play.html, и при выборочном экспорте.
+
+    kinds — оставить только эти сцены (подсписок ["capital","bronze","neolithic"]).
+    """
+    run_dir = Path(run_dir)
+    if not run_dir.exists():
+        raise FileNotFoundError(f"каталог прогона не найден: {run_dir}")
+    data = _load(run_dir)
+    picks = _pick_scenes(data)
+    run_id = ""
+    rj = run_dir / "run.json"
+    if rj.exists():
+        try:
+            run_id = json.loads(rj.read_text(encoding="utf-8")).get("run_id", "")
+        except Exception:
+            pass
+    scenes = [_build_scene(data, p, seed=11 + i)
+              for i, p in enumerate(picks)
+              if kinds is None or p["kind"] in kinds]
+    return {"run_id": run_id or run_dir.name, "scenes": scenes}
+
+
 def build_play(run_dir: str | Path, out_path: str | Path | None = None,
                scenes: list | None = None) -> Path:
     """Собрать игровой режим прогулки по поселениям прогона.
@@ -757,20 +786,7 @@ def build_play(run_dir: str | Path, out_path: str | Path | None = None,
     out = Path(out_path) if out_path else run_dir / "play.html"
     out.parent.mkdir(parents=True, exist_ok=True)
 
-    data = _load(run_dir)
-    picks = _pick_scenes(data)
-    if scenes:
-        picks = [p for p in picks if p["kind"] in scenes]
-    run_id = ""
-    rj = run_dir / "run.json"
-    if rj.exists():
-        try:
-            run_id = json.loads(rj.read_text(encoding="utf-8")).get("run_id", "")
-        except Exception:
-            pass
-    payload = {"run_id": run_id or run_dir.name,
-               "scenes": [_build_scene(data, p, seed=11 + i)
-                          for i, p in enumerate(picks)]}
+    payload = build_scene_data(run_dir, kinds=scenes)
     html = _render(payload)
     out.write_text(html, encoding="utf-8")
     size = out.stat().st_size

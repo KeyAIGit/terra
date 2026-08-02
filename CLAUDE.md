@@ -71,9 +71,17 @@ claude-haiku-4-5). Проверка UI — Playwright+Chromium (--use-gl=swiftsh
 
 ## UE5 (когда пользователь поставит)
 
-Экспорт: heightmap PNG16 + маски + manifest застройки + people.json +
-import_terra.py для UE editor Python. Мост к ноутбуку: Claude desktop app,
-папка проекта UE в доверенных. UE в облачном контейнере не запускается.
+ГОТОВО: `python3 -m terra.export_ue runs/terra-1` → пакет `export_ue/`
+(на сцену: terrain.obj+текстура, terrain_far, water, masks/ PNG16+веса,
+buildings.json, people.json, meta.json, proxy_meshes/) + общие
+import_terra.py (скрипт для встроенного Python UE 5.4+, источники в
+terra/ue/) и README_UE.md. Сцены строятся из terra.play.build_scene_data —
+ОБЩЕЙ точки с play.html; высотное поле — порт groundH из _play_js.py
+(держать в синхроне). Экспорт сам гоняет самопроверки (OBJ, «здания на
+рельефе» <30 см, PNG16, спавны людей) и падает ненулевым кодом при провале.
+Мост к ноутбуку: Claude desktop app, папка проекта UE в доверенных.
+UE в облачном контейнере не запускается — UE-скрипт писать консервативно,
+каждый рискованный вызов с фолбэком.
 
 ## Правила
 
