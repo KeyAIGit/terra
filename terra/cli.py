@@ -258,7 +258,9 @@ def cmd_doctor(a):
     rich = {k: 0.9 for k in kn.MAT_KEYS}
     r = kn.starting_repertoire()
     for _ in range(400):
-        m = kn.reachable_mask(r, rich, 1e7, 0.6, 1.0, set(range(14)))
+        # 5e7 — с запасом выше самого высокого pop-гейта каталога
+        # (машинный разум требует 2e7 связанных душ)
+        m = kn.reachable_mask(r, rich, 5e7, 0.6, 1.0, set(range(14)))
         if not m.any():
             break
         for tid in np.flatnonzero(m):
