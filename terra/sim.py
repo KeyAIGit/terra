@@ -61,7 +61,9 @@ DEFAULT_CONFIG = {
 }
 
 # шаг времени: в глубокой древности события редки, ближе к нам — гуще
-DT_SCHEDULE = ((-12000, 10), (-7000, 5), (-2500, 2))
+# Чем ближе к нам, тем быстрее всё меняется — и тем мельче должен быть шаг.
+# Двенадцать тысяч лет назад десятилетие ничего не решало; в XX веке решает год.
+DT_SCHEDULE = ((-12000, 10), (-7000, 5), (-2500, 2), (1500, 1))
 
 _JUNC_COOLDOWN = {"crisis": 260, "schism": 320, "contact": 60, "succession": 90,
                   "reform": 400, "expansion": 300, "innovation": 200}
@@ -465,7 +467,12 @@ class Sim:
                 widowed = dead_mates[co.alive[dead_mates]]
                 ag.imprint(co, widowed, "loss", 0.34, self.year)
         ag.age_effects(co, idx, self.year, dt)
-        fert = (1.0 + 0.4 * rep.effect("fertility")) * (0.6 + 0.5 * min(1.5, food_ratio))
+        # Рождаемость: сытость поднимает её, а знание — снижает. Когда дети
+        # перестают умирать, а женщины идут учиться, семьи становятся малыми;
+        # это и есть демографический переход, и он не «политика», а то, что
+        # происходит с людьми. Ниже трети от природного уровня не опускаем.
+        fert = max(0.28, 1.0 + 0.4 * rep.effect("fertility")) \
+            * (0.6 + 0.5 * min(1.5, food_ratio))
         newborn = ag.pair_and_breed(self.rng, co, idx, self.year, fert, dt)
         for ch, mo, fa in newborn:
             poly.agent_ids.append(ch)
@@ -473,7 +480,11 @@ class Sim:
         # душевые ставки рождений и смертей, наблюдённые в выборке
         b_rate = len(newborn) / max(1.0, before * dt)
         d_rate = len(dead) / max(1.0, before * dt)
-        r = float(np.clip(b_rate - d_rate, -0.050, 0.011))
+        # Потолок годового прироста. До медицины он около процента: больше
+        # людей просто не выживает. Когда заражение побеждено, тот же перевес
+        # рождений над смертями даёт вдвое больше — так и получился XX век.
+        r_cap = 0.011 + 0.013 * float(np.clip(rep.effect("health") / 2.5, 0, 1))
+        r = float(np.clip(b_rate - d_rate, -0.050, r_cap))
         poly.pop = float(np.clip(poly.pop * math.exp(r * dt), 0, K * 1.30 + 150))
         poly.agent_ids = list(map(int, idx))
 

@@ -1059,6 +1059,38 @@ def _ores(rng, H, W, elev, is_land, B, tect, precip, temp, latitude,
         + 0.35 * _smoothstep(slope, 20.0, 160.0)
     ore["stone"] = _calibrate_fraction(st * land, land, 0.30, 0.3)
 
+    # ── недра нового времени ──
+    # Они лежат здесь с самого начала, но до поры ничего не значат: пока никто
+    # не умеет их взять, нефть — только чёрная лужа, а уран — тяжёлый камень.
+    #
+    # НЕФТЬ — осадочные бассейны бывших тёплых морей, с ловушками у краёв
+    # платформ; в щитах и молодых горах её нет.
+    oi = basin * _gauss(palat, 20.0, 24.0) * (0.2 + n(5, 21)) \
+        + 0.5 * basin * np.clip(n(4, 22) - 0.45, 0, None) * 2.0 \
+        + 0.3 * alluvial * n(5, 23)
+    oi = oi * (1.0 - 0.85 * shield) * (1.0 - 0.6 * orogen)
+    ore["oil"] = _calibrate_fraction(oi, land, float(rng.uniform(0.05, 0.09)), 0.3)
+
+    # КВАРЦЕВЫЙ ПЕСОК — древние пляжи и выветренные граниты: чистая кремнёвка
+    si = 0.8 * coast_arid * _smoothstep(precip, 100, 900) * (0.3 + n(5, 24)) \
+        + 0.7 * granite * np.clip(n(5, 25) - 0.4, 0, None) * 2.0 \
+        + 0.4 * basin * _smoothstep(precip, 900, 2400) * n(5, 26)
+    ore["silica"] = _calibrate_fraction(si, land, 0.16, 0.3)
+
+    # БОКСИТ — латериты влажных тропиков: годы жары и ливней вымывают всё,
+    # кроме глинозёма
+    lat_abs = np.abs(latitude)[:, None] * np.ones((1, W))
+    bx = _gauss(lat_abs, 8.0, 13.0) * _smoothstep(precip, 1100, 2600) \
+        * _smoothstep(temp, 18, 26) * (0.25 + n(5, 27)) \
+        * np.clip(1.0 - slope / 90.0, 0, 1)
+    ore["bauxite"] = _calibrate_fraction(bx, land, 0.045, 0.3)
+
+    # УРАН — граниты щитов и песчаники, где грунтовые воды его переотложили
+    ur = 0.9 * granite * np.clip(n(6, 28) - 0.55, 0, None) * 3.0 \
+        + 0.5 * shield * np.clip(n(6, 29) - 0.62, 0, None) * 3.0 \
+        + 0.35 * basin * arid * np.clip(n(5, 30) - 0.6, 0, None) * 2.5
+    ore["uranium"] = _calibrate_fraction(ur, land, float(rng.uniform(0.012, 0.022)), 0.3)
+
     for k in ORE_KEYS:
         v = ore.get(k, np.zeros((H, W)))
         v = np.clip(v, 0, 1)

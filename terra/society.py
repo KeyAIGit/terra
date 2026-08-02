@@ -31,44 +31,51 @@ EARTH_R = 6371.0
 
 # ── пригодность биома для способа хозяйства ────────────────────────────────
 BIOME_MODE = {
-    #                    forag c_forag hortic pastor agrar intens
-    ICE:                 (0.03, 0.01, 0.00, 0.00, 0.00, 0.00),
-    TUNDRA:              (0.18, 0.10, 0.02, 0.22, 0.02, 0.00),
-    BOREAL:              (0.30, 0.22, 0.10, 0.15, 0.12, 0.05),
-    TEMPERATE_FOREST:    (0.55, 0.55, 0.62, 0.32, 0.80, 0.85),
-    TEMPERATE_GRASSLAND: (0.48, 0.42, 0.55, 0.95, 0.85, 0.90),
-    MEDITERRANEAN:       (0.52, 0.62, 0.80, 0.55, 0.92, 0.95),
-    DESERT:              (0.08, 0.05, 0.04, 0.20, 0.05, 0.30),
-    XERIC_SHRUB:         (0.22, 0.16, 0.18, 0.60, 0.28, 0.55),
-    SAVANNA:             (0.62, 0.45, 0.55, 0.85, 0.62, 0.70),
-    TROPICAL_FOREST:     (0.50, 0.42, 0.72, 0.10, 0.40, 0.50),
-    MONTANE:             (0.25, 0.18, 0.28, 0.45, 0.22, 0.35),
-    WETLAND:             (0.55, 0.75, 0.45, 0.10, 0.42, 0.75),
-    LAKE:                (0.00, 0.00, 0.00, 0.00, 0.00, 0.00),
-    OCEAN:               (0.00, 0.00, 0.00, 0.00, 0.00, 0.00),
+    #                    forag c_forag hortic pastor agrar intens mechan
+    ICE:                 (0.03, 0.01, 0.00, 0.00, 0.00, 0.00, 0.00),
+    TUNDRA:              (0.18, 0.10, 0.02, 0.22, 0.02, 0.00, 0.03),
+    BOREAL:              (0.30, 0.22, 0.10, 0.15, 0.12, 0.05, 0.20),
+    TEMPERATE_FOREST:    (0.55, 0.55, 0.62, 0.32, 0.80, 0.85, 0.95),
+    TEMPERATE_GRASSLAND: (0.48, 0.42, 0.55, 0.95, 0.85, 0.90, 1.00),
+    MEDITERRANEAN:       (0.52, 0.62, 0.80, 0.55, 0.92, 0.95, 0.92),
+    DESERT:              (0.08, 0.05, 0.04, 0.20, 0.05, 0.30, 0.35),
+    XERIC_SHRUB:         (0.22, 0.16, 0.18, 0.60, 0.28, 0.55, 0.60),
+    SAVANNA:             (0.62, 0.45, 0.55, 0.85, 0.62, 0.70, 0.72),
+    TROPICAL_FOREST:     (0.50, 0.42, 0.72, 0.10, 0.40, 0.50, 0.55),
+    MONTANE:             (0.25, 0.18, 0.28, 0.45, 0.22, 0.35, 0.30),
+    WETLAND:             (0.55, 0.75, 0.45, 0.10, 0.42, 0.75, 0.70),
+    LAKE:                (0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00),
+    OCEAN:               (0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00),
 }
-MODES = ("forager", "complex_forager", "horticulture", "pastoral", "agrarian", "intensive")
+MODES = ("forager", "complex_forager", "horticulture", "pastoral", "agrarian",
+         "intensive", "mechanized")
 MODE_I = {m: i for i, m in enumerate(MODES)}
 # Для присваивающих и скотоводческих способов — человек на км² ВСЕЙ земли.
 # Для земледельческих — человек на км² ПАХОТНОЙ земли, а пашня это малая доля
 # любой территории. Без этого различия мир кормит миллиарды уже в неолите.
-MODE_DENSITY = np.array([0.085, 0.30, 20.0, 1.1, 62.0, 145.0], dtype=np.float32)
-FARMING = (2, 4, 5)
-MODE_SED = np.array([0.05, 0.55, 0.75, 0.20, 0.90, 0.97], dtype=np.float32)
-MODE_MOBILITY = np.array([1.0, 0.55, 0.30, 0.95, 0.18, 0.10], dtype=np.float32)
+# Механизированное хозяйство — не «ещё лучше пашня»: это другая физика.
+# Азот берут из воздуха, работу — из нефти, сорт выводят нарочно.
+# Один работник кормит десятки, и плотность на гектар пашни растёт втрое.
+MODE_DENSITY = np.array([0.085, 0.30, 20.0, 1.1, 62.0, 145.0, 1100.0],
+                        dtype=np.float32)
+FARMING = (2, 4, 5, 6)
+MODE_SED = np.array([0.05, 0.55, 0.75, 0.20, 0.90, 0.97, 0.99], dtype=np.float32)
+MODE_MOBILITY = np.array([1.0, 0.55, 0.30, 0.95, 0.18, 0.10, 0.06], dtype=np.float32)
 # насколько производитель этого уклада даёт больше, чем съедает сам:
 # именно из этой разницы и берутся жрецы, воины, писцы и цари
-MODE_EFFICIENCY = np.array([0.030, 0.085, 0.19, 0.11, 0.36, 0.46], dtype=np.float32)
+MODE_EFFICIENCY = np.array([0.030, 0.085, 0.19, 0.11, 0.36, 0.46, 0.93],
+                           dtype=np.float32)
 MODE_RU = {"forager": "охотники-собиратели", "complex_forager": "оседлые собиратели",
            "horticulture": "мотыжное земледелие", "pastoral": "скотоводы",
-           "agrarian": "пашенное земледелие", "intensive": "ирригационное хозяйство"}
+           "agrarian": "пашенное земледелие", "intensive": "ирригационное хозяйство",
+           "mechanized": "механизированное хозяйство"}
 FORM_RU = {"band": "община", "tribe": "племя", "bigman": "вождество бигменов",
            "chiefdom": "вождество", "citystate": "город-государство",
            "kingdom": "царство", "empire": "держава", "republic": "республика",
            "confederation": "союз"}
 
 
-_SUIT = np.zeros((6, 16), dtype=np.float32)
+_SUIT = np.zeros((7, 16), dtype=np.float32)
 for _bi, _row in BIOME_MODE.items():
     for _mi, _v in enumerate(_row):
         _SUIT[_mi, _bi] = _v
@@ -586,12 +593,21 @@ def collapse_risk(poly: Polity, rep: kn.Repertoire, food_ratio: float) -> float:
     return float(np.clip(strain * (0.35 + poly.complexity), 0, 4.0))
 
 
+_AFF_TRANSMIT = kn.AFF_IDX["transmit"]
+
+
 def admin_limit(rep: kn.Repertoire, form: str) -> float:
     """Сколько людей можно удержать в одном политическом теле."""
     base = {"band": 8_000, "tribe": 25_000, "bigman": 40_000, "chiefdom": 130_000,
             "citystate": 260_000, "republic": 1_100_000, "confederation": 800_000,
             "kingdom": 3_000_000, "empire": 30_000_000}.get(form, 15_000)
-    return base * (1.0 + 2.4 * rep.effect("admin")) * (1.0 + 0.8 * rep.effect("info"))
+    # Предел управляемого тела задан не территорией, а связью: гонец на коне
+    # держит державу в десятки миллионов, телеграф и перепись — в сотни,
+    # а сеть, где всякий достижим мгновенно, — в миллиарды.
+    reach = (1.0 + 2.4 * rep.effect("admin")) * (1.0 + 0.8 * rep.effect("info")) \
+        * (1.0 + 1.6 * min(1.0, rep.effect("literacy"))) \
+        * (1.0 + 3.0 * rep.affordances()[_AFF_TRANSMIT])
+    return base * reach
 
 
 def update_complexity(poly: Polity, rep: kn.Repertoire, co: ag.Cohort):
@@ -655,7 +671,12 @@ def urban_share(rep: kn.Repertoire, poly: Polity) -> float:
         return 0.0
     u = 0.02 + 0.30 * rep.effect("urban") + 0.22 * poly.complexity + 0.18 * rep.effect("trade")
     u *= (0.5 + 0.8 * min(1.0, poly.surplus * 8))
-    return float(np.clip(u, 0.0, 0.22))
+    # Доиндустриальный город кормится окрестной пашней и потому мал: больше
+    # пятой части народа в городах не удержать. Когда хлеб везут по железной
+    # дороге, а поле пашет машина, ограничение снимается — и мир становится
+    # городским: сегодня в городах живёт больше половины людей.
+    cap = 0.22 + 0.55 * min(1.0, 0.55 * rep.effect("labor") + 0.45 * rep.effect("urban"))
+    return float(np.clip(u, 0.0, min(0.80, cap)))
 
 
 # ────────────────────────────────────────────────────────────────────────────

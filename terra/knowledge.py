@@ -388,9 +388,202 @@ T("mech_clock", "механические часы", "средневековье
 T("experiment", "опытный метод", "новое время", gives={"predict": 1.0, "measure": 0.9},
   aff={"predict": 0.75, "measure": 0.75, "record": 0.85}, pop=30000, surplus=0.14, diff=4.6,
   eff={"innovation": 1.2, "info": 0.8}, lossy=0.95)
-T("steam", "паровая машина", "новое время", gives={"propel": 1.0, "heat": 1.0},
+T("steam", "паровая машина", "новое время", gives={"propel": 1.0, "heat": 1.0, "power": 0.70},
   aff={"propel": 0.8, "measure": 0.85, "smelt": 0.85, "predict": 0.8}, mat={"coal": 0.3},
   pop=60000, surplus=0.16, diff=5.0, eff={"labor": 1.5, "trade_range": 1.0, "urban": 0.8}, lossy=0.95)
+
+# ────────────────────────────────────────────────────────────────────────────
+#  X. Новое время: работа не из мышц, вещество на части, счёт без головы
+#
+#  Здесь ничего не «наступает по расписанию». Всё то же правило: нужны
+#  аффордансы, материалы, масштаб связного населения и избыток, которым можно
+#  кормить тех, кто не пашет. Народ без угля не построит паровой машины, народ
+#  без чистого песка не выплавит стекла и не дойдёт до кремния, а народ без
+#  школ не наберёт достаточно голов, чтобы держать всё это разом.
+#
+#  Отсюда же и то, ради чего всё затевалось: вселенные могут дойти до машин,
+#  которые считают сами, — а могут не дойти никогда.
+# ────────────────────────────────────────────────────────────────────────────
+
+# ── сила ──
+T("water_mill", "водяная мельница", "средневековье",
+  gives={"power": 0.35, "grind": 0.85, "lever": 0.75},
+  aff={"lever": 0.55, "traction": 0.4}, mat={"river": 0.35, "timber": 0.2},
+  pop=1200, surplus=0.06, diff=2.8, eff={"labor": 0.45, "yield": 0.1}, lossy=0.55)
+T("distillation", "перегонка", "средневековье",
+  gives={"refine": 0.40, "ferment": 0.85, "cure": 0.7},
+  aff={"ferment": 0.5, "heat": 0.75, "contain": 0.6}, pop=4000, surplus=0.08, diff=3.4,
+  eff={"health": 0.2, "trade_good": 0.25}, lossy=0.75)
+T("coke_iron", "кокс и чугун", "новое время",
+  gives={"smelt": 1.0, "refine": 0.55, "heat": 1.0},
+  aff={"smelt": 0.85, "refine": 0.35, "measure": 0.6}, mat={"coal": 0.35, "iron": 0.3},
+  pop=40000, surplus=0.14, diff=4.6,
+  eff={"labor": 0.7, "military": 0.4, "trade_good": 0.3}, lossy=0.9)
+T("machine_tool", "станок", "новое время",
+  gives={"precision": 0.55, "cut": 1.0, "measure": 1.0},
+  aff={"power": 0.5, "smelt": 0.9, "measure": 0.85}, pop=50000, surplus=0.15, diff=4.8,
+  eff={"labor": 0.8, "innovation": 0.4}, lossy=0.92)
+T("steel_mass", "массовая сталь", "промышленная эпоха",
+  gives={"smelt": 1.0, "armor": 1.0, "precision": 0.7},
+  aff={"smelt": 1.0, "refine": 0.5, "precision": 0.45}, mat={"iron": 0.35, "coal": 0.3},
+  pop=120000, surplus=0.18, diff=5.2,
+  eff={"labor": 0.9, "military": 0.5, "urban": 0.6, "trade_good": 0.35}, lossy=0.95)
+T("railway", "железная дорога", "промышленная эпоха",
+  gives={"carry": 1.0, "propel": 1.0, "organize": 0.9},
+  aff={"power": 0.65, "smelt": 0.95, "precision": 0.5}, mat={"iron": 0.3, "coal": 0.3},
+  pop=200000, surplus=0.18, diff=5.0,
+  eff={"trade_range": 1.4, "admin": 0.7, "military": 0.4, "urban": 0.5}, lossy=0.95)
+T("steam_ship", "пароход", "промышленная эпоха",
+  gives={"float": 1.0, "propel": 1.0},
+  aff={"power": 0.65, "float": 0.8, "precision": 0.45}, mat={"coal": 0.3},
+  pop=150000, surplus=0.17, diff=4.9,
+  eff={"sea": 1.0, "trade_range": 1.2, "military": 0.35}, lossy=0.95)
+T("interchangeable", "взаимозаменяемая деталь", "промышленная эпоха",
+  gives={"precision": 0.80, "organize": 0.95},
+  aff={"precision": 0.55, "measure": 0.95, "organize": 0.7}, pop=150000, surplus=0.18,
+  diff=4.7, eff={"labor": 0.9, "military": 0.4}, lossy=0.92)
+T("chemistry", "химия", "промышленная эпоха",
+  gives={"refine": 0.78, "predict": 1.0, "cure": 0.9},
+  aff={"refine": 0.5, "predict": 0.95, "measure": 0.9}, pop=120000, surplus=0.18, diff=5.4,
+  eff={"innovation": 0.8, "health": 0.35, "trade_good": 0.3}, lossy=0.95)
+T("electric_generator", "электрическая машина", "промышленная эпоха",
+  gives={"power": 0.92, "signal": 1.0, "transmit": 0.35},
+  aff={"power": 0.7, "precision": 0.6, "predict": 0.95},
+  mat={"copper": 0.3, "iron": 0.25}, pop=250000, surplus=0.20, diff=5.6,
+  eff={"labor": 1.2, "urban": 0.7, "info": 0.4}, lossy=0.96)
+T("telegraph", "телеграф", "промышленная эпоха",
+  gives={"transmit": 0.55, "signal": 1.0, "record": 1.0},
+  aff={"power": 0.55, "signal": 0.9, "record": 0.9}, mat={"copper": 0.28},
+  pop=200000, surplus=0.18, diff=4.8,
+  eff={"admin": 0.9, "trade": 0.5, "info": 0.6, "military": 0.3}, lossy=0.94)
+T("oil_refining", "нефтепереработка", "промышленная эпоха",
+  gives={"refine": 0.95, "heat": 1.0},
+  aff={"refine": 0.7, "heat": 0.95, "measure": 0.9}, mat={"oil": 0.3},
+  pop=200000, surplus=0.19, diff=5.2,
+  eff={"labor": 0.6, "trade_good": 0.5, "innovation": 0.3}, lossy=0.95)
+T("combustion_engine", "двигатель внутреннего сгорания", "современность",
+  gives={"power": 1.0, "propel": 1.0, "traction": 1.0},
+  aff={"refine": 0.85, "precision": 0.7, "power": 0.8}, mat={"oil": 0.3},
+  pop=400000, surplus=0.20, diff=5.6,
+  eff={"labor": 1.3, "trade_range": 1.2, "military": 0.6, "mobility": 0.8}, lossy=0.96)
+T("electrolysis", "электролиз", "современность",
+  gives={"refine": 1.0, "smelt": 1.0},
+  aff={"power": 0.85, "refine": 0.7}, mat={"bauxite": 0.25},
+  pop=350000, surplus=0.20, diff=5.5,
+  eff={"trade_good": 0.4, "labor": 0.4, "innovation": 0.3}, lossy=0.96)
+T("fertilizer", "связанный азот", "современность",
+  gives={"irrigate": 1.0, "refine": 1.0},
+  aff={"refine": 0.8, "power": 0.8, "predict": 1.0}, pop=400000, surplus=0.20, diff=5.8,
+  eff={"mode:mechanized": 1.0, "yield": 1.3, "food": 0.6, "famine_buffer": 0.6},
+  lossy=0.96)
+T("power_grid", "энергосеть", "современность",
+  gives={"power": 1.0, "transmit": 0.6},
+  aff={"power": 0.92, "organize": 0.95, "precision": 0.7}, mat={"copper": 0.3},
+  pop=600000, surplus=0.22, diff=5.4,
+  eff={"labor": 1.1, "urban": 1.0, "complexity": 0.4, "health": 0.2}, lossy=0.97)
+
+# ── здоровье и население: то, что переломило демографию ──
+T("germ_theory", "теория заражения", "промышленная эпоха",
+  gives={"cure": 1.0, "predict": 1.0},
+  aff={"predict": 0.95, "measure": 0.9, "refine": 0.5}, pop=150000, surplus=0.18, diff=5.2,
+  eff={"health": 1.2, "plague_resist": 1.0, "urban": 0.4}, lossy=0.95)
+T("vaccination", "прививка", "промышленная эпоха",
+  gives={"cure": 1.0},
+  aff={"cure": 0.9, "predict": 0.9}, pop=200000, surplus=0.18, diff=5.0,
+  eff={"health": 1.0, "plague_resist": 1.2}, lossy=0.94)
+T("antibiotics", "антибиотики", "современность",
+  gives={"cure": 1.0},
+  aff={"cure": 1.0, "refine": 0.8, "predict": 1.0}, pop=500000, surplus=0.21, diff=5.7,
+  eff={"health": 1.4, "plague_resist": 1.0}, lossy=0.96)
+T("public_health", "общественное здравоохранение", "современность",
+  gives={"organize": 1.0, "cure": 1.0},
+  aff={"cure": 0.95, "organize": 0.9, "record": 0.9},
+  pop=800000, surplus=0.22, diff=5.0,
+  eff={"health": 1.0, "plague_resist": 0.8, "admin": 0.5, "urban": 0.4}, lossy=0.95)
+T("mass_schooling", "всеобщая школа", "современность",
+  gives={"record": 1.0, "count": 1.0, "organize": 1.0},
+  aff={"record": 1.0, "organize": 0.9}, pop=500000, surplus=0.20, diff=4.6,
+  eff={"literacy": 1.4, "info": 0.9, "retention": 1.2, "innovation": 0.5,
+       "complexity": 0.3}, lossy=0.93)
+# Демографический переход: когда дети перестают умирать, а женщины идут учиться
+# и работать, семьи становятся маленькими. Это не «политика» — это то, что
+# происходит с людьми, и без этого население мира ушло бы в бессмыслицу.
+T("family_planning", "планирование семьи", "современность",
+  gives={"cure": 1.0, "count": 1.0},
+  aff={"cure": 0.95, "record": 1.0, "refine": 0.8},
+  pop=1500000, surplus=0.22, diff=4.8,
+  eff={"fertility": -2.6, "health": 0.4}, lossy=0.9)
+
+# ── счёт без головы ──
+T("mech_calculator", "счётная машина", "новое время",
+  gives={"compute": 0.35, "count": 1.0},
+  aff={"precision": 0.5, "count": 0.85, "measure": 0.9}, pop=60000, surplus=0.16, diff=4.6,
+  eff={"admin": 0.4, "info": 0.4, "innovation": 0.25}, lossy=0.9)
+T("statistics", "статистика", "промышленная эпоха",
+  gives={"compute": 0.5, "predict": 1.0, "count": 1.0},
+  aff={"compute": 0.3, "predict": 0.95, "record": 0.95}, pop=200000, surplus=0.18, diff=4.8,
+  eff={"admin": 0.8, "info": 0.6, "health": 0.2, "innovation": 0.4}, lossy=0.93)
+T("radio", "радио", "современность",
+  gives={"transmit": 0.9, "signal": 1.0},
+  aff={"power": 0.85, "transmit": 0.5, "predict": 1.0}, mat={"copper": 0.3},
+  pop=500000, surplus=0.20, diff=5.4,
+  eff={"info": 1.0, "admin": 0.6, "cohesion": 0.4, "military": 0.4}, lossy=0.96)
+T("semiconductor", "полупроводник", "информационная эпоха",
+  gives={"compute": 0.75, "precision": 0.95},
+  aff={"refine": 1.0, "precision": 0.75, "predict": 1.0}, mat={"silica": 0.3},
+  pop=1000000, surplus=0.23, diff=6.0,
+  eff={"innovation": 0.9, "info": 0.6}, lossy=0.97)
+T("computer", "вычислительная машина", "информационная эпоха",
+  gives={"compute": 0.92, "count": 1.0, "record": 1.0},
+  aff={"compute": 0.7, "power": 0.9, "precision": 0.9}, pop=2000000, surplus=0.24, diff=6.2,
+  eff={"admin": 1.2, "info": 1.2, "innovation": 1.0, "complexity": 0.5}, lossy=0.97)
+T("network", "сеть", "информационная эпоха",
+  gives={"transmit": 1.0, "compute": 0.95, "organize": 1.0},
+  aff={"compute": 0.85, "transmit": 0.85, "organize": 0.95}, pop=4000000, surplus=0.25,
+  diff=6.0, eff={"info": 1.5, "trade": 0.8, "admin": 0.8, "innovation": 1.0,
+                 "cohesion": -0.2}, lossy=0.97)
+T("automation", "автоматизация", "информационная эпоха",
+  gives={"precision": 1.0, "power": 1.0, "organize": 1.0},
+  aff={"compute": 0.85, "precision": 0.9, "power": 0.95}, pop=3000000, surplus=0.25,
+  diff=5.9, eff={"labor": 1.6, "yield": 0.5, "inequality": 0.4}, lossy=0.97)
+T("machine_learning", "обучающаяся машина", "информационная эпоха",
+  gives={"compute": 1.0, "predict": 1.0},
+  aff={"compute": 0.92, "predict": 1.0, "record": 1.0}, pop=8000000, surplus=0.26,
+  diff=6.4, eff={"innovation": 1.4, "info": 1.0, "admin": 0.6}, lossy=0.98)
+# Здесь заканчивается то, что мы про себя знаем, и начинается то, ради чего
+# затевалась мультивселенная: как ЭТО пройдёт в мире, который прожил свою,
+# а не нашу историю.
+T("artificial_mind", "искусственный разум", "информационная эпоха",
+  gives={"compute": 1.0, "predict": 1.0, "organize": 1.0},
+  aff={"compute": 1.0, "predict": 1.0, "organize": 1.0}, pop=20000000, surplus=0.28,
+  diff=7.0, eff={"innovation": 2.0, "admin": 1.5, "labor": 1.2, "info": 1.2,
+                 "complexity": 0.8}, lossy=0.99)
+
+# ── полёт, высота, сила недр ──
+T("aviation", "авиация", "современность",
+  gives={"propel": 1.0, "float": 1.0, "carry": 1.0},
+  aff={"power": 0.95, "precision": 0.8, "refine": 0.9}, mat={"bauxite": 0.25, "oil": 0.25},
+  pop=1000000, surplus=0.23, diff=5.9,
+  eff={"trade_range": 1.3, "military": 0.9, "mobility": 1.0}, lossy=0.97)
+T("reinforced_concrete", "железобетон", "современность",
+  gives={"shelter": 1.0, "lever": 1.0},
+  aff={"smelt": 1.0, "precision": 0.6, "measure": 0.95}, mat={"stone": 0.3, "iron": 0.3},
+  pop=400000, surplus=0.20, diff=4.9,
+  eff={"urban": 1.2, "labor": 0.4, "defense": 0.5}, lossy=0.95)
+T("high_rise", "высотный город", "современность",
+  gives={"shelter": 1.0, "organize": 1.0},
+  aff={"shelter": 0.95, "power": 0.9, "precision": 0.75}, pop=2000000, surplus=0.24,
+  diff=5.2, eff={"urban": 1.6, "complexity": 0.5, "inequality": 0.3}, lossy=0.96)
+T("nuclear_fission", "расщепление ядра", "информационная эпоха",
+  gives={"power": 1.0, "heat": 1.0, "project": 1.0},
+  aff={"refine": 1.0, "predict": 1.0, "compute": 0.6, "precision": 0.9},
+  mat={"uranium": 0.25}, pop=5000000, surplus=0.26, diff=6.8,
+  eff={"labor": 0.9, "military": 1.5, "complexity": 0.5}, lossy=0.98)
+T("spaceflight", "космический полёт", "информационная эпоха",
+  gives={"propel": 1.0, "transmit": 1.0, "predict": 1.0},
+  aff={"power": 1.0, "compute": 0.85, "precision": 0.95, "refine": 1.0},
+  pop=10000000, surplus=0.27, diff=6.6,
+  eff={"info": 0.8, "military": 0.6, "innovation": 0.7, "legitimacy": 0.3}, lossy=0.98)
 
 MODE_UNLOCK = {k: v for t in _CATALOG for k, v in ()}  # заполняется ниже
 N_TECH = len(_CATALOG)
@@ -789,7 +982,8 @@ def tech_key(tid: int) -> str:
 
 def era_of(rep: Repertoire) -> str:
     """Грубая эпоха народа — для летописи."""
-    order = ["новое время", "средневековье", "античность", "железо", "бронза",
+    order = ["информационная эпоха", "современность", "промышленная эпоха",
+             "новое время", "средневековье", "античность", "железо", "бронза",
              "халколит", "неолит", "мезолит", "палеолит"]
     have = {_CATALOG[t].era_hint for t in np.flatnonzero(rep.known)}
     counts = {e: sum(1 for t in np.flatnonzero(rep.known) if _CATALOG[t].era_hint == e)

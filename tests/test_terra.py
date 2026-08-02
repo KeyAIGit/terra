@@ -118,14 +118,31 @@ def test_knowledge():
 
     # достижимость всего каталога из палеолита при щедрой планете
     r = kn.starting_repertoire()
+    # 5·10⁷ — масштаб связного населения, при котором в принципе возможно всё,
+    # вплоть до вычислительных машин: их не построить в общине на тысячу душ
     for _ in range(400):
-        m = kn.reachable_mask(r, rich, 1e7, 0.6, 1.0, set(range(14)))
+        m = kn.reachable_mask(r, rich, 5e7, 0.6, 1.0, set(range(14)))
         if not m.any():
             break
         for tid in np.flatnonzero(m):
             kn.learn(r, int(tid), 1.0)
     unreach = [t.key for t in kn.CATALOG if not r.known[t.tid]]
     check("весь каталог достижим на щедрой планете", not unreach, str(unreach[:6]))
+
+    # индустриальный потолок: механизированное хозяйство должно давать
+    # порядок «наших» восьми миллиардов, а не бесконечность
+    import terra.society as _so
+    check("механизированное хозяйство кормит на порядок больше пашенного",
+          _so.MODE_DENSITY[_so.MODE_I["mechanized"]]
+          > 8 * _so.MODE_DENSITY[_so.MODE_I["agrarian"]])
+    check("но не бесконечно: не больше 25 крат пашенного",
+          _so.MODE_DENSITY[_so.MODE_I["mechanized"]]
+          < 25 * _so.MODE_DENSITY[_so.MODE_I["agrarian"]])
+    # путь к машинному разуму существует, но требует масштаба целой цивилизации
+    _ai = kn.BY_KEY.get("artificial_mind")
+    check("искусственный разум требует масштаба в миллионы душ",
+          _ai is not None and _ai.needs_pop >= 1e6,
+          f"нужно {_ai.needs_pop:,.0f}" if _ai else "нет такого знания")
 
     ceil_small = kn.knowledge_ceiling(200)
     ceil_big = kn.knowledge_ceiling(200000)

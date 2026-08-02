@@ -1,5 +1,22 @@
 # TERRA → Unreal Engine 5: как собрать уровень одним скриптом
 
+> **Версия 2 (2026-08-02).** Исправлено: во все OBJ теперь пишутся UV-координаты.
+> Без них импортёр Interchange в UE 5.8 роняет проверку
+> `Ensure condition failed: UVs.IsValidIndex(VertexData.UVIndex)` — сцена всё
+> равно собиралась, но с красным окном и падением CrashReportClient.
+> Если ставишь поверх первой версии: **удали старую папку `export_ue`
+> целиком** и распакуй новую на её место, потом запусти скрипт заново.
+>
+> **На macOS** путь к скрипту берётся так: правый клик по `import_terra.py`
+> в Finder → зажать **⌥ (Option)** → «Скопировать как путь». Команда для
+> строки Python в Output Log:
+>
+> ```python
+> exec(open("/Users/ТЫ/Documents/Unreal Projects/Terra/export_ue/import_terra.py", encoding="utf-8").read())
+> ```
+>
+> На Mac обратные слэши не нужны, префикс `r` можно не ставить.
+
 Эта папка — готовый пакет: три сцены твоего мира (`capital/`, `bronze/`,
 `neolithic/`), общий скрипт `import_terra.py` и эта инструкция. Всё, что ниже,
 рассчитано на человека, который открыл Unreal Engine первый раз в жизни.
