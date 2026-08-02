@@ -359,6 +359,27 @@ class Sim:
         n = idx.size
         frac = np.bincount(acts, minlength=ag.N_ACT) / n
 
+        # ── прожитая жизнь: руки учатся делу, старшие передают младшим ──
+        # Умение здесь ничьё не «общее»: оно принадлежит человеку и уходит
+        # с ним. Народ владеет знанием ровно настолько, насколько живые люди
+        # успели его перенять.
+        sub_dom = ag.DI["farm"] if poly.subsistence in ("horticulture", "agrarian",
+                                                        "intensive", "pastoral") \
+            else ag.DI["forage"]
+        # Сколько знания народа вообще помещается в одну голову. В общине из
+        # десятка умений взрослый знает всё; в державе со ста — лишь часть, и
+        # держится остальное уже на письме, школах и цехах.
+        head = 14.0 + 26.0 * rep.effect("info") + 34.0 * rep.effect("literacy") \
+            + 10.0 * rep.effect("retention")
+        lore_share = float(np.clip(head / max(8.0, rep.count()), 0.06, 1.0))
+        # потолок мастерства: чему вообще можно выучиться в этом обществе
+        craft_depth = float(np.clip(0.30 + 0.70 * min(1.0, rep.count() / 40.0), 0, 1))
+        ag.practice(co, idx, acts, self.year, dt, sub_dom, craft_depth)
+        ag.apprentice(self.rng, co, idx, acts, self.year, dt)
+        ag.absorb_lore(co, idx, self.year, lore_share,
+                       frac[ag.AI["teach"]] * 2.2 + frac[ag.AI["care"]] * 0.8
+                       + 0.35 * rep.effect("literacy"), dt)
+
         # ── итог их решений для народа ──
         eff_int = frac[ag.AI["intensify"]]
         production = K * (1.0 + 0.42 * eff_int + 0.12 * frac[ag.AI["subsist"]]
@@ -371,6 +392,12 @@ class Sim:
         food_ratio = float(np.clip(avail / max(poly.pop, 1.0), 0.15, 2.2))
         if food_ratio < 1.0:
             poly.food_stock = max(0.0, poly.food_stock - poly.pop * (1.0 - food_ratio) * 0.6)
+        # голодный год оставляет след на каждом, кто его застал — навсегда
+        if food_ratio < 0.96:
+            ag.imprint(co, idx, "hunger", float(min(0.55, (0.96 - food_ratio) * 1.4)),
+                       self.year)
+        if hostility > 0.4:
+            ag.imprint(co, idx, "violence", float(min(0.35, hostility * 0.35)), self.year)
         # Прибавочный продукт — не «незанятая ёмкость». Общество, упёршееся в
         # предел земли, живёт впроголодь, и по прежней мерке избытка у него ноль
         # всегда — а значит, никогда не появятся ни жрецы, ни цари.
@@ -412,6 +439,8 @@ class Sim:
             for i in kill:
                 co.kill(int(i))
             idx = idx[co.alive[idx]]
+            # выжившие помнят мор до конца дней
+            ag.imprint(co, idx, "plague", float(min(0.7, plague * 3.0)), self.year)
             if idx.size < 3:
                 self._extinct(poly, "вымер от мора")
                 return
@@ -422,10 +451,19 @@ class Sim:
         before = idx.size
         dead = ag.mortality(self.rng, co, idx, self.year, food_ratio, violence,
                             load * 0.006, health_t, dt)
+        dead_kin = np.unique(co.kin_group[dead]) if dead.size else None
+        dead_mates = co.mate[dead][co.mate[dead] >= 0] if dead.size else None
         for i in dead:
             self._on_death(poly, int(i))
             co.kill(int(i))
         idx = idx[co.alive[idx]]
+        # смерть в семье — это личное горе, которое человек носит до конца
+        if dead_kin is not None and idx.size:
+            bereaved = idx[np.isin(co.kin_group[idx], dead_kin)]
+            ag.imprint(co, bereaved, "loss", 0.16, self.year)
+            if dead_mates is not None and dead_mates.size:
+                widowed = dead_mates[co.alive[dead_mates]]
+                ag.imprint(co, widowed, "loss", 0.34, self.year)
         ag.age_effects(co, idx, self.year, dt)
         fert = (1.0 + 0.4 * rep.effect("fertility")) * (0.6 + 0.5 * min(1.5, food_ratio))
         newborn = ag.pair_and_breed(self.rng, co, idx, self.year, fert, dt)
@@ -603,7 +641,14 @@ class Sim:
                 if experimenters.size == 0:
                     break
                 who = int(experimenters[int(self.rng.integers(0, experimenters.size))])
-                qual = float(0.30 + 0.5 * co.skill[who] + 0.45 * co.traits[who, ag.TI["curiosity"]])
+                # Открывает не «общество», а конкретный человек — и тем вернее,
+                # чем дольше он этим занимался и чем больше успел перенять.
+                # Поэтому мастер на седьмом десятке стоит десятка юнцов.
+                qual = float(0.16
+                             + 0.55 * co.mastery[who, ag.DI["craft"]]
+                             + 0.30 * co.lore[who]
+                             + 0.38 * co.traits[who, ag.TI["curiosity"]]
+                             + 0.12 * min(1.0, (self.year - co.born[who]) / 45.0))
                 expo = 0.35 * rep.effect("info") + 0.25 * poly.values.get("openness", 0.5)
                 tid = kn.attempt_discovery(self.rng, rep, mask, qual, expo, demand, headroom,
                                            hint=hint)
@@ -628,10 +673,15 @@ class Sim:
                 headroom = kn.carrying_knowledge(tscale, rep.count())
                 mask = kn.reachable_mask(rep, mats, tscale, poly.surplus, sed, biomes)
 
-        retention = (0.25 + frac[ag.AI["teach"]] * 1.5 + rep.effect("retention")
-                     + 0.35 * rep.effect("info"))
+        # Знание народа держится не «само»: оно держится на живых людях.
+        # Если поколение мастеров умерло, не успев научить, а молодые не
+        # переняли — repertoire осыпается, сколько бы ни было записано.
+        grip_gen = ag.generation_grip(co, idx, self.year)
+        retention = (0.06 + 0.55 * grip_gen + frac[ag.AI["teach"]] * 1.3
+                     + rep.effect("retention") + 0.35 * rep.effect("info"))
         kn.reinforce(rep, poly.pop, retention, dt)
-        stress = float(np.clip((1.05 - food_ratio) * 1.6 + (1.0 - poly.cohesion) * 0.5, 0, 2.5))
+        stress = float(np.clip((1.05 - food_ratio) * 1.6 + (1.0 - poly.cohesion) * 0.5
+                               + 1.1 * max(0.0, 0.45 - grip_gen), 0, 2.5))
         if stress > 0.12 or tscale < 900:
             lost = kn.erode(self.rng, rep, stress, tscale, retention)
             for tid in lost:
@@ -650,7 +700,12 @@ class Sim:
         self.stats["discoveries"] += 1
         t = kn.CATALOG[tid]
         co.prestige[who] += 0.35 + 0.22 * t.difficulty
-        co.skill[who] = min(1.0, co.skill[who] + 0.05)
+        # открытие — это и личный опыт: рука мастера после него твёрже
+        w1 = np.array([who], dtype=np.int64)
+        co.mastery[who, ag.DI["craft"]] = min(1.0, co.mastery[who, ag.DI["craft"]] + 0.07)
+        co.lore[who] = min(1.0, co.lore[who] + 0.05)
+        ag.remember(co, w1, "discovery", self.year, 1.0)
+        ag.imprint(co, w1, "glory", 0.25, self.year, note_val=1.0)
         if t.difficulty >= 2.0:
             lect = self.lects[poly.pid]
             nm = co.notable[who]
@@ -733,6 +788,10 @@ class Sim:
                 self._on_death(poly, int(i))
                 co.kill(int(i))
             poly.agent_ids = [int(i) for i in idx if co.alive[i]]
+            # те, кто пережил крушение, до смерти не поверят в прочность порядка
+            surv = np.array(poly.agent_ids, dtype=np.int64)
+            if surv.size:
+                ag.imprint(co, surv, "collapse", float(min(0.8, 0.35 + sev)), self.year)
             ag.indoctrinate(co, np.array(poly.agent_ids, dtype=np.int64),
                             {"authority": 0.15, "scarcity": 0.85}, 0.5)
         txt = (f"Держава {poly.name} обрушилась: из {int(pop_before):,} душ осталось "
@@ -1435,6 +1494,24 @@ class Sim:
         if aid in self.people:
             self.people[aid]["died"] = self.year
             self.people[aid]["age"] = self.year - int(co.born[i])
+            self.people[aid]["life"] = ag.life_story(co, i, self.year)
+        # Со смертью мастера, который никого не выучил, умение уходит по-настоящему:
+        # у его народа больше нет ни одних рук, которые это умели.
+        top = float(co.mastery[i].max())
+        if top > 0.62 and int(co.taught[i]) == 0 and poly.pop > 400:
+            dom = ag.DOMAINS[int(np.argmax(co.mastery[i]))]
+            peers = np.array([j for j in poly.agent_ids
+                              if co.alive[j] and j != i], dtype=np.int64)
+            if peers.size and float(co.mastery[peers, ag.DI[dom]].max()) < top - 0.30:
+                self.log("loss",
+                         f"{self._name_of(poly, i)} умер, не передав своё "
+                         f"мастерство ({ag.DOMAIN_RU[dom]}); в народе {poly.name} "
+                         f"больше нет рук, которые это умели.",
+                         weight=2.0 + 2.0 * top, poly=poly.pid, person=aid)
+                # личное умение исчезло — общее знание в этой области слабеет
+                rep = self.reps.get(poly.pid)
+                if rep is not None:
+                    kn.forget_domain(rep, dom, strength=0.35 * top)
         if not co.notable[i]:
             return
         age = self.year - int(co.born[i])

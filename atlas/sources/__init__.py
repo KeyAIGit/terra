@@ -11,6 +11,10 @@ from atlas.sources import (
     naturalearth,
     wikidata_rulers,
     hyde,
+    astro,
+    etopo,
+    biosphere,
+    osm_features,
 )
 
 # Порядок приоритета: лёгкое и целиком — раньше; тяжёлое/срезы — позже.
@@ -22,6 +26,10 @@ REGISTRY = [
     met,
     naturalearth,
     wikidata_rulers,
+    astro,
+    etopo,
+    biosphere,
+    osm_features,
     hyde,
 ]
 

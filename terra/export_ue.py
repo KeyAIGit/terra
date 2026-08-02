@@ -262,12 +262,14 @@ def write_grid_obj(path: Path, ax: np.ndarray, H: np.ndarray, name: str,
         row = H[i]
         for j in range(n):
             lines.append(f"v {ax[j] * M2CM:.1f} {zi * M2CM:.1f} {row[j] * M2CM:.1f}")
-    if with_uv:
-        for i in range(n):
-            v = 1.0 - (ax[i] + half) / (2 * half)
-            for j in range(n):
-                u = (ax[j] + half) / (2 * half)
-                lines.append(f"vt {u:.5f} {v:.5f}")
+    # UV пишем ВСЕГДА, даже если текстуры нет. Импортёр Interchange в UE 5.8
+    # предполагает, что у грани есть индекс UV, и без него роняет проверку
+    # UVs.IsValidIndex(VertexData.UVIndex) (проверено на Mac, UE 5.8.1).
+    for i in range(n):
+        v = 1.0 - (ax[i] + half) / (2 * half)
+        for j in range(n):
+            u = (ax[j] + half) / (2 * half)
+            lines.append(f"vt {u:.5f} {v:.5f}")
     for i in range(n):
         for j in range(n):
             lines.append(f"vn {nx[i, j]:.4f} {ny[i, j]:.4f} {nz[i, j]:.4f}")
@@ -278,12 +280,8 @@ def write_grid_obj(path: Path, ax: np.ndarray, H: np.ndarray, name: str,
             b = i * n + j + 2
             c = (i + 1) * n + j + 2
             d = (i + 1) * n + j + 1
-            if with_uv:
-                lines.append(f"f {a}/{a}/{a} {b}/{b}/{b} {c}/{c}/{c}")
-                lines.append(f"f {a}/{a}/{a} {c}/{c}/{c} {d}/{d}/{d}")
-            else:
-                lines.append(f"f {a}//{a} {b}//{b} {c}//{c}")
-                lines.append(f"f {a}//{a} {c}//{c} {d}//{d}")
+            lines.append(f"f {a}/{a}/{a} {b}/{b}/{b} {c}/{c}/{c}")
+            lines.append(f"f {a}/{a}/{a} {c}/{c}/{c} {d}/{d}/{d}")
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
@@ -296,6 +294,10 @@ def write_water_obj(path: Path, size_m: float, water_col: str):
     for i in range(n):
         for j in range(n):
             lines.append(f"v {ax[j] * M2CM:.1f} {ax[i] * M2CM:.1f} {y:.1f}")
+    # UV обязательны для импортёра UE (см. комментарий в write_terrain_obj)
+    for i in range(n):
+        for j in range(n):
+            lines.append(f"vt {j / (n - 1):.4f} {1.0 - i / (n - 1):.4f}")
     lines.append("vn 0 0 1")
     lines.append("usemtl water")
     for i in range(n - 1):
@@ -304,8 +306,8 @@ def write_water_obj(path: Path, size_m: float, water_col: str):
             b = i * n + j + 2
             c = (i + 1) * n + j + 2
             d = (i + 1) * n + j + 1
-            lines.append(f"f {a}//1 {b}//1 {c}//1")
-            lines.append(f"f {a}//1 {c}//1 {d}//1")
+            lines.append(f"f {a}/{a}/1 {b}/{b}/1 {c}/{c}/1")
+            lines.append(f"f {a}/{a}/1 {c}/{c}/1 {d}/{d}/1")
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     r, g, b = _hex2rgb(water_col)
     path.with_suffix(".mtl").write_text(

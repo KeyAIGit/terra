@@ -102,6 +102,68 @@ BELIEFS = (
 BI = {b: i for i, b in enumerate(BELIEFS)}
 N_BELIEF = len(BELIEFS)
 
+# ── прожитая жизнь: то, что копится в ОДНОМ человеке и умирает вместе с ним ──
+#
+# Знание цивилизации живёт в repertoire народа. Но народ — это не хранилище:
+# всё, что «умеет общество», на деле держится в руках и головах живых людей.
+# Здесь — их личный, невоспроизводимый капитал: чему научились руки, что
+# запомнили глаза, что оставили на человеке голод, война и мор. Ничего из
+# этого не наследуется автоматически. Либо мастер успел научить — либо с его
+# смертью умение исчезает, даже если «в народе оно записано».
+DOMAINS = ("forage", "farm", "craft", "war", "ritual",
+           "trade", "letters", "heal", "build", "rule")
+DI = {d: i for i, d in enumerate(DOMAINS)}
+N_DOM = len(DOMAINS)
+DOMAIN_RU = {
+    "forage": "промысел", "farm": "земледелие", "craft": "ремесло", "war": "война",
+    "ritual": "обряд", "trade": "торг", "letters": "счёт и письмо", "heal": "врачевание",
+    "build": "строительство", "rule": "управление",
+}
+
+# какое действие какое умение упражняет (действие → [(домен, доля)])
+ACT_PRACTICE: dict[str, tuple[tuple[str, float], ...]] = {
+    "subsist": (("@subsist", 1.0),),          # @subsist → уклад народа (промысел/земледелие)
+    "intensify": (("@subsist", 0.75), ("farm", 0.35)),
+    "store": (("@subsist", 0.35), ("craft", 0.35)),
+    "experiment": (("craft", 0.70), ("letters", 0.20)),
+    "teach": (("@best", 0.45), ("ritual", 0.15)),
+    "migrate": (("forage", 0.55),),
+    "raid": (("war", 1.0),),
+    "defend": (("war", 0.65), ("build", 0.25)),
+    "trade": (("trade", 1.0), ("letters", 0.20)),
+    "build": (("build", 1.0), ("craft", 0.30)),
+    "worship": (("ritual", 1.0),),
+    "climb": (("rule", 0.85), ("trade", 0.15)),
+    "rebel": (("war", 0.5), ("rule", 0.5)),
+    "care": (("heal", 0.85),),
+}
+
+# домены, которые слабеют с возрастом (тело), и те, что не слабеют (голова)
+_DOM_PHYSICAL = np.zeros(N_DOM, dtype=np.float32)
+for _d, _v in (("forage", 1.0), ("farm", 0.75), ("war", 1.25), ("build", 0.7),
+               ("craft", 0.3), ("trade", 0.15)):
+    _DOM_PHYSICAL[DI[_d]] = _v
+
+# ── шрамы: пережитое, что остаётся на человеке до смерти ───────────────────
+SCARS = ("hunger", "violence", "plague", "loss", "collapse", "glory")
+SI = {s: i for i, s in enumerate(SCARS)}
+N_SCAR = len(SCARS)
+SCAR_RU = {
+    "hunger": "голод", "violence": "насилие", "plague": "мор",
+    "loss": "утрата близких", "collapse": "крушение порядка", "glory": "торжество",
+}
+
+N_MEM = 6            # сколько отдельных событий человек помнит поимённо
+MEM_KINDS = ("none", "hunger", "violence", "plague", "loss", "collapse", "glory",
+             "discovery", "birth", "power", "journey", "faith")
+MI = {k: i for i, k in enumerate(MEM_KINDS)}
+MEM_RU = {
+    "hunger": "голодный год", "violence": "война", "plague": "мор",
+    "loss": "смерть близкого", "collapse": "крушение державы", "glory": "торжество",
+    "discovery": "открытие", "birth": "рождение ребёнка", "power": "власть",
+    "journey": "уход с родных мест", "faith": "явление божества",
+}
+
 
 class Cohort:
     """Все живые симулируемые люди мира в одной структуре массивов."""
@@ -109,7 +171,14 @@ class Cohort:
     __slots__ = ("cap", "n", "free", "aid", "polity", "born", "sex", "y", "x",
                  "alive", "traits", "needs", "belief", "prestige", "wealth",
                  "power", "health", "skill", "role", "mate", "kin_group",
-                 "last_act", "valence", "children", "notable", "seed_counter")
+                 "last_act", "valence", "children", "notable", "seed_counter",
+                 # прожитая жизнь (умирает с человеком, если не передана)
+                 "mastery", "lore", "scars", "mem_kind", "mem_year", "mem_val",
+                 "mem_p", "taught", "teacher")
+
+    # поля, добавленные позже: старые чекпоинты дозаполняются при загрузке
+    _LATE = ("mastery", "lore", "scars", "mem_kind", "mem_year", "mem_val",
+             "mem_p", "taught", "teacher")
 
     def __init__(self, cap: int = 60000):
         self.cap = cap
@@ -139,6 +208,50 @@ class Cohort:
         self.children = z(cap, dtype=np.int16)
         self.notable = z(cap, dtype=bool)
         self.seed_counter = 0
+        # ── прожитая жизнь ──
+        self.mastery = z((cap, N_DOM), dtype=np.float32)   # чему научились руки
+        self.lore = z(cap, dtype=np.float32)               # доля знания своего народа
+        self.scars = z((cap, N_SCAR), dtype=np.float32)    # что оставило пережитое
+        self.mem_kind = z((cap, N_MEM), dtype=np.int8)     # что человек помнит
+        self.mem_year = z((cap, N_MEM), dtype=np.int32)
+        self.mem_val = z((cap, N_MEM), dtype=np.float32)
+        self.mem_p = z(cap, dtype=np.int8)                 # куда писать следующее
+        self.taught = z(cap, dtype=np.int16)               # скольких успел научить
+        self.teacher = z(cap, dtype=np.int32) - 1          # у кого учился
+
+    # ── чекпоинты ──
+    def __getstate__(self):
+        return {k: getattr(self, k) for k in self.__slots__}
+
+    def __setstate__(self, st):
+        for k in self.__slots__:
+            if k in st:
+                setattr(self, k, st[k])
+        # старые миры: полей прожитой жизни не было — заводим пустыми
+        cap = st["cap"]
+        for k in self._LATE:
+            if k in st:
+                continue
+            if k == "mastery":
+                v = np.zeros((cap, N_DOM), dtype=np.float32)
+                v[:, DI["forage"]] = st["skill"]           # прежний общий навык
+            elif k == "scars":
+                v = np.zeros((cap, N_SCAR), dtype=np.float32)
+            elif k == "mem_kind":
+                v = np.zeros((cap, N_MEM), dtype=np.int8)
+            elif k == "mem_year":
+                v = np.zeros((cap, N_MEM), dtype=np.int32)
+            elif k == "mem_val":
+                v = np.zeros((cap, N_MEM), dtype=np.float32)
+            elif k == "mem_p":
+                v = np.zeros(cap, dtype=np.int8)
+            elif k == "taught":
+                v = np.zeros(cap, dtype=np.int16)
+            elif k == "teacher":
+                v = np.zeros(cap, dtype=np.int32) - 1
+            else:                                          # lore
+                v = np.full(cap, 0.35, dtype=np.float32)
+            setattr(self, k, v)
 
     # ── создание и смерть ──
     def spawn(self, rng, polity: int, year: int, y: int, x: int,
@@ -184,6 +297,16 @@ class Cohort:
         self.valence[i] = 0.0
         self.children[i] = 0
         self.notable[i] = False
+        # человек рождается пустым: ни умения, ни знания, ни памяти
+        self.mastery[i] = 0.0
+        self.lore[i] = 0.0
+        self.scars[i] = 0.0
+        self.mem_kind[i] = 0
+        self.mem_year[i] = 0
+        self.mem_val[i] = 0.0
+        self.mem_p[i] = 0
+        self.taught[i] = 0
+        self.teacher[i] = -1
         return i
 
     def spawn_many(self, rng, polity: int, year: int, mothers: np.ndarray,
@@ -232,6 +355,16 @@ class Cohort:
         self.valence[i] = 0.0
         self.children[i] = 0
         self.notable[i] = False
+        # ребёнок не наследует ни ремесла, ни памяти родителей — только их учат
+        self.mastery[i] = 0.0
+        self.lore[i] = 0.0
+        self.scars[i] = 0.0
+        self.mem_kind[i] = 0
+        self.mem_year[i] = 0
+        self.mem_val[i] = 0.0
+        self.mem_p[i] = 0
+        self.taught[i] = 0
+        self.teacher[i] = -1
         np.add.at(self.children, mothers, 1)
         np.add.at(self.children, fathers, 1)
         return i
@@ -372,6 +505,46 @@ def choose_actions(rng, co: Cohort, idx, ctx: dict, temperature: float = 0.55) -
     U[:, AI["build"]] += 1.2 * co.power[idx]
     U[:, AI["rebel"]] -= 2.0 * co.power[idx]
 
+    # ── прожитое: человек выбирает не только по нужде, но и по памяти ──
+    S = co.scars[idx]
+    s_hun, s_vio = S[:, SI["hunger"]], S[:, SI["violence"]]
+    s_pla, s_los = S[:, SI["plague"]], S[:, SI["loss"]]
+    s_col, s_glo = S[:, SI["collapse"]], S[:, SI["glory"]]
+    # переживший голод копит впрок даже в изобилии — до самой смерти
+    U[:, AI["store"]] += 1.35 * s_hun
+    U[:, AI["intensify"]] += 0.75 * s_hun
+    U[:, AI["experiment"]] -= 0.45 * s_hun          # осторожность выученного голода
+    # переживший войну укрепляется и не доверяет
+    U[:, AI["defend"]] += 1.25 * s_vio
+    U[:, AI["trade"]] -= 0.55 * s_vio
+    U[:, AI["raid"]] += 0.45 * s_vio * T[:, TI["aggression"]]
+    # мор гонит к богам и с места
+    U[:, AI["worship"]] += 0.95 * s_pla
+    U[:, AI["migrate"]] += 0.55 * s_pla
+    # потерявший близких держится за родню
+    U[:, AI["care"]] += 1.05 * s_los
+    # видевший крушение державы не верит в порядок
+    U[:, AI["build"]] -= 0.65 * s_col
+    U[:, AI["rebel"]] += 0.55 * s_col
+    U[:, AI["climb"]] -= 0.35 * s_col
+    # знавший торжество тянется к нему снова
+    U[:, AI["climb"]] += 0.85 * s_glo
+    U[:, AI["build"]] += 0.35 * s_glo
+
+    # мастерство: человек тянется делать то, что умеет лучше всего
+    M = co.mastery[idx]
+    U[:, AI["intensify"]] += 0.55 * M[:, DI["farm"]]
+    U[:, AI["experiment"]] += 0.85 * M[:, DI["craft"]] + 0.45 * co.lore[idx]
+    U[:, AI["raid"]] += 0.60 * M[:, DI["war"]]
+    U[:, AI["defend"]] += 0.45 * M[:, DI["war"]]
+    U[:, AI["trade"]] += 0.75 * M[:, DI["trade"]]
+    U[:, AI["build"]] += 0.70 * M[:, DI["build"]]
+    U[:, AI["worship"]] += 0.60 * M[:, DI["ritual"]]
+    U[:, AI["climb"]] += 0.55 * M[:, DI["rule"]]
+    U[:, AI["care"]] += 0.50 * M[:, DI["heal"]]
+    # мастеру есть что передать — и он это чувствует
+    U[:, AI["teach"]] += 0.9 * M.max(axis=1) * np.clip(age / 45.0, 0.2, 1.4) + 0.5 * co.lore[idx]
+
     # запрещённые в данном обществе действия
     for a in ctx.get("blocked", ()):
         U[:, AI[a]] = -50.0
@@ -392,7 +565,11 @@ def learn_from_outcome(co: Cohort, idx, acts, outcome: np.ndarray, dt: float):
     """Убеждения правятся личным опытом. Медленно и с перекосом к недавнему."""
     if idx.size == 0:
         return
-    lr = np.clip(0.06 * dt * (1.4 - co.traits[idx, TI["conformity"]]), 0.01, 0.35)
+    # чем больше человек пережил, тем неохотнее он пересматривает картину мира:
+    # обжёгшийся не переучивается от одного удачного года
+    hard = np.clip(co.scars[idx].sum(axis=1) * 0.28, 0, 0.75)
+    lr = np.clip(0.06 * dt * (1.4 - co.traits[idx, TI["conformity"]]) * (1.0 - hard),
+                 0.004, 0.35)
     good = outcome > 0
     # «новое работает» правится только если человек пробовал новое
     tried = (acts == AI["experiment"]) | (acts == AI["migrate"]) | (acts == AI["trade"])
@@ -410,6 +587,15 @@ def learn_from_outcome(co: Cohort, idx, acts, outcome: np.ndarray, dt: float):
     co.belief[idx, BI["scarcity"]] += lr * 0.5 * (
         np.clip(co.needs[idx, NI["food"]], 0, 1) - co.belief[idx, BI["scarcity"]]) \
         * np.where(co.needs[idx, NI["food"]] > co.belief[idx, BI["scarcity"]], 1.6, 0.45)
+    # шрамы тянут убеждения на всю жизнь, независимо от того, как идут дела
+    S = co.scars[idx]
+    co.belief[idx, BI["scarcity"]] += lr * 0.9 * np.clip(S[:, SI["hunger"]] - co.belief[idx, BI["scarcity"]], 0, None)
+    co.belief[idx, BI["danger"]] += lr * 0.9 * np.clip(S[:, SI["violence"]] - co.belief[idx, BI["danger"]], 0, None)
+    co.belief[idx, BI["divine"]] += lr * 0.7 * np.clip(S[:, SI["plague"]] - co.belief[idx, BI["divine"]], 0, None)
+    co.belief[idx, BI["authority"]] -= lr * 0.8 * S[:, SI["collapse"]]
+    co.belief[idx, BI["trust"]] -= lr * 0.5 * S[:, SI["violence"]]
+    # шрамы медленно бледнеют, но никогда не исчезают полностью
+    co.scars[idx] = np.clip(S * (1.0 - 0.004 * dt), 0, 1.5)
     co.valence[idx] += 0.2 * dt * (outcome - co.valence[idx])
     np.clip(co.belief[idx], 0.02, 0.98, out=co.belief[idx])
 
@@ -438,9 +624,14 @@ def social_learning(rng, co: Cohort, idx, dt: float, openness: float = 1.0):
     target = (amb * elite_mean + (1.0 - amb) * crowd_mean)
     co.belief[idx] = np.clip(B + strength * conf * (target - B), 0.02, 0.98)
 
-    # черты не наследуются подражанием, но навык — да
-    sk_elite = co.skill[idx][elite].mean()
-    co.skill[idx] += strength * 0.35 * conf[:, 0] * np.clip(sk_elite - co.skill[idx], 0, None)
+    # черты не наследуются подражанием, а вот ремесло подсматривают —
+    # но подсмотренное берётся много хуже, чем переданное из рук в руки
+    M_elite = co.mastery[idx][elite].mean(axis=0)[None, :]
+    co.mastery[idx] = np.clip(
+        co.mastery[idx] + strength * 0.12 * conf * np.clip(M_elite - co.mastery[idx], 0, None),
+        0, 1)
+    Mn = co.mastery[idx]
+    co.skill[idx] = np.clip(0.72 * Mn.max(axis=1) + 0.28 * Mn.mean(axis=1), 0, 1)
 
 
 def indoctrinate(co: Cohort, idx, values: dict, strength: float):
@@ -454,6 +645,229 @@ def indoctrinate(co: Cohort, idx, values: dict, strength: float):
             continue
         co.belief[idx, j] += strength * conf * (tgt - co.belief[idx, j])
     np.clip(co.belief[idx], 0.02, 0.98, out=co.belief[idx])
+
+
+# ────────────────────────────────────────────────────────────────────────────
+#  ПРОЖИТАЯ ЖИЗНЬ: личный капитал, который умирает вместе с человеком
+# ────────────────────────────────────────────────────────────────────────────
+def _act_domains(act_i: int, subsist_dom: int, best_dom: np.ndarray | None = None):
+    """Раскладка действия по доменам умений. '@subsist' зависит от уклада народа."""
+    out = []
+    for dom, share in ACT_PRACTICE[ACTIONS[act_i]]:
+        if dom == "@subsist":
+            out.append((subsist_dom, share))
+        elif dom == "@best":
+            out.append((-1, share))            # -1 = «то, что человек знает лучше всего»
+        else:
+            out.append((DI[dom], share))
+    return out
+
+
+def practice(co: Cohort, idx, acts, year: int, dt: float,
+             subsist_dom: int = 0, lore_supply: float = 0.5):
+    """Умение растёт только от дела. Не от возраста и не от происхождения.
+
+    Мастерство копится всю жизнь: молодые растут быстро, старики — медленно,
+    но и теряют мало. Тело слабеет (война, промысел), голова — нет (обряд,
+    письмо, управление): поэтому старики и становятся хранителями.
+    Потолок мастерства ограничен тем, что вообще умеет цивилизация вокруг:
+    нельзя стать великим кузнецом там, где никто не знает металла.
+    """
+    if idx.size == 0:
+        return
+    age = (year - co.born[idx]).astype(np.float32)
+    T = co.traits[idx]
+    dil, cur, pat = T[:, TI["diligence"]], T[:, TI["curiosity"]], T[:, TI["patience"]]
+
+    # чего вообще можно достичь в этом обществе и с этим характером
+    ceiling = np.clip((0.34 + 0.52 * dil + 0.22 * cur)
+                      * (0.42 + 0.58 * np.clip(lore_supply, 0, 1))
+                      * (0.55 + 0.45 * co.lore[idx]), 0.06, 1.0)[:, None]
+    # Скорость обучения падает с возрастом, но не исчезает. Темп подобран так,
+    # чтобы мастерство набиралось ДЕСЯТИЛЕТИЯМИ: в двадцать пять человек умеет
+    # заметно меньше, чем в пятьдесят, — и это различие видно в его работе.
+    plastic = np.clip(1.45 - age / 44.0, 0.30, 1.45)
+    rate = (0.030 * dt * plastic * (0.45 + 0.75 * dil))[:, None]
+
+    # что именно человек делал в этом такте
+    prac = np.zeros((idx.size, N_DOM), dtype=np.float32)
+    best = np.argmax(co.mastery[idx], axis=1)
+    for a_i in range(N_ACT):
+        sel = acts == a_i
+        if not sel.any():
+            continue
+        for dom, share in _act_domains(a_i, subsist_dom):
+            if dom < 0:                                   # «своё лучшее ремесло»
+                np.add.at(prac, (np.flatnonzero(sel), best[sel]), share)
+            else:
+                prac[sel, dom] += share
+    np.clip(prac, 0, 1.4, out=prac)
+
+    M = co.mastery[idx]
+    grow = rate * prac * np.clip(ceiling - M, 0, None)
+    # что не упражняли — тихо ржавеет; руки помнят долго, поэтому темп мал
+    rust = 0.008 * dt * (prac <= 0.02) * M * (1.35 - 0.5 * pat[:, None])
+    # тело стареет: физические умения уходят после шестидесяти
+    frail = np.clip((age - 58.0) / 34.0, 0, 1)[:, None] * _DOM_PHYSICAL[None, :]
+    co.mastery[idx] = np.clip(M + grow - rust - 0.020 * dt * frail * M, 0.0, 1.0)
+
+    # сводный «навык» для остального кода — то, в чём человек хорош
+    Mn = co.mastery[idx]
+    co.skill[idx] = np.clip(0.72 * Mn.max(axis=1) + 0.28 * Mn.mean(axis=1), 0, 1)
+
+
+def absorb_lore(co: Cohort, idx, year: int, share: float, teaching: float, dt: float):
+    """Сколько знания своего народа человек успел вобрать лично.
+
+    В маленькой общине взрослый знает почти всё, что знает община. В большой
+    культуре — лишь часть: знания стало больше, чем помещается в одну голову,
+    и держится оно уже не памятью, а письмом, школами и цехами. Отсюда и
+    хрупкость больших обществ: рушатся институты — и знание некому нести.
+
+    `share` — какая доля общего знания вообще достижима одному человеку.
+    """
+    if idx.size == 0:
+        return
+    age = (year - co.born[idx]).astype(np.float32)
+    plastic = np.clip(1.30 - age / 34.0, 0.14, 1.30)
+    cur = co.traits[idx, TI["curiosity"]]
+    conf = co.traits[idx, TI["conformity"]]
+    rate = np.clip(0.055 * dt * plastic * (0.40 + 0.6 * cur + 0.4 * conf)
+                   * (0.45 + 1.1 * np.clip(teaching, 0, 1)), 0, 0.7)
+    tgt = float(np.clip(share, 0, 1))
+    # без передачи знание тускнеет и в отдельной голове — но медленно
+    fade = 0.0035 * dt * (1.0 - np.clip(teaching, 0, 1))
+    co.lore[idx] = np.clip(co.lore[idx] + rate * (tgt - co.lore[idx]) - fade, 0, 1)
+
+
+def apprentice(rng, co: Cohort, idx, acts, year: int, dt: float) -> int:
+    """Передача из рук в руки — единственный мост между жизнью и культурой.
+
+    Мастер, выбравший «учить», отдаёт часть своего умения молодым. Ничего
+    не передаётся само: если поколение мастеров умерло, не успев научить,
+    умение исчезает, даже если народ «в целом им владеет».
+    Возвращает число состоявшихся передач.
+    """
+    if idx.size < 2:
+        return 0
+    # учит не только тот, кто «взялся учить»: половина передачи идёт через
+    # обычную заботу о детях — рядом с матерью и отцом ребёнок и учится делу
+    formal = acts == AI["teach"]
+    caring = (acts == AI["care"]) & (co.children[idx] > 0)
+    teachers = idx[formal | caring]
+    if teachers.size == 0:
+        return 0
+    t_str = np.where(formal[formal | caring], 1.0, 0.45).astype(np.float32)
+    age = year - co.born[idx]
+    pupils = idx[(age >= 6) & (age <= 30)]
+    if pupils.size == 0:
+        return 0
+    # ученик достаётся мастеру по кругу — детерминированно, без случайных пар
+    order = np.argsort(co.mastery[pupils].max(axis=1))       # сперва самые неумелые
+    pupils = pupils[order]
+    k = min(pupils.size, teachers.size * 3)
+    pupils = pupils[:k]
+    pick = np.arange(k) % teachers.size
+    tt = teachers[pick]
+
+    Mt, Mp = co.mastery[tt], co.mastery[pupils]
+    quality = (0.30 + 0.45 * co.traits[tt, TI["patience"]]
+               + 0.35 * co.traits[tt, TI["sociability"]]
+               + 0.25 * co.prestige[tt]) * t_str[pick]
+    take = (0.22 + 0.55 * co.traits[pupils, TI["curiosity"]]
+            + 0.30 * co.traits[pupils, TI["conformity"]])
+    gain = np.clip(0.40 * dt * quality * take, 0, 0.9)[:, None]
+    co.mastery[pupils] = np.clip(Mp + gain * np.clip(Mt - Mp, 0, None), 0, 1)
+    # вместе с ремеслом переходит и доля знания народа
+    lg = np.clip(0.35 * dt * quality * take, 0, 0.8)
+    co.lore[pupils] = np.clip(co.lore[pupils]
+                              + lg * np.clip(co.lore[tt] - co.lore[pupils], 0, None), 0, 1)
+    co.teacher[pupils] = np.where(co.teacher[pupils] < 0, tt, co.teacher[pupils])
+    np.add.at(co.taught, tt, 1)
+    co.prestige[tt] += 0.012 * dt
+    return int(k)
+
+
+def imprint(co: Cohort, idx, kind: str, intensity: float, year: int,
+            note_val: float | None = None):
+    """Пережитое оставляет след на всю оставшуюся жизнь.
+
+    Голод в детстве — и человек до старости копит впрок. Война — и он до
+    смерти не верит чужим. Это не «параметр общества»: это личный опыт,
+    который не передаётся детям и исчезает, когда поколение уходит.
+    """
+    if idx.size == 0 or intensity <= 0:
+        return
+    j = SI.get(kind)
+    if j is not None:
+        s = co.scars[idx, j]
+        # чем свежее человек, тем глубже след: детская травма прочнее взрослой
+        co.scars[idx, j] = np.clip(s + intensity * (1.0 - 0.55 * s), 0, 1.5)
+    remember(co, idx, kind if kind in MI else "glory", year,
+             note_val if note_val is not None else -intensity)
+
+
+def remember(co: Cohort, idx, kind: str, year: int, val: float = 0.0):
+    """Кольцо личной памяти: что человек будет помнить и о чём заговорит."""
+    if idx.size == 0:
+        return
+    k = MI.get(kind)
+    if not k:
+        return
+    p = co.mem_p[idx].astype(np.int64) % N_MEM
+    co.mem_kind[idx, p] = k
+    co.mem_year[idx, p] = year
+    co.mem_val[idx, p] = val
+    co.mem_p[idx] = ((p + 1) % N_MEM).astype(np.int8)
+
+
+def scar_pressure(co: Cohort, idx) -> dict:
+    """Как пережитое давит на выбор — читается в choose_actions."""
+    S = co.scars[idx]
+    return {
+        "hunger": S[:, SI["hunger"]], "violence": S[:, SI["violence"]],
+        "plague": S[:, SI["plague"]], "loss": S[:, SI["loss"]],
+        "collapse": S[:, SI["collapse"]], "glory": S[:, SI["glory"]],
+    }
+
+
+def generation_grip(co: Cohort, idx, year: int) -> float:
+    """Насколько крепко ЖИВОЕ поколение держит знание своего народа (0..1).
+
+    Это и есть связка личного с общим: repertoire народа осыпается не по
+    абстрактному «стрессу», а потому что умерли те, кто умел, и никто не
+    успел перенять. Считается по доле знания у взрослых и по мастерству.
+    """
+    if idx.size == 0:
+        return 0.0
+    age = year - co.born[idx]
+    adults = idx[age >= 14]
+    if adults.size == 0:
+        return float(np.clip(co.lore[idx].mean(), 0, 1))
+    lore = float(co.lore[adults].mean())
+    mast = float(co.mastery[adults].max(axis=1).mean())
+    # старики — хранители: их доля повышает удержание
+    elders = float((year - co.born[adults] >= 45).mean())
+    return float(np.clip(0.55 * lore + 0.30 * mast + 0.15 * elders, 0, 1))
+
+
+def life_story(co: Cohort, i: int, year: int) -> dict:
+    """Что этот человек умеет, что пережил и что помнит — для летописи и NPC."""
+    i = int(i)
+    M = co.mastery[i]
+    top = np.argsort(-M)[:3]
+    crafts = [(DOMAINS[int(j)], round(float(M[j]), 2)) for j in top if M[j] > 0.12]
+    sc = {SCARS[j]: round(float(v), 2) for j, v in enumerate(co.scars[i]) if v > 0.12}
+    mem = []
+    for s in range(N_MEM):
+        k = int(co.mem_kind[i, s])
+        if k:
+            mem.append({"kind": MEM_KINDS[k], "year": int(co.mem_year[i, s]),
+                        "val": round(float(co.mem_val[i, s]), 2)})
+    mem.sort(key=lambda m: m["year"])
+    return {"age": int(year - co.born[i]), "crafts": crafts, "scars": sc,
+            "lore": round(float(co.lore[i]), 2), "memories": mem,
+            "taught": int(co.taught[i]), "had_teacher": bool(co.teacher[i] >= 0)}
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -525,17 +939,15 @@ def pair_and_breed(rng, co: Cohort, idx, year: int, fertility_mod: float,
 
 
 def age_effects(co: Cohort, idx, year: int, dt: float):
-    """Навык и здоровье с возрастом."""
+    """Здоровье с возрастом. Умение здесь НЕ растёт — только от дела (practice)."""
     if idx.size == 0:
         return
     age = year - co.born[idx]
-    learn_rate = np.clip(0.055 * dt * (0.35 + co.traits[idx, TI["diligence"]]), 0, 0.5)
-    ceiling = np.clip(0.25 + 0.75 * co.traits[idx, TI["diligence"]], 0.2, 1.0)
-    growing = age < 45
-    co.skill[idx] += np.where(growing, learn_rate * (ceiling - co.skill[idx]), -0.004 * dt)
-    np.clip(co.skill[idx], 0.0, 1.0, out=co.skill[idx])
     decline = np.clip((age - 45) / 45.0, 0, 1)
-    co.health[idx] = np.clip(1.0 - 0.55 * decline, 0.2, 1.0)
+    # пережитый голод и мор укорачивают жизнь спустя десятилетия
+    worn = np.clip(0.10 * co.scars[idx, SI["hunger"]] + 0.08 * co.scars[idx, SI["plague"]]
+                   + 0.05 * co.scars[idx, SI["violence"]], 0, 0.22)
+    co.health[idx] = np.clip(1.0 - 0.55 * decline - worn, 0.2, 1.0)
 
 
 # ────────────────────────────────────────────────────────────────────────────

@@ -428,6 +428,73 @@ for t in _CATALOG:
     for k, v in t.effects.items():
         _EFF[t.tid, _EI[k]] = v
 
+# ── чьими руками держится знание ────────────────────────────────────────────
+# Каждое умение народа кто-то физически умеет. Здесь — к какому людскому делу
+# (домену мастерства из agents.DOMAINS) относится каждое знание: если умирают
+# последние мастера этого дела, знание перестаёт быть живым.
+# Домен выбирается по весу: чему знание служит сильнее всего — и что при этом
+# делают руки. Не «правило поверх правила», а взвешенный максимум.
+_DOM_EFFECT_W = {
+    "war": {"military": 1.0, "siege": 1.3, "defense": 0.9},
+    "letters": {"literacy": 1.6, "info": 1.1, "retention": 1.3},
+    "heal": {"health": 1.0, "plague_resist": 1.5},
+    "trade": {"trade": 1.2, "trade_range": 1.1, "trade_good": 0.9,
+              "prestige_goods": 0.8},
+    "ritual": {"legitimacy": 1.45, "meaning": 1.9, "cohesion": 1.1},
+    "rule": {"admin": 1.2, "complexity": 1.0, "surplus_extract": 1.0,
+             "scale": 1.0, "inequality": 0.35},
+    "build": {"labor": 1.0, "urban": 1.3, "defense": 0.5},
+    "farm": {"yield": 1.3, "fertility": 1.0, "soil_restore": 1.0, "food": 0.75,
+             "storage": 0.9, "famine_buffer": 1.0, "mode:horticulture": 1.3,
+             "mode:agrarian": 1.3, "mode:intensive": 1.3, "mode:pastoral": 1.3},
+    "forage": {"marine_bonus": 1.3, "mobility": 0.7, "sea": 0.9},
+}
+# ремесло опознаётся не по пользе для общества, а по тому, ЧТО делают руки
+_DOM_GIVES_W = {
+    "craft": {"smelt": 1.7, "cure": 1.1, "weave": 1.1, "ferment": 1.1,
+              "heat": 0.9, "grind": 0.7, "contain": 0.95, "cut": 0.35,
+              "bind": 0.35},
+    "ritual": {"signal": 0.7},
+    "heal": {"cure": 0.4},
+    "build": {"lever": 0.7, "shelter": 0.8, "traction": 0.5},
+    "letters": {"record": 1.4, "count": 1.2, "measure": 0.9, "predict": 1.0},
+    "war": {"project": 0.8, "armor": 1.0, "pierce": 0.4},
+    "forage": {"float": 0.6, "propel": 0.5},
+    "farm": {"irrigate": 1.2, "store": 0.5},
+    "rule": {"organize": 1.2, "signal": 0.6},
+    "trade": {"carry": 0.6},
+}
+_DOM_NAMES = tuple(sorted(set(_DOM_EFFECT_W) | set(_DOM_GIVES_W)))
+
+TECH_DOMAIN = ["craft"] * N_TECH
+for _t in _CATALOG:
+    _best, _bs = "craft", 0.30          # порог: иначе всё безымянное — ремесло
+    for _d in _DOM_NAMES:
+        _s = sum(w * float(_t.effects.get(k, 0.0))
+                 for k, w in _DOM_EFFECT_W.get(_d, {}).items())
+        _s += sum(w * float(_t.gives.get(a, 0.0))
+                  for a, w in _DOM_GIVES_W.get(_d, {}).items())
+        if _s > _bs:
+            _best, _bs = _d, _s
+    TECH_DOMAIN[_t.tid] = _best
+
+
+def forget_domain(rep: "Repertoire", domain: str, strength: float = 0.3) -> None:
+    """Умер последний мастер — знания этого дела теряют хватку.
+
+    Не стирает знание разом: подтачивает хватку, а добьёт обычное забвение.
+    Так и выглядит настоящая утрата ремесла — не событие, а вымирание рук.
+    """
+    if strength <= 0 or not rep.known.any():
+        return
+    sel = np.array([i for i in range(N_TECH)
+                    if TECH_DOMAIN[i] == domain and rep.known[i]], dtype=np.int64)
+    if sel.size == 0:
+        return
+    rep.grip[sel] = np.maximum(0.0, rep.grip[sel]
+                               - float(strength) * (0.35 + 0.65 * _LOSSY[sel]))
+    rep.touch()
+
 
 # ────────────────────────────────────────────────────────────────────────────
 #  Состояние знаний народа

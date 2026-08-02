@@ -6,9 +6,11 @@
 #     original/hyde33_c7_base_mrt2023/zip/<СРЕЗ>.zip
 # (лендинг с DOI: https://public.yoda.uu.nl/geo/UU01/AEZZIT.html)
 #
-# Сейчас: ОДИН тестовый срез 2000BC_pop.zip -> Parquet-грид (lon, lat, value)
-# по popc (число людей на ячейку 5'); нулевые/NODATA-ячейки опущены.
-# Остальные срезы — в манифест pending_urls. Лицензия CC-BY-4.0.
+# Полный слой popc: все *_pop.zip срезы (10000BC..2023AD) -> Parquet-гриды
+# (lon, lat, value) по popc (число людей на ячейку 5'); нулевые/NODATA опущены.
+# Каждый срез — отдельный чанк slice_<файл> в манифесте: обрыв по бюджету
+# продолжается с места (`--source hyde`). lu-срезы (землепользование) остаются
+# в pending_urls до отдельного захода. Лицензия CC-BY-4.0.
 # Ярус R: HYDE — модельная реконструкция, а не прямое наблюдение.
 
 from __future__ import annotations
@@ -32,6 +34,16 @@ BASE = ("https://geo.public.data.uu.nl/vault-hyde/HYDE%203.3%5B1701183392%5D/"
         "original/hyde33_c7_base_mrt2023/zip/")
 TEST_SLICE = "2000BC_pop.zip"
 TEST_YEAR = -2000
+
+
+def _slice_year(fname: str) -> int:
+    """'10000BC_pop.zip' -> -10000; '0AD_pop.zip' -> 0; '2023AD_pop.zip' -> 2023."""
+    base = fname.split("_", 1)[0]
+    if base.endswith("BC"):
+        return -int(base[:-2])
+    if base.endswith("AD"):
+        return int(base[:-2])
+    raise ValueError(f"не разобран год среза: {fname}")
 
 
 def _asc_to_grid(path: str):
@@ -133,6 +145,42 @@ def fetch(ctx: common.Ctx) -> dict:
             "Ярус R: модельная реконструкция.", tier="R")
         man.mark_chunk(NAME, "srcrow", rows=1, files=paths)
 
+    # --- полный слой popc: закачка отложенных *_pop.zip хронологически ---
+    pend = man.src(NAME).get("pending_urls", [])
+    pop_urls = sorted((u for u in pend if u.endswith("_pop.zip")),
+                      key=lambda u: _slice_year(u.rsplit("/", 1)[1]))
+    for url in pop_urls:
+        fname = url.rsplit("/", 1)[1]
+        if man.chunk_done(NAME, "slice_" + fname):
+            continue
+        ctx.check(120)  # скачать (~30-60 МБ) + распарсить грид
+        year = _slice_year(fname)
+        zpath = common.download(ctx, url, common.raw_path(NAME, fname))
+        with zipfile.ZipFile(zpath) as z:
+            member = None
+            for n in z.namelist():
+                b = os.path.basename(n).lower()
+                if b.startswith("popc") and b.endswith(".asc"):
+                    member = n
+                    break
+            if member is None:
+                man.mark_chunk(NAME, "slice_" + fname, rows=0,
+                               note="нет popc_*.asc — пропущен")
+                common.drop_raw(NAME)
+                continue
+            ex_dir = common.raw_path(NAME, "asc")
+            z.extract(member, ex_dir)
+            asc = os.path.join(ex_dir, member)
+        lon, lat, val = _asc_to_grid(asc)
+        rel = _write_grid(out_dir, "popc", year, lon, lat, val, url)
+        man.mark_chunk(NAME, "slice_" + fname, rows=len(val), files=[rel])
+        common.drop_raw(NAME)
+        print(f"    hyde: popc {year:+d} — {len(val)} населённых ячеек")
+
     common.drop_raw(NAME)
+    n_done = 1 + sum(1 for u in pop_urls
+                     if man.chunk_done(NAME, "slice_" + u.rsplit("/", 1)[1]))
+    n_lu = sum(1 for u in pend if u.endswith("_lu.zip"))
     return {"status": "done",
-            "note": f"тестовый срез {TEST_SLICE}; остальное в pending_urls"}
+            "note": f"popc {n_done}/{len(pop_urls) + 1} срезов; "
+                    f"lu-срезы ({n_lu}) остаются в pending_urls"}
