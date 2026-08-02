@@ -18,6 +18,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+import pathlib
 from pathlib import Path
 
 RUNS = Path("runs")
@@ -358,6 +359,32 @@ def _summary(s):
 
 
 # ────────────────────────────────────────────────────────────────────────────
+def cmd_multiverse(a):
+    """Реестр вселенных: что в них совпало, а что разошлось."""
+    from . import multiverse as mv
+    root = a.runs
+    out = a.out or str(pathlib.Path(root) / "multiverse.html")
+    unis = mv.scan(root)
+    if not unis:
+        print(f"в {root} нет прогонов")
+        return
+    print(f"вселенных: {len(unis)}")
+    for u in unis:
+        print(f"  {u['name']:<18} сид {str(u['seed']):<4} "
+              f"до {mv._fmt_year(u['year_now']):<14} {mv._fmt_pop(u['pop_now']):>9}  "
+              f"знаний {u['tech_max']:>3}  крушений {u['stats']['collapses']}")
+    if len(unis) >= 2:
+        d = mv.divergence(unis[0], unis[1])
+        gap = d["mean_gap"]
+        print(f"\n{d['a']} против {d['b']}: "
+              + (f"вехи расходятся в среднем на {gap:.0f} лет" if gap
+                 else "общих вех нет")
+              + f", знаний {d['tech_delta']:+d}")
+    page = mv.build_multiverse(root, out)
+    js = mv.registry_json(root, str(pathlib.Path(out).with_suffix(".json")))
+    print(f"\nстраница: {page}\nреестр: {js}")
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser("terra", description="итеративный симулятор цивилизации")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -427,6 +454,11 @@ def main(argv=None):
     p.add_argument("run")
     p.add_argument("--limit", type=int, default=20)
     p.set_defaults(f=cmd_oracle)
+
+    p = sub.add_parser("multiverse", help="обзор всех вселенных и их расхождений")
+    p.add_argument("--runs", default="runs")
+    p.add_argument("-o", "--out", default=None)
+    p.set_defaults(f=cmd_multiverse)
 
     a = ap.parse_args(argv)
     a.f(a)

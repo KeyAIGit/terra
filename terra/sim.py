@@ -460,7 +460,7 @@ class Sim:
         # смерть в семье — это личное горе, которое человек носит до конца
         if dead_kin is not None and idx.size:
             bereaved = idx[np.isin(co.kin_group[idx], dead_kin)]
-            ag.imprint(co, bereaved, "loss", 0.16, self.year)
+            ag.imprint(co, bereaved, "loss", 0.05, self.year)
             if dead_mates is not None and dead_mates.size:
                 widowed = dead_mates[co.alive[dead_mates]]
                 ag.imprint(co, widowed, "loss", 0.34, self.year)
@@ -634,9 +634,14 @@ class Sim:
                     hint = None
             experimenters = idx[co.last_act[idx] == ag.AI["experiment"]]
             if experimenters.size == 0:
-                # в выборке из двух десятков человек искателя может не оказаться,
-                # хотя в народе их сотни — берём самых любопытных как их представителей
-                experimenters = idx[np.argsort(-co.traits[idx, ag.TI["curiosity"]])[:3]]
+                # В выборке из двух десятков человек искателя может не оказаться,
+                # хотя в народе их сотни. Их представителями берём тех, у кого
+                # для этого есть и склад ума, и набитая рука: новое чаще всего
+                # выходит из рук мастера, а не из чистого любопытства.
+                pick_score = (0.30 * co.mastery[idx, ag.DI["craft"]]
+                              + 0.55 * co.traits[idx, ag.TI["curiosity"]]
+                              + 0.20 * co.lore[idx])
+                experimenters = idx[np.argsort(-pick_score)[:3]]
             for _ in range(int(tries)):
                 if experimenters.size == 0:
                     break
@@ -644,11 +649,18 @@ class Sim:
                 # Открывает не «общество», а конкретный человек — и тем вернее,
                 # чем дольше он этим занимался и чем больше успел перенять.
                 # Поэтому мастер на седьмом десятке стоит десятка юнцов.
-                qual = float(0.16
-                             + 0.55 * co.mastery[who, ag.DI["craft"]]
-                             + 0.30 * co.lore[who]
-                             + 0.38 * co.traits[who, ag.TI["curiosity"]]
-                             + 0.12 * min(1.0, (self.year - co.born[who]) / 45.0))
+                # Мера того, насколько человек вообще годен для открытия:
+                # рука, набитая в ремесле, общая выучка и доля знания народа,
+                # которую он успел перенять. Подобрано так, чтобы средний
+                # искатель был примерно там же, где раньше был «навык», —
+                # новизна не в скорости прогресса, а в том, что теперь между
+                # юнцом и мастером есть настоящая разница.
+                skill_eff = float(np.clip(
+                    0.5 * co.mastery[who, ag.DI["craft"]]
+                    + 0.5 * co.mastery[who].max()
+                    + 0.35 * co.lore[who], 0, 1))
+                qual = float(0.30 + 0.5 * skill_eff
+                             + 0.45 * co.traits[who, ag.TI["curiosity"]])
                 expo = 0.35 * rep.effect("info") + 0.25 * poly.values.get("openness", 0.5)
                 tid = kn.attempt_discovery(self.rng, rep, mask, qual, expo, demand, headroom,
                                            hint=hint)
@@ -1469,6 +1481,9 @@ class Sim:
         rec["power"] = round(float(co.power[i]), 2)
         rec["wealth"] = round(float(co.wealth[i]), 2)
         rec["last_seen"] = self.year
+        # прожитая жизнь: чему выучились руки, что пережито, что помнится.
+        # Обновляем при каждом упоминании — человек продолжает жить.
+        rec["life"] = ag.life_story(co, i, self.year)
         return rec
 
     def _deed(self, poly, i, kind: str, text: str):

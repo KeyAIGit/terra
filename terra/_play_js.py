@@ -1395,11 +1395,22 @@ function fillCard(d){
   if(d.deeds&&d.deeds.length){ html+='<div class="sec">деяния</div>';
     d.deeds.forEach(function(dd){ html+='<div class="deed"><i>'+fmtYear(dd.y)+
       ':</i> '+dd.t+'</div>'; }); }
+  if(d.crafts&&d.crafts.length){ html+='<div class="sec">чему выучились руки</div>';
+    d.crafts.forEach(function(c){ html+='<span class="chip">'+c[0]+' '+
+      lvlWord(c[1])+'</span>'; }); }
+  if(d.scars&&Object.keys(d.scars).length){ html+='<div class="sec">пережитое</div>';
+    Object.keys(d.scars).forEach(function(k){ html+='<span class="chip scar">'+k+
+      ' '+lvlWord(d.scars[k])+'</span>'; }); }
+  if(d.memories&&d.memories.length){ html+='<div class="sec">помнит</div>';
+    d.memories.forEach(function(m){ html+='<div class="deed"><i>'+fmtYear(m.y)+
+      ':</i> '+m.k+'</div>'; }); }
   html+='<div class="sec">черты</div>';
   d.traits.forEach(function(t2){ html+='<span class="chip">'+t2[0]+' '+
     lvlWord(t2[1])+'</span>'; });
   html+='<div class="sec">убеждения</div>';
   d.beliefs.forEach(function(b2){ html+='<span class="chip">'+b2[0]+'</span>'; });
+  if(d.taught) html+='<div class="kv" style="margin-top:8px">выучил учеников: <b>'+
+    d.taught+'</b></div>';
   EL.dcard.innerHTML=html;
 }
 function lvlWord(v){ return v>0.75?'●●●':v>0.55?'●●':v>0.4?'●':'○'; }
@@ -1468,6 +1479,19 @@ function answer(u,topic){
     s+=pick(rng,ROLE_STORY[d.role]||ROLE_STORY.commoner)+' ';
     if(d.age>55) s+=pick(rng,['Годы мои уже немалые.','Мало кто доживает до моих лет.'])+' ';
     else if(d.age<22) s+='Я ещё молод, но своё дело знаю. ';
+    if(d.crafts&&d.crafts.length){
+      var cr=d.crafts[0];
+      s+=pick(rng,['Моё дело — '+cr[0]+', и рука у меня к нему привычная. ',
+        'Всю жизнь моё ремесло — '+cr[0]+'. ',
+        'Что умею, то умею: '+cr[0]+'. ']);
+      if(cr[1]>0.6&&d.age>45) s+='Учился этому дольше, чем иные живут. ';
+    }
+    if(d.taught>0) s+='Кое-кого я и сам выучил. ';
+    if(d.scars&&Object.keys(d.scars).length&&rng()<0.75){
+      var sk=Object.keys(d.scars)[0];
+      s+=pick(rng,['Через '+sk+' я прошёл, и это со мной осталось. ',
+        'Меня не переучишь: я знаю, что такое '+sk+'. ']);
+    }
     if(d.deeds&&d.deeds.length){ var dd=pick(rng,d.deeds);
       s+='Про меня в народе помнят: '+dd.t+' — это было в '+fmtYear(dd.y)+'.'; }
     else if(d.real) s+='Моё имя записано в книге людей этого мира.';
@@ -1529,6 +1553,20 @@ function dossier(u){
     return b[0]; }).join('; ')+'.');
   if(d.deeds&&d.deeds.length) out.push('Твои деяния: '+d.deeds.map(function(x){
     return fmtYear(x.y)+' — '+x.t; }).join('; ')+'.');
+  // Прожитая жизнь — главное, что отличает тебя от любого другого человека.
+  if(d.crafts&&d.crafts.length) out.push('Чему выучились твои руки за жизнь: '+
+    d.crafts.map(function(c){ return c[0]+' ('+Math.round(c[1]*100)+' из 100); '; })
+    .join('')+' Ты говоришь о своём деле уверенно и подробно, о чужом — как мирянин.');
+  if(d.scars&&Object.keys(d.scars).length) out.push('Что ты пережил и что оставило '+
+    'на тебе след навсегда: '+Object.keys(d.scars).map(function(k){
+      return k+' ('+Math.round(d.scars[k]*100)+' из 100)'; }).join(', ')+
+    '. Это влияет на твои решения до сих пор, даже когда всё хорошо.');
+  if(d.memories&&d.memories.length) out.push('Ты лично помнишь: '+
+    d.memories.map(function(m){ return fmtYear(m.y)+' — '+m.k; }).join('; ')+
+    '. Об этом ты рассказываешь как очевидец, а не с чужих слов.');
+  if(d.taught) out.push('Ты выучил '+d.taught+' учеников — своё умение ты передал.');
+  else if(d.crafts&&d.crafts.length&&d.age>45) out.push(
+    'Учеников у тебя нет: то, что ты умеешь, уйдёт с тобой. Ты об этом думаешь.');
   var evs=(S.events||[]).map(function(e){ return fmtYear(e.y)+' — '+e.t; });
   if(evs.length) out.push('События, которые помнит твой народ: '+evs.join(' '));
   out.push('Местность: '+S.biome_ru+(S.river?', рядом река':'')+

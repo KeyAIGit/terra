@@ -122,7 +122,9 @@ DOMAIN_RU = {
 
 # какое действие какое умение упражняет (действие → [(домен, доля)])
 ACT_PRACTICE: dict[str, tuple[tuple[str, float], ...]] = {
-    "subsist": (("@subsist", 1.0),),          # @subsist → уклад народа (промысел/земледелие)
+    # добывая пищу, человек попутно чинит и мастерит — отсюда и берутся руки,
+    # способные однажды придумать новое
+    "subsist": (("@subsist", 1.0), ("craft", 0.14)),
     "intensify": (("@subsist", 0.75), ("farm", 0.35)),
     "store": (("@subsist", 0.35), ("craft", 0.35)),
     "experiment": (("craft", 0.70), ("letters", 0.20)),
@@ -224,6 +226,9 @@ class Cohort:
         return {k: getattr(self, k) for k in self.__slots__}
 
     def __setstate__(self, st):
+        # старые чекпоинты писались протоколом по умолчанию: (None, {слоты})
+        if isinstance(st, tuple):
+            st = st[1] or {}
         for k in self.__slots__:
             if k in st:
                 setattr(self, k, st[k])
@@ -522,7 +527,7 @@ def choose_actions(rng, co: Cohort, idx, ctx: dict, temperature: float = 0.55) -
     U[:, AI["worship"]] += 0.95 * s_pla
     U[:, AI["migrate"]] += 0.55 * s_pla
     # потерявший близких держится за родню
-    U[:, AI["care"]] += 1.05 * s_los
+    U[:, AI["care"]] += 0.50 * s_los
     # видевший крушение державы не верит в порядок
     U[:, AI["build"]] -= 0.65 * s_col
     U[:, AI["rebel"]] += 0.55 * s_col
@@ -531,19 +536,23 @@ def choose_actions(rng, co: Cohort, idx, ctx: dict, temperature: float = 0.55) -
     U[:, AI["climb"]] += 0.85 * s_glo
     U[:, AI["build"]] += 0.35 * s_glo
 
-    # мастерство: человек тянется делать то, что умеет лучше всего
+    # Мастерство тянет человека к своему делу — но только тянет. Сделать этот
+    # рычаг сильным нельзя: умение растёт от дела, а дело выбирается по умению,
+    # и на масштабе народа такая петля сама себя разгоняет. Особенно война:
+    # воюющие становятся лучшими воинами, потому воюют ещё охотнее — и один
+    # народ съедает материк. Поэтому коэффициенты здесь намеренно скромные.
     M = co.mastery[idx]
-    U[:, AI["intensify"]] += 0.55 * M[:, DI["farm"]]
-    U[:, AI["experiment"]] += 0.85 * M[:, DI["craft"]] + 0.45 * co.lore[idx]
-    U[:, AI["raid"]] += 0.60 * M[:, DI["war"]]
-    U[:, AI["defend"]] += 0.45 * M[:, DI["war"]]
-    U[:, AI["trade"]] += 0.75 * M[:, DI["trade"]]
-    U[:, AI["build"]] += 0.70 * M[:, DI["build"]]
-    U[:, AI["worship"]] += 0.60 * M[:, DI["ritual"]]
-    U[:, AI["climb"]] += 0.55 * M[:, DI["rule"]]
-    U[:, AI["care"]] += 0.50 * M[:, DI["heal"]]
+    U[:, AI["intensify"]] += 0.30 * M[:, DI["farm"]]
+    U[:, AI["experiment"]] += 0.55 * M[:, DI["craft"]] + 0.30 * co.lore[idx]
+    U[:, AI["raid"]] += 0.22 * M[:, DI["war"]]
+    U[:, AI["defend"]] += 0.25 * M[:, DI["war"]]
+    U[:, AI["trade"]] += 0.35 * M[:, DI["trade"]]
+    U[:, AI["build"]] += 0.35 * M[:, DI["build"]]
+    U[:, AI["worship"]] += 0.30 * M[:, DI["ritual"]]
+    U[:, AI["climb"]] += 0.25 * M[:, DI["rule"]]
+    U[:, AI["care"]] += 0.25 * M[:, DI["heal"]]
     # мастеру есть что передать — и он это чувствует
-    U[:, AI["teach"]] += 0.9 * M.max(axis=1) * np.clip(age / 45.0, 0.2, 1.4) + 0.5 * co.lore[idx]
+    U[:, AI["teach"]] += 0.6 * M.max(axis=1) * np.clip(age / 45.0, 0.2, 1.4) + 0.35 * co.lore[idx]
 
     # запрещённые в данном обществе действия
     for a in ctx.get("blocked", ()):
@@ -630,8 +639,7 @@ def social_learning(rng, co: Cohort, idx, dt: float, openness: float = 1.0):
     co.mastery[idx] = np.clip(
         co.mastery[idx] + strength * 0.12 * conf * np.clip(M_elite - co.mastery[idx], 0, None),
         0, 1)
-    Mn = co.mastery[idx]
-    co.skill[idx] = np.clip(0.72 * Mn.max(axis=1) + 0.28 * Mn.mean(axis=1), 0, 1)
+    co.skill[idx] = _overall(co.mastery[idx])
 
 
 def indoctrinate(co: Cohort, idx, values: dict, strength: float):
@@ -663,6 +671,14 @@ def _act_domains(act_i: int, subsist_dom: int, best_dom: np.ndarray | None = Non
     return out
 
 
+def _overall(M: np.ndarray) -> np.ndarray:
+    """Общая умелость человека: главное дело плюс подспорье из соседних."""
+    if M.size == 0:
+        return np.zeros(M.shape[0], dtype=np.float32)
+    top3 = np.sort(M, axis=1)[:, -3:]
+    return np.clip(0.80 * top3[:, -1] + 0.20 * top3.mean(axis=1), 0, 1)
+
+
 def practice(co: Cohort, idx, acts, year: int, dt: float,
              subsist_dom: int = 0, lore_supply: float = 0.5):
     """Умение растёт только от дела. Не от возраста и не от происхождения.
@@ -679,15 +695,18 @@ def practice(co: Cohort, idx, acts, year: int, dt: float,
     T = co.traits[idx]
     dil, cur, pat = T[:, TI["diligence"]], T[:, TI["curiosity"]], T[:, TI["patience"]]
 
-    # чего вообще можно достичь в этом обществе и с этим характером
-    ceiling = np.clip((0.34 + 0.52 * dil + 0.22 * cur)
-                      * (0.42 + 0.58 * np.clip(lore_supply, 0, 1))
-                      * (0.55 + 0.45 * co.lore[idx]), 0.06, 1.0)[:, None]
+    # Чего вообще можно достичь в этом обществе и с этим характером.
+    # Мастер своего дела к старости должен доходить почти до предела умения —
+    # иначе в мире не бывает по-настоящему искусных рук, а без них не бывает
+    # ни тонкого ремесла, ни изобретений.
+    ceiling = np.clip((0.42 + 0.62 * dil + 0.24 * cur)
+                      * (0.55 + 0.45 * np.clip(lore_supply, 0, 1))
+                      * (0.75 + 0.25 * co.lore[idx]), 0.06, 1.0)[:, None]
     # Скорость обучения падает с возрастом, но не исчезает. Темп подобран так,
     # чтобы мастерство набиралось ДЕСЯТИЛЕТИЯМИ: в двадцать пять человек умеет
     # заметно меньше, чем в пятьдесят, — и это различие видно в его работе.
     plastic = np.clip(1.45 - age / 44.0, 0.30, 1.45)
-    rate = (0.030 * dt * plastic * (0.45 + 0.75 * dil))[:, None]
+    rate = (0.055 * dt * plastic * (0.45 + 0.75 * dil))[:, None]
 
     # что именно человек делал в этом такте
     prac = np.zeros((idx.size, N_DOM), dtype=np.float32)
@@ -711,9 +730,10 @@ def practice(co: Cohort, idx, acts, year: int, dt: float,
     frail = np.clip((age - 58.0) / 34.0, 0, 1)[:, None] * _DOM_PHYSICAL[None, :]
     co.mastery[idx] = np.clip(M + grow - rust - 0.020 * dt * frail * M, 0.0, 1.0)
 
-    # сводный «навык» для остального кода — то, в чём человек хорош
-    Mn = co.mastery[idx]
-    co.skill[idx] = np.clip(0.72 * Mn.max(axis=1) + 0.28 * Mn.mean(axis=1), 0, 1)
+    # Сводный «навык» для остального кода — то, в чём человек хорош.
+    # Считаем по лучшим трём делам, а не по всем десяти: человека судят по
+    # тому, что он умеет, а не по тому, чего он не касался.
+    co.skill[idx] = _overall(co.mastery[idx])
 
 
 def absorb_lore(co: Cohort, idx, year: int, share: float, teaching: float, dt: float):
@@ -945,8 +965,8 @@ def age_effects(co: Cohort, idx, year: int, dt: float):
     age = year - co.born[idx]
     decline = np.clip((age - 45) / 45.0, 0, 1)
     # пережитый голод и мор укорачивают жизнь спустя десятилетия
-    worn = np.clip(0.10 * co.scars[idx, SI["hunger"]] + 0.08 * co.scars[idx, SI["plague"]]
-                   + 0.05 * co.scars[idx, SI["violence"]], 0, 0.22)
+    worn = np.clip(0.06 * co.scars[idx, SI["hunger"]] + 0.05 * co.scars[idx, SI["plague"]]
+                   + 0.03 * co.scars[idx, SI["violence"]], 0, 0.10)
     co.health[idx] = np.clip(1.0 - 0.55 * decline - worn, 0.2, 1.0)
 
 

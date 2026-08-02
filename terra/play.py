@@ -23,7 +23,7 @@ import math
 import random
 from pathlib import Path
 
-from terra.agents import ROLE_RU
+from terra.agents import DOMAIN_RU, MEM_RU, ROLE_RU, SCAR_RU
 from terra.contracts import BIOME_COLORS, BIOME_NAMES
 from terra.gallery import BELIEF_RU, TRAIT_RU
 from terra.society import FORM_RU, MODE_RU
@@ -516,6 +516,7 @@ def _npc_from_person(p: dict, year: int) -> dict:
         age = end - p.get("born", year - 40)
     age = max(15, min(78, int(age)))
     tr = p.get("traits", {})
+    life = p.get("life") or {}
     return {
         "name": p.get("name", "?"), "sex": int(p.get("sex", 1)),
         "role": p.get("role", "commoner"),
@@ -527,6 +528,13 @@ def _npc_from_person(p: dict, year: int) -> dict:
         "tr": {k: round(tr.get(k, 0.5), 2) for k in
                ("aggression", "piety", "curiosity", "sociability", "ambition")},
         "prestige": round(p.get("prestige", 0), 2),
+        # прожитая жизнь: ремесло рук, следы пережитого, личная память
+        "crafts": [[DOMAIN_RU.get(d, d), lvl] for d, lvl in (life.get("crafts") or [])],
+        "scars": {SCAR_RU.get(k, k): v for k, v in (life.get("scars") or {}).items()},
+        "memories": [{"y": m.get("year"), "k": MEM_RU.get(m.get("kind"), m.get("kind"))}
+                     for m in (life.get("memories") or [])][-4:],
+        "lore": life.get("lore", 0),
+        "taught": life.get("taught", 0),
     }
 
 
@@ -858,6 +866,7 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;
  text-transform:uppercase}
 #dcard .chip{display:inline-block;background:#1c2436;border:1px solid #2e3a55;
  border-radius:10px;padding:2px 9px;margin:3px 3px 0 0;font-size:11.5px;color:#c6cdda}
+#dcard .chip.scar{background:#2a1c1c;border-color:#553030;color:#e0b9b9}
 #dcard .deed{font-size:12px;color:#b9c1cf;margin-top:5px;line-height:1.45;
  padding-left:10px;border-left:2px solid #3a4763}
 #dcard .deed i{color:#8a93a8;font-style:normal}
