@@ -1,342 +1,119 @@
 # TERRA
 
-Виртуальный мир земного типа, запускаемый с 12 000 года до н. э. — с того момента,
-когда люди уже есть, огонь и язык уже есть, а всё остальное ещё нет.
-Дальше история не сценарий, а результат.
+**A civilization simulator with sub-agent people — and the beginnings of a game built on top of it.**
 
-Люди в TERRA обладают собственной агентностью: у каждого симулируемого человека
-свой характер, свои потребности, своя — часто ошибочная — картина мира, своя родня
-и свои амбиции. Каждый год он сам решает, что делать. Народы, вождества, города,
-религии, войны и державы — это не сущности, которые кто-то создал, а то, во что
-складываются миллионы таких решений.
+TERRA starts an Earth-like planet at 12,000 BCE — the moment when humans, fire and
+language already exist, and nothing else does. From there, history is not a script
+but an outcome. Every simulated person has their own personality traits, needs,
+kinship ties and a *subjective, often wrong* picture of the world. Each year they
+choose what to do. Peoples, chiefdoms, cities, religions, wars and empires are not
+entities anyone placed on the map — they are what millions of such choices add up to.
 
-Мир полностью детерминирован по сиду и конфигурации. Тот же сид даёт ту же историю
-до последнего имени. Поэтому её можно **переигрывать**: откатиться на любой год,
-изменить один параметр — и посмотреть, где судьбы разойдутся.
+Worlds are fully deterministic: the same seed reproduces the same history down to
+the last personal name. So history can be **replayed**: roll back to any year,
+change one parameter, and watch destinies diverge.
+
+**Live demo:** https://bekzod25-terra-world.static.hf.space/
+*(3D first-person walk, rotating globe, atlas & chronicle, portrait gallery — note:
+in-world text and UI are currently in Russian)*
+
+![Capital city](docs/play_capital_temple.jpg)
+![Night village](docs/play_neo_nightfire.jpg)
+![Globe](docs/globe_night.jpg)
 
 ---
 
-## Что можно посмотреть
+## What emerges (not scripted)
 
-| файл | вес | что это |
+- **No tech tree.** 123 pieces of knowledge are defined only by physical
+  preconditions — affordances (cut, heat, store, count, record…), materials, biome,
+  scale of a cohesive population, storable surplus. Discovery happens when a
+  specific person with cognitive leisure stumbles onto a combination that works
+  *here and now*. Bronze is skipped where there is no tin; farming may never appear
+  without large-seeded wild grasses; writing is born only under accounting pressure
+  in dense settlements.
+- **Real dark ages.** A knowledge ceiling depends on the scale of the connected
+  population. When a complex polity collapses (Tainter-style cost of complexity),
+  cities empty, the ceiling drops, and skills literally crumble away — descendants
+  can no longer do what their grandparents did.
+- **Languages that branch.** Every culture has its own phonology; when a people
+  splits, its language forks through 29 real sound laws. Personal names, ethnonyms,
+  god names and city names are all generated from the living language.
+- **People with biographies.** The world keeps a book of people: everyone who
+  invented something, ruled, or decided at a crossroads is recorded with their
+  name, lifespan, traits, beliefs and deeds.
+
+Calibration against our own history (seed 1): population 2.2M at 11,000 BCE →
+178M at 500 CE (Earth: ~3M → ~190M); planetary carrying capacity by subsistence
+mode lands within real archaeological ranges.
+
+## The game layer
+
+`play.html` — a self-contained first-person walk (WASD + mouse) through three
+scenes assembled *from simulation data*: an imperial capital in 500 CE (walls,
+sanctuary, market), a Bronze Age river town with a ziggurat, a Neolithic village
+at night by the fires. The inhabitants are the actual people from the world's
+book of people; press **E** to talk — answers are generated from their recorded
+traits, beliefs, gods and chronicle events. Paste an Anthropic API key into the
+dialogue panel and NPCs converse freely in character (browser-side call,
+`claude-haiku-4-5`).
+
+## Unreal Engine 5 export
+
+```bash
+python3 -m terra.export_ue runs/terra-1
+```
+
+Produces, per scene: terrain meshes with baked color, PNG16 heightmaps and
+material weightmaps, a building manifest (every footprint verified to sit on the
+terrain within 30 cm), inhabitants with dialogue cards and patrol routes, 17
+procedural proxy meshes (hut → ziggurat), plus `import_terra.py` for UE's built-in
+Python that assembles the level in one run, and a step-by-step `README_UE.md`.
+The road to photorealism from there is free within the Epic ecosystem
+(Fab/Megascans materials, MetaHuman characters).
+
+## Quick start
+
+```bash
+pip install numpy scipy pillow --break-system-packages
+npm i three@0.185.1
+
+python3 -m terra new --seed 1 --to 500 --name terra-1   # live 12,500 years (~1.5 h)
+python3 -m terra doctor terra-1                         # physics self-check
+python3 -m terra report terra-1                         # dashboard
+python3 -m terra.play runs/terra-1                      # build the walkable game
+python3 -m terra fork terra-1 --at -3000 --set climate_severity=1.8
+python3 -m terra compare terra-1 terra-1-fork3000
+python3 -m tests.test_terra --slow                      # 70+ checks incl. determinism
+```
+
+## Architecture
+
+| layer | file | responsibility |
 |---|---|---|
-| `runs/<мир>/compact.html` | **0.2 МБ** | **лёгкий обозреватель — открывается везде**: карта с ползунком времени, летопись, крупнейшие народы, замечательные люди, графики. Без WebGL и без экзотических браузерных API. Начинать смотреть отсюда. |
-| `runs/<мир>/globe-lite.html` | 7 МБ | тот же трёхмерный глобус с уменьшенными текстурами |
-| `runs/<мир>/globe.html` | 20 МБ | **трёхмерная планета**: рельеф, биомы, владения, города, ночная сторона с огнями, ползунок времени, облёт |
-| `runs/<мир>/report.html` | 14 МБ | плоская карта, летопись, графики, **дерево языкового родства**, панель замечательных людей |
-| `runs/<мир>/gallery.html` | 0.4 МБ | **лица мира**: фотопортреты конкретных людей рядом с их досье из симуляции |
-
-```bash
-python3 -m terra compact terra-1    # лёгкий обозреватель, ~0.2 МБ — если тяжёлое не открывается
-python3 -m terra report terra-1     # дашборд
-python3 -m terra.globe runs/terra-1 # трёхмерный глобус
-python3 -m terra.portrait runs/terra-1 -n 10   # словесные портреты людей
-```
-
-## Быстрый старт
-
-```bash
-cd terra
-
-python3 -m terra new --seed 1 --to 500          # создать мир и прожить 12 500 лет
-python3 -m terra show terra-1                   # что стало с миром
-python3 -m terra chronicle terra-1 --min 3.0    # летопись
-python3 -m terra report terra-1                 # HTML-дашборд с картой и таймлайном
-python3 -m terra doctor terra-1                 # самопроверка физики мира
-
-# переиграть историю от 3000 года до н. э. в более суровом климате
-python3 -m terra fork terra-1 --at -3000 --set climate_severity=1.8 --name terra-1-suho
-python3 -m terra compare terra-1 terra-1-suho
-```
-
----
-
-## Как устроен мир
-
-Три слоя, каждый честно отделён от остальных.
-
-### L0 — планета (`world.py`)
-
-Тектоника плит, рельеф, ледники, ячейки Хэдли, орографические дожди, реки со стоком
-и поймами, почвы, руды, дикая флора и фауна. Не копия Земли — планета земного типа
-с теми же **аффордансами**: один материк с широтной осью (аналог Афроевразии), один
-с меридиональной (аналог Америк), изолированный южный, архипелаг, полярные шапки.
-
-Асимметрия материков заложена не как правило, а как факт географии:
-тягловые животные (`dom_draft > 0.4`) встречаются **только** на широтном гиганте —
-0.0% площади на меридиональном материке и на южном изоляте. Дикие крупносеменные
-злаки лежат 2–5 очагами, а не ровным слоем. Олово занимает менее 1% суши, поэтому
-бронза почти всегда требует дальней торговли — или не случается вовсе.
-
-Климатическая история задана на все 14 000 лет: дегляциация, аналог позднего дриаса,
-голоценовый оптимум, засушливые события 8.2 и 4.2 тысячелетий назад, дальше колебания
-и красный шум. Плюс 60–200 локальных шоков — засухи, наводнения, извержения.
-
-### L1 — общества (`society.py`)
-
-Народ — носитель языка, знаний и институтов. У него есть территория, способ хозяйства,
-форма правления, сплочённость, законность власти, неравенство и сложность.
-
-Ключевые механизмы, из которых вырастает правдоподобие:
-
-- **Доля пахотной земли.** Это главный физический предел. Пашня — малая часть любой
-  территории: 40% в лучшей пойме, 8–20% в обычном ландшафте, ноль в горах и пустыне.
-  Без этого множителя неолитический мир кормит миллиарды.
-- **Истощение почв** — медленная мина под каждым оседлым обществом.
-- **Цена сложности** (по Тэйнтеру): содержание иерархии, жречества и войска съедает
-  долю продукта, растущую быстрее, чем отдача от них.
-- **Управляемый предел**: народ, переросший то, чем умеет управлять, делится.
-  При делении **язык ветвится** — так возникают языковые семьи.
-- **Эпидемии** как плата за плотность, скот и торговые связи.
-- **Забвение знаний**: при обеднении и распаде общество физически разучивается делать
-  то, что умело. Тёмные века здесь настоящие.
-
-**Баланс почвы.** У пашни есть предел нагрузки, ниже которого она держится
-тысячелетиями: пойма с ежегодным илом выдерживает больше, пар, навоз и бобовые
-поднимают предел ещё выше. Выше предела почва садится, ниже — отдыхает и
-возвращается. Первая версия модели этого не умела — истощение только росло, за
-два века любая пашня превращалась в пустошь, земледелие становилось хуже
-собирательства, и мир к 500 году н. э. приходил с 44 миллионами человек вместо
-178. Это была самая дорогая ошибка проекта.
-
-Проверка ёмкости планеты (сид 1, 4000 до н. э., суша 157 млн км²):
-
-| способ хозяйства | ёмкость планеты | чел/км² | реальный аналог |
-|---|---:|---:|---|
-| охота и собирательство | 4.9 млн | 0.03 | верхний палеолит ≈ 4–8 млн |
-| оседлое собирательство | 18.1 млн | 0.11 | — |
-| мотыжное земледелие | 75.3 млн | 0.48 | — |
-| скотоводство | 27.5 млн | 0.17 | — |
-| пашенное земледелие | 211.4 млн | 1.34 | мир около 1 г. н. э. ≈ 200–250 млн |
-| ирригационное хозяйство | 702.5 млн | 4.46 | мир около 1700 г. ≈ 600–700 млн |
-
-### L2 — люди (`agents.py`)
-
-Здесь и живёт субагентность. Каждый симулируемый человек имеет:
-
-- **10 черт** — любопытство, склонность к риску, агрессия, общительность, конформизм,
-  амбиции, терпение, эмпатия, набожность, усердие. Наследуются от обоих родителей
-  плюс развитие.
-- **5 потребностей** — еда, безопасность, родня, статус, смысл.
-- **7 убеждений** — «там лучше», «чужие опасны», «новое работает», «своим можно верить»,
-  «власть законна», «миром правят высшие силы», «еды не хватит». Это **субъективная
-  модель мира**, и она бывает неверна. Люди уходят не туда, где лучше, а туда, где они
-  верят, что лучше.
-- Родню, супруга, детей, престиж, богатство, власть, ремесло, здоровье.
-
-Каждый год человек выбирает одно из 14 действий — добывать, вкладываться, запасать,
-пробовать новое, учить, уходить, нападать, обороняться, торговать, строить, молиться,
-добиваться статуса, бунтовать, заботиться о своих. Выбор мягкий, а не оптимальный:
-в утилите стоят его собственные убеждения и его характер.
-
-Убеждения правятся тремя путями: личным опытом, **престижным подражанием** (копируют
-тех, кто выглядит успешным, а не тех, кто прав) и давлением институтов. Отсюда берутся
-и мода, и предрассудки, и живучие традиции.
-
-Реализация — структура массивов на numpy: десятки тысяч людей живут одновременно.
-Каждый народ представлен поимённой выборкой в 12–40 человек, взвешенной по численности;
-рождаемость и смертность в выборке задают демографию всего народа.
-
-### Познание (`knowledge.py`)
-
-**Дерева технологий нет.** Есть 123 знания, каждое описано не местом в цепочке,
-а условиями физической возможности: какие аффордансы нужны (резать, нагревать,
-хранить, считать, тянуть, записывать…), какие материалы, какой биом, какой
-масштаб сплочённого населения, какой прибавочный продукт, какая оседлость.
-
-Открытие происходит, когда конкретный человек с когнитивным досугом нащупывает
-комбинацию, которая работает **здесь и сейчас**. Вес выбора складывается из двух
-множителей — оба поведенческие, не сценарные:
-
-- **близость к освоенному**: новое рождается из соседства уже понятого;
-- **нужда**: люди возятся с тем, что болит. Голодный ищет, чем накормить,
-  а не как считать звёзды.
-
-Следствия, которые не запрограммированы, а получаются сами:
-
-- земледелие может не появиться вовсе, если рядом нет крупносеменных злаков;
-- бронза пропускается там, где нет олова, — народ либо застревает в камне,
-  либо позже приходит сразу к железу;
-- письменность рождается только под давлением учёта, и только там, где есть
-  **концентрация** людей: три миллиона разбросанных пахарей письма не дают,
-  а город в двадцать тысяч даёт;
-- масштаб для знания считается по сплочённому ядру, а не по общей численности.
-
-### Языки (`lang.py`)
-
-У каждой культуры своя фонология, слоговая структура, морфология и порядок слов —
-с реалистичными частотами (SOV ≈ 45%, SVO ≈ 40%). Из языка порождаются имена людей,
-народов, богов, городов и титулы правителей.
-
-При расколе народа язык **ветвится**: применяется набор из 29 настоящих звуковых
-законов — палатализация, лениция, апокопа, ротацизм, дебуккализация и т. д. Законы
-работают регулярно по всему унаследованному словарю, поэтому через пять тысяч лет
-потомки одного праязыка остаются узнаваемо родственными, но явно разными:
-
-```
-значение   ПРА       A1       A2       B1      B2      C1     C2
-вода       tik       cik      cik      tix     six     ci     þih
-огонь      hotxod    huðux    hudox    oþot    uþud    oþo    hoþhot
-камень     gogul     bũ       bũ       goglu   guglu   gogol  kokul
-бык        keb       čeb      čib      čip     keb     čeb    sep
-```
-
-### Переломные точки (`junctures.py`)
-
-Большую часть времени люди действуют по склонностям, и это считается быстро.
-Но иногда народ упирается в развилку, где алгоритма мало: голод с несколькими
-выходами, смерть правителя, первая встреча с чужаками, назревший раскол,
-переустройство власти.
-
-В такие моменты **слово получает конкретный человек**. Симуляция собирает пакет
-«что он видит, во что он верит, чего ему не хватает» и передаёт решателю:
-
-| решатель | что делает |
-|---|---|
-| `heuristic` | встроенный, детерминированный, работает всегда и офлайн |
-| `api` | настоящая LLM через Anthropic API, если задан `ANTHROPIC_API_KEY` |
-| `oracle` | файловый протокол: мир выкладывает развилки на диск и ждёт ответа извне |
-
-Режим `oracle` позволяет отдать сознание ключевых людей внешнему разуму — в том числе
-Claude, работающему рядом:
-
-```bash
-python3 -m terra new --seed 7 --resolver oracle --set oracle_wait=120
-python3 -m terra oracle <run>       # показать развилки, ждущие решения
-# ответы дописываются строками в runs/<run>/oracle/resolved.jsonl:
-# {"jid": "...", "choice": "migrate", "reasoning": "..."}
-```
-
-Если ответа нет — берётся эвристика, и мир не останавливается.
-
----
-
-## Перезапуск, ветвление, сравнение
-
-Каждый мир пишет полные точки сохранения. От любой можно продолжить или
-ответвиться с изменённым параметром:
-
-```bash
-python3 -m terra fork terra-1 --at -6000 --set innovation_rate=0.5
-python3 -m terra fork terra-1 --at -6000 --set war_appetite=2.0 --name terra-1-voina
-python3 -m terra compare terra-1 terra-1-fork6000 terra-1-voina
-```
-
-Параметры, которые имеет смысл крутить:
-
-| параметр | что меняет |
-|---|---|
-| `seed` | другая планета и другая история целиком |
-| `innovation_rate` | как быстро люди нащупывают новое |
-| `diffusion_rate` | как быстро знания расходятся между народами |
-| `climate_severity` | сила климатических потрясений |
-| `war_appetite` | склонность к набегам |
-| `disease_severity` | тяжесть эпидемий |
-| `earth_like_layout` | `false` — планета со случайной компоновкой материков |
-| `seed_polities` | сколько народов на старте |
-| `resolver` | `heuristic` / `api` / `oracle` |
-
----
-
-## Что лежит в каталоге прогона
-
-```
-runs/<имя>/
-  run.json          конфигурация, сид, итоговая статистика
-  world.npz + .json планета
-  timeline.jsonl    показатели мира по годам
-  snapshots.jsonl   карта владений, народы и города по годам
-  chronicle.jsonl   летопись событий
-  lects.json.gz     языки живых народов
-  checkpoints/      точки сохранения для ветвления
-  oracle/           очередь развилок и ответы на них
-  report.html       дашборд наблюдателя
-```
-
----
-
-## Обрушение и тёмные века
-
-Сложное общество живёт, пока изъятие покрывает содержание сложности. Когда
-перестаёт — оно рушится не постепенно, а разом. Пустеют города, власть падает
-на ступень вниз, держава разваливается. Вместе с городами исчезает и знание,
-которое держалось только на них: потолок знаний зависит от масштаба сплочённого
-населения, и всё, что выше нового потолка, осыпается, начиная с самого сложного.
-Через век потомки не умеют того, что умели деды.
-
-## Как знание переходит через горы
-
-Хозяйственное умение привязано к климату: пшеница не переезжает в тайгу. Поэтому
-прямое заимствование через широты и чужие биомы почти не работает. Но работает
-другое — **знание о том, что вещь возможна**. Народ, видевший у соседей хлеб из
-посеянного зерна, доходит до земледелия сам, даже если чужие семена у него не
-всходят. В модели это отдельный множитель: увиденное у соседей ищется
-целенаправленно, а не наугад. Так замысел переходит там, где не переходит обычай.
-
-## Люди, которых можно назвать по имени
-
-Мир ведёт книгу людей (`people.jsonl`): всякий, кто что-то изобрёл, правил или
-решал на развилке, попадает в неё с именем, годами жизни, характером, убеждениями
-и списком поступков. Из этой книги собираются:
-
-- `python3 -m terra.portrait <мир>` — словесные портреты, выведенные из симуляции:
-  одежда из освоенных ремёсел, украшения из добывавшихся руд, орудие из умений,
-  лицо и осанка из черт характера;
-- `python3 -m terra.gallery <мир> --images <каталог>` — страница с фотопортретами
-  рядом с досье.
-
-## Прогон terra-1 (сид 1)
-
-| год | TERRA | у нас |
-|---:|---:|---:|
-| −11 000 | 2.2 млн | ~3 млн |
-| −8 200 | 5.4 млн | ~5 млн |
-| −4 400 | 12.1 млн | ~20 млн |
-| −2 500 | 24.5 млн | ~50 млн |
-| −650 | 44.1 млн | ~100 млн |
-| 0 | 129 млн | ~190 млн |
-| 500 | 178 млн | ~190 млн |
-
-К 500 году н. э.: 310 народов, 178 млн человек, крупнейшая держава Šène — 52 млн
-подданных, столица Níhmīwū — 2.3 млн жителей. За 12 500 лет: 3676 открытий,
-39 утраченных умений, 1302 войны, 827 обрушений держав, 307 моров, 271 раскол
-народов, 5510 разрешённых развилок.
-
-Технология в этом мире обогнала нашу примерно на тысячелетие: к 500 году сильнейшие
-державы освоили весь каталог из 123 умений. Замедляется параметром `innovation_rate`.
-
-## Честные ограничения
-
-Это модель, а не мир. Что она **не** делает:
-
-- Не моделирует сознание. «Субагентность» здесь — это индивидуальные черты,
-  субъективные убеждения, память и собственный выбор действия; в режимах `api`
-  и `oracle` к этому добавляется настоящее рассуждение LLM в переломные точки.
-  Но это не заявка на внутренний опыт.
-- Народ — это этнополитическая единица порядка тысяч–миллионов людей, а не одна
-  община. Поимённо живут не все, а взвешенная выборка.
-- Каталог из 123 знаний конечен и назван узнаваемыми словами — чтобы летопись
-  читалась. Порядок открытий при этом не задан: он каждый раз разный.
-- Такт времени переменный: 10 лет до 7000 до н. э., 5 лет до 2500 до н. э.,
-  дальше 2 года. События внутри такта не разрешаются по порядку.
-- Экономика огрублена: нет цен, рынков товаров и денежного обращения как отдельной
-  динамики — только запасы, изъятие излишка, торговые связи и доступ к материалам.
-- Калибровка проверена по демографии и по срокам ключевых переходов. Отдельные
-  прогоны могут расходиться с нашей историей — это не баг, а смысл затеи.
-
----
-
-## Проверка
-
-```bash
-python3 -m terra doctor              # физика мира, каталог знаний, целостность прогона
-python3 -m tests.test_terra --slow   # 72 проверки, включая детерминизм и ветвление
-python3 -m terra.knowledge           # каталог знаний, что достижимо, что заперто навсегда
-python3 -m terra.lang                # паспорт праязыка, таблица когнатов, расхождение ветвей
-python3 -m terra.world               # структура планеты, биомы, редкость олова
-```
-
-Проверки следят в том числе за тем, чего глазом не увидеть: что в графе аффордансов
-нет тупиков (однажды из-за такого тупика дощатая лодка и полиспаст были недостижимы
-навсегда), что обход множеств упорядочен (иначе мир, продолженный с точки сохранения,
-расходится сам с собой), и что ёмкость планеты остаётся в исторических пределах.
+| L0 planet | `terra/world.py` | plate tectonics, 14,000-year climate history, rivers, ores, wild flora/fauna |
+| L1 societies | `terra/society.py` | carrying capacity, soil balance, war, epidemics, institutions, collapse |
+| L2 people | `terra/agents.py` | traits, needs, subjective beliefs, kinship, action choice, prestige imitation |
+| cognition | `terra/knowledge.py` | 123 technologies as physical preconditions, no tree |
+| languages | `terra/lang.py` | phonology, 29 sound laws, drift and branching |
+| junctures | `terra/junctures.py` | pivotal decisions: heuristic / Anthropic API / file oracle |
+| main loop | `terra/sim.py` | deterministic stepping, checkpoints, forking, book of people |
+| game | `terra/play.py`, `terra/_play_js.py` | first-person scenes, NPC dialogue |
+| UE bridge | `terra/export_ue.py`, `terra/ue/` | terrain/manifest export + UE editor-Python importer |
+| viewers | `terra/globe.py`, `report.py`, `compact.py`, `gallery.py` | 3D globe, dashboard, light atlas, faces |
+| atlas | `atlas/` | (early) real-history data pipeline: Wikidata, Pleiades, museum APIs |
+
+Pure Python 3.11 + numpy/scipy/Pillow; three.js is inlined into self-contained
+HTML files. The simulation is the single source of truth — visualizations only read.
+
+## Honest limitations
+
+- The simulation models an Earth-*like* planet, not Earth; an "Earth mode" fed by
+  real datasets (HYDE, Pleiades) is planned in `atlas/`.
+- One polity is an ethno-political unit of thousands–millions; named individuals
+  are a weighted sample, not the full population.
+- The browser game is stylized low-poly; photorealism is the UE5 path.
+- In-world text and interfaces are currently Russian.
+
+*Built by Fable (Claude, Anthropic) in a Cowork session; the human sets direction
+and accounts, the model writes the world.*

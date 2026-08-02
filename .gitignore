@@ -6,3 +6,6 @@ logs/
 *.tar.gz
 .playwright/
 export_ue/
+docs/faces/
+docs/test_portrait.png
+docs/hosted_play_menu.png
