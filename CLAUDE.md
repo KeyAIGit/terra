@@ -29,7 +29,7 @@
 | report.py / compact.py / gallery.py / portrait.py | дашборд, лёгкий атлас, лица |
 | cli.py | команды: new/continue/fork/compare/report/doctor/compact/oracle |
 | tests/test_terra.py | 72 проверки: детерминизм, физика, ветвление — гонять после правок |
-| atlas/ | НАЧАТО: сбор реальных исторических данных (Wikidata/Pleiades/Met доступны) |
+| atlas/ | конвейер атласа: schema (K/T/R) + state (манифест) + sources/* + ingest/doctor/upload_hf |
 
 ## Команды
 
@@ -61,13 +61,27 @@ python3 -m terra.globe runs/terra-1   # глобус
 свободный чат с NPC прямо из браузера (anthropic-dangerous-direct-browser-access,
 claude-haiku-4-5). Проверка UI — Playwright+Chromium (--use-gl=swiftshader).
 
-## Атлас исторических данных (следующий большой этап)
+## Атлас исторических данных (конвейер ПОСТРОЕН, склад собран локально)
 
 План в проекте claude.ai: «TERRA-Атлас». Суть: НЕ собирать «все знания», а
-выжимки готовых датасетов (Wikidata, Pleiades, HYDE, p3k14c, Met/Smithsonian CC0)
-в Parquet+DuckDB на HF datasets; каждая запись с источником, лицензией и ярусом
-достоверности K/T/R (известно/типично/реконструкция); компилятор «библий сцены»
-(эпоха × регион) → JSON для игры/UE. Проба уже в atlas/proba.jsonl.
+выжимки готовых датасетов в Parquet; каждая запись с source/license/tier
+K/T/R (известно/типично/реконструкция); компилятор «библий сцены» — следующий шаг.
+
+```bash
+python3 -m atlas.ingest --budget 1500   # резюмируемый сбор (манифест data/manifest.json)
+python3 -m atlas.doctor --examples      # сводка + проверка схемы каждого parquet
+HF_TOKEN=hf_... python3 -m atlas.upload_hf  # выгрузка в HF Bekzod25/terra-atlas
+```
+
+Собрано (2026-08-02, ~73 МБ parquet, 2.16 млн записей, atlas/data/ в gitignore):
+pleiades 42k мест; p3k14c 174k C14-дат; dplace EA 1.3k обществ + 121k значений;
+seshat Equinox 444 политии + 47k фактов (лицензия небезусловная!); met 485k
+артефактов CC0 (без картинок); naturalearth 4 слоя 10m; wikidata_rulers срез
+«Междуречье −2500…−500» (384 правителя, столицы); hyde тестовый срез popc
+2000BC (ярус R), остальные 251 срез — pending_urls в манифесте. Полный слой
+персон Wikidata — дамп-масштаб, план в wikidata_rulers.GLOBAL_PERSONS_PLAN.
+Грабли: Met CSV в Git LFS (качать через media.githubusercontent.com);
+api.github.com/search закрыт прокси; HYDE-зеркало — geo.public.data.uu.nl.
 
 ## UE5 (когда пользователь поставит)
 
