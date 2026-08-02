@@ -1,0 +1,18 @@
+{
+  "name": "terra",
+  "version": "1.0.0",
+  "description": "Виртуальный мир земного типа, запускаемый с 12 000 года до н. э. — с того момента, когда люди уже есть, огонь и язык уже есть, а всё остальное ещё нет. Дальше история не сценарий, а результат.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "three": "^0.185.1"
+  }
+}
