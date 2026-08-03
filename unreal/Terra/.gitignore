@@ -1,0 +1,42 @@
+# Unreal generated state
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+.vscode/
+.idea/
+*.VC.db
+*.opensdf
+*.sdf
+*.sln
+*.suo
+*.xcodeproj
+*.xcworkspace
+
+# Local snapshots and imported source packages
+Backups/
+export_ue/
+
+# Local credentials and developer overrides
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.key
+*token*
+*secret*
+Config/DefaultEditorPerProjectUserSettings.local.ini
+
+# Reproducible third-party Pixel Streaming checkout/runtime (see Scripts/PixelStreaming/dependency-lock.json)
+Tools/PixelStreamingInfrastructure-UE5.8/
+Tools/.runtime/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.log
+
+# Local handoff documents may contain credentials and are never published.
+TERRA_HANDOFF*.md

@@ -5,7 +5,7 @@
 
 Симулятор цивилизации с субагентными людьми + игровой слой. Владелец: Bekzad.
 Курс: игра-перемещение по эпохам, 3D, путь к фотореализму через UE5.
-Роли: Фейбл (Claude) — весь код, симуляция, данные, игра; пользователь — аккаунты, UE на Mac (M3 Max).
+Роли: Codex — ведущий инженер и интегратор; субагенты получают ограниченные зоны ответственности; пользователь — владелец продукта, аккаунтов и UE на Mac (M3 Max).
 
 ## Что это
 
@@ -16,8 +16,7 @@
 - Онлайн-витрина мира: https://bekzod25-terra-world.static.hf.space/
   (HF Space Bekzod25/terra-world; тяжёлые страницы на CDN; сейчас там мир terra-1,
   пересобрать из terra-life после доводки до 2100).
-- Секреты (GitHub PAT, HF write-токен) — в приватном HF-репо Bekzod25/terra-secrets
-  (github.md; hf_token.md в base64). В публичный репозиторий не класть.
+- Секреты хранятся только в macOS Keychain, локальном environment или CI secret manager. HF Datasets не является secret manager; любой токен, попавший в handoff или лог, считается скомпрометированным и ротируется.
 
 ## Модули
 
@@ -132,6 +131,14 @@ import_terra.py (README ведёт за руку). OBJ всегда с UV — и
 UE 5.8 роняет UVs.IsValidIndex. Сцены строятся из terra.play.build_scene_data —
 ОБЩЕЙ точки с play.html; высотное поле — порт groundH из _play_js.py.
 Мост из Cowork: папка видна как mnt/Terra; удалять нельзя — mv в _to_delete/.
+
+## UE takeover baseline (2026-08-02)
+
+- Проверенный исходный UE 5.8 foundation находится в `unreal/Terra/`.
+- C++-плагин `TerraRuntime` содержит first-person pawn, GameMode, interaction contract и versioned NPC/scene types.
+- Безопасный data bridge валидирует `terra-life` и импортирует только в digest-versioned `/Game/TerraLife`, не меняя legacy `/Game/Terra`.
+- Продуктовый договор, архитектура и roadmap: `docs/TERRA_PRODUCT_SPEC_RU.md`, `docs/TERRA_ARCHITECTURE.md`, `docs/TERRA_ROADMAP.md`.
+- Буквальная «неотличимость от реальности» не имеет достоверной даты; текущий gate — измеримый живой вертикальный срез.
 
 ## Правила
 

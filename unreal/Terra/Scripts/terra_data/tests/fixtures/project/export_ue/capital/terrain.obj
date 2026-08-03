@@ -1,0 +1,6 @@
+# TERRA test fixture: flat 1200 m square regular XY grid (centimetres, Z up)
+o terra_capital_ci_fixture
+v -60000.0 -60000.0 0.0
+v 60000.0 -60000.0 0.0
+v -60000.0 60000.0 0.0
+v 60000.0 60000.0 0.0

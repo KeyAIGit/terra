@@ -17,6 +17,13 @@ change one parameter, and watch destinies diverge.
 *(3D first-person walk, rotating globe, atlas & chronicle, portrait gallery — note:
 in-world text and UI are currently in Russian)*
 
+**Current engineering baseline:** the accepted simulation run is `terra-life`; the
+UE 5.8 foundation, safe data bridge and first character look-development are now
+versioned under `unreal/Terra/`. See the [product specification](docs/TERRA_PRODUCT_SPEC_RU.md),
+[target architecture](docs/TERRA_ARCHITECTURE.md), and [delivery roadmap](docs/TERRA_ROADMAP.md).
+The roadmap treats “indistinguishable from reality” as a direction, not a dated promise.
+
+
 ![Capital city](docs/play_capital_temple.jpg)
 ![Night village](docs/play_neo_nightfire.jpg)
 ![Globe](docs/globe_night.jpg)
@@ -25,7 +32,7 @@ in-world text and UI are currently in Russian)*
 
 ## What emerges (not scripted)
 
-- **No tech tree.** 123 pieces of knowledge are defined only by physical
+- **No tech tree.** 159 pieces of knowledge are defined only by physical
   preconditions — affordances (cut, heat, store, count, record…), materials, biome,
   scale of a cohesive population, storable surplus. Discovery happens when a
   specific person with cognitive leisure stumbles onto a combination that works
@@ -69,8 +76,9 @@ material weightmaps, a building manifest (every footprint verified to sit on the
 terrain within 30 cm), inhabitants with dialogue cards and patrol routes, 17
 procedural proxy meshes (hut → ziggurat), plus `import_terra.py` for UE's built-in
 Python that assembles the level in one run, and a step-by-step `README_UE.md`.
-The road to photorealism from there is free within the Epic ecosystem
-(Fab/Megascans materials, MetaHuman characters).
+The path to a photoreal vertical slice uses Epic's Nanite/Lumen, Fab assets and
+MetaHuman tools, but still requires licensed content, 3D/character production,
+animation, optimization and systematic visual QA.
 
 ## Quick start
 
@@ -94,7 +102,7 @@ python3 -m tests.test_terra --slow                      # 70+ checks incl. deter
 | L0 planet | `terra/world.py` | plate tectonics, 14,000-year climate history, rivers, ores, wild flora/fauna |
 | L1 societies | `terra/society.py` | carrying capacity, soil balance, war, epidemics, institutions, collapse |
 | L2 people | `terra/agents.py` | traits, needs, subjective beliefs, kinship, action choice, prestige imitation |
-| cognition | `terra/knowledge.py` | 123 technologies as physical preconditions, no tree |
+| cognition | `terra/knowledge.py` | 159 technologies as physical preconditions, no tree |
 | languages | `terra/lang.py` | phonology, 29 sound laws, drift and branching |
 | junctures | `terra/junctures.py` | pivotal decisions: heuristic / Anthropic API / file oracle |
 | main loop | `terra/sim.py` | deterministic stepping, checkpoints, forking, book of people |
@@ -115,5 +123,5 @@ HTML files. The simulation is the single source of truth — visualizations only
 - The browser game is stylized low-poly; photorealism is the UE5 path.
 - In-world text and interfaces are currently Russian.
 
-*Built by Fable (Claude, Anthropic) in a Cowork session; the human sets direction
-and accounts, the model writes the world.*
+*Originally prototyped by Fable (Claude, Anthropic). Ongoing engineering and the
+UE5 takeover are led by Codex; Bekzad owns the product direction and accounts.*
