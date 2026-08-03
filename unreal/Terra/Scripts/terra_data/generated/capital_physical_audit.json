@@ -1,0 +1,3916 @@
+{
+  "access": {
+    "gate_count": 2,
+    "market_stall_count": 4,
+    "player_start_to_road_centerline_m": 22.0,
+    "player_start_to_road_edge_m": 17.5,
+    "player_start_used_only_as_square_proxy_cm": [
+      0.0,
+      -5600.0
+    ],
+    "public_square_status": "not_explicit_in_source",
+    "special_buildings": [
+      {
+        "building_index": 12,
+        "center_to_road_edge_m": 0.0,
+        "facade_parallel_deviation_deg": 6.072,
+        "front_faces_road_dot": -0.994389,
+        "front_midpoint_cm": [
+          1200.0,
+          18400.0
+        ],
+        "nearest_road_index": 10,
+        "road_edge_distance_m": 7.933,
+        "type": "gate"
+      },
+      {
+        "building_index": 13,
+        "center_to_road_edge_m": 0.0,
+        "facade_parallel_deviation_deg": 0.01,
+        "front_faces_road_dot": -1.0,
+        "front_midpoint_cm": [
+          17799.791,
+          -1200.0
+        ],
+        "nearest_road_index": 1,
+        "road_edge_distance_m": 8.5,
+        "type": "gate"
+      },
+      {
+        "building_index": 14,
+        "center_to_road_edge_m": 14.368,
+        "facade_parallel_deviation_deg": 0.0,
+        "front_faces_road_dot": 0.486107,
+        "front_midpoint_cm": [
+          -890.0,
+          -5000.0
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 13.809,
+        "type": "well"
+      },
+      {
+        "building_index": 16,
+        "center_to_road_edge_m": 29.5,
+        "facade_parallel_deviation_deg": 6.88,
+        "front_faces_road_dot": 0.992799,
+        "front_midpoint_cm": [
+          2971.059,
+          -6355.228
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 25.789,
+        "type": "market_stall"
+      },
+      {
+        "building_index": 17,
+        "center_to_road_edge_m": 20.5,
+        "facade_parallel_deviation_deg": 6.88,
+        "front_faces_road_dot": 0.992799,
+        "front_midpoint_cm": [
+          3871.059,
+          -6355.228
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 16.789,
+        "type": "market_stall"
+      },
+      {
+        "building_index": 18,
+        "center_to_road_edge_m": 25.5,
+        "facade_parallel_deviation_deg": 6.88,
+        "front_faces_road_dot": 0.992799,
+        "front_midpoint_cm": [
+          2971.059,
+          -5255.228
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 25.789,
+        "type": "market_stall"
+      },
+      {
+        "building_index": 19,
+        "center_to_road_edge_m": 20.5,
+        "facade_parallel_deviation_deg": 6.88,
+        "front_faces_road_dot": 0.992799,
+        "front_midpoint_cm": [
+          3871.059,
+          -5255.228
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 16.789,
+        "type": "market_stall"
+      },
+      {
+        "building_index": 20,
+        "center_to_road_edge_m": 9.5,
+        "facade_parallel_deviation_deg": 90.0,
+        "front_faces_road_dot": 0.0,
+        "front_midpoint_cm": [
+          1586.0,
+          -11200.0
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 9.5,
+        "type": "temple"
+      }
+    ]
+  },
+  "audit_digest": "sha256:8470679b3d12cdb4e5e2842b680e35a815a12120fb6de94213f59cb8d80d5717",
+  "conclusion": {
+    "physical_city_status": "blockout_not_population_scale_city",
+    "safe_use": "historical macro-placement/blockout evidence only; not a street-level reality claim",
+    "why": [
+      "300 proxies cannot physically represent either 2.3M or the 8.37M declared in source meta at this footprint",
+      "the source contains OBB collisions and road/building penetrations",
+      "most house facade normals are not simultaneously close, parallel, and facing their nearest road",
+      "no explicit public-square polygon or pedestrian/service access graph exists"
+    ]
+  },
+  "density": {
+    "comparison_2_3m": {
+      "people_per_estimated_house_gfa_m2": 50.71,
+      "people_per_house_proxy": 9019.608,
+      "people_per_km2_layout_bbox": 7691209.015,
+      "people_per_km2_terrain": 1597222.222,
+      "people_per_km2_wall_enclosure": 18147961.116,
+      "people_per_proxy": 7666.667
+    },
+    "source_population": {
+      "people_per_estimated_house_gfa_m2": 184.489,
+      "people_per_house_proxy": 32814.624,
+      "people_per_km2_layout_bbox": 27981718.575,
+      "people_per_km2_terrain": 5810922.917,
+      "people_per_km2_wall_enclosure": 66024878.488,
+      "people_per_proxy": 27892.43
+    }
+  },
+  "generator_version": "1.0.0",
+  "geometry": {
+    "building_count": 300,
+    "building_types": {
+      "field": 6,
+      "fire_pit": 1,
+      "gate": 2,
+      "house_gable": 255,
+      "hut_round": 4,
+      "market_stall": 4,
+      "stela": 14,
+      "temple": 1,
+      "tower": 6,
+      "wall_segment": 6,
+      "well": 1
+    },
+    "estimated_house_gfa_m2": 45356.14,
+    "house_count": 255,
+    "layout_bbox": {
+      "area_km2": 0.299043,
+      "height_m": 607.912,
+      "max_cm": [
+        30949.303,
+        43148.667
+      ],
+      "min_cm": [
+        -18242.5,
+        -17642.5
+      ],
+      "width_m": 491.918
+    },
+    "road_centerline_km": 3.482122,
+    "road_count": 11,
+    "terrain_area_km2": 1.44,
+    "total_pairwise_footprint_m2": 25135.831,
+    "wall_enclosure_area_km2": 0.126736
+  },
+  "overlaps": {
+    "pair_count": 20,
+    "pairs": [
+      {
+        "a_index": 0,
+        "a_type": "wall_segment",
+        "b_index": 3,
+        "b_type": "wall_segment",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 3.026
+      },
+      {
+        "a_index": 0,
+        "a_type": "wall_segment",
+        "b_index": 8,
+        "b_type": "tower",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 15.5318
+      },
+      {
+        "a_index": 0,
+        "a_type": "wall_segment",
+        "b_index": 12,
+        "b_type": "gate",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 3.51
+      },
+      {
+        "a_index": 1,
+        "a_type": "wall_segment",
+        "b_index": 5,
+        "b_type": "wall_segment",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 3.1097
+      },
+      {
+        "a_index": 1,
+        "a_type": "wall_segment",
+        "b_index": 9,
+        "b_type": "tower",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 15.5318
+      },
+      {
+        "a_index": 1,
+        "a_type": "wall_segment",
+        "b_index": 12,
+        "b_type": "gate",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 3.51
+      },
+      {
+        "a_index": 2,
+        "a_type": "wall_segment",
+        "b_index": 3,
+        "b_type": "wall_segment",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 3.134
+      },
+      {
+        "a_index": 2,
+        "a_type": "wall_segment",
+        "b_index": 4,
+        "b_type": "wall_segment",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 3.0596
+      },
+      {
+        "a_index": 2,
+        "a_type": "wall_segment",
+        "b_index": 6,
+        "b_type": "tower",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 15.5318
+      },
+      {
+        "a_index": 2,
+        "a_type": "wall_segment",
+        "b_index": 7,
+        "b_type": "tower",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 15.5318
+      },
+      {
+        "a_index": 2,
+        "a_type": "wall_segment",
+        "b_index": 11,
+        "b_type": "tower",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 31.0635
+      },
+      {
+        "a_index": 3,
+        "a_type": "wall_segment",
+        "b_index": 6,
+        "b_type": "tower",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 15.5317
+      },
+      {
+        "a_index": 3,
+        "a_type": "wall_segment",
+        "b_index": 8,
+        "b_type": "tower",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 15.5317
+      },
+      {
+        "a_index": 3,
+        "a_type": "wall_segment",
+        "b_index": 10,
+        "b_type": "tower",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 31.0635
+      },
+      {
+        "a_index": 4,
+        "a_type": "wall_segment",
+        "b_index": 7,
+        "b_type": "tower",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 15.5317
+      },
+      {
+        "a_index": 4,
+        "a_type": "wall_segment",
+        "b_index": 13,
+        "b_type": "gate",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 3.51
+      },
+      {
+        "a_index": 4,
+        "a_type": "wall_segment",
+        "b_index": 47,
+        "b_type": "house_gable",
+        "classification": "unintended_collision",
+        "overlap_area_m2": 1.4086
+      },
+      {
+        "a_index": 5,
+        "a_type": "wall_segment",
+        "b_index": 9,
+        "b_type": "tower",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 15.5317
+      },
+      {
+        "a_index": 5,
+        "a_type": "wall_segment",
+        "b_index": 13,
+        "b_type": "gate",
+        "classification": "likely_compositional_but_not_booleaned",
+        "overlap_area_m2": 3.51
+      },
+      {
+        "a_index": 13,
+        "a_type": "gate",
+        "b_index": 47,
+        "b_type": "house_gable",
+        "classification": "unintended_collision",
+        "overlap_area_m2": 26.2094
+      }
+    ],
+    "pairwise_overlap_area_m2": 240.368,
+    "type_pairs": {
+      "gate + house_gable": 1,
+      "gate + wall_segment": 4,
+      "house_gable + wall_segment": 1,
+      "tower + wall_segment": 10,
+      "wall_segment + wall_segment": 4
+    },
+    "unintended_pair_count": 2
+  },
+  "roads_and_frontage": {
+    "building_road_collision_count": 63,
+    "building_road_collisions": [
+      {
+        "building_index": 12,
+        "building_type": "gate",
+        "penetration_m": 4.0,
+        "road_index": 0
+      },
+      {
+        "building_index": 12,
+        "building_type": "gate",
+        "penetration_m": 4.0,
+        "road_index": 10
+      },
+      {
+        "building_index": 13,
+        "building_type": "gate",
+        "penetration_m": 3.5,
+        "road_index": 1
+      },
+      {
+        "building_index": 20,
+        "building_type": "temple",
+        "penetration_m": 2.5,
+        "road_index": 2
+      },
+      {
+        "building_index": 23,
+        "building_type": "stela",
+        "penetration_m": 1.75,
+        "road_index": 1
+      },
+      {
+        "building_index": 37,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 5
+      },
+      {
+        "building_index": 38,
+        "building_type": "house_gable",
+        "penetration_m": 1.018,
+        "road_index": 5
+      },
+      {
+        "building_index": 40,
+        "building_type": "house_gable",
+        "penetration_m": 0.064,
+        "road_index": 0
+      },
+      {
+        "building_index": 41,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 4
+      },
+      {
+        "building_index": 46,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 3
+      },
+      {
+        "building_index": 48,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 3
+      },
+      {
+        "building_index": 50,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 3
+      },
+      {
+        "building_index": 52,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 3
+      },
+      {
+        "building_index": 52,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 9
+      },
+      {
+        "building_index": 54,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 3
+      },
+      {
+        "building_index": 56,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 3
+      },
+      {
+        "building_index": 57,
+        "building_type": "house_gable",
+        "penetration_m": 2.451,
+        "road_index": 8
+      },
+      {
+        "building_index": 58,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 3
+      },
+      {
+        "building_index": 60,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 3
+      },
+      {
+        "building_index": 61,
+        "building_type": "house_gable",
+        "penetration_m": 2.365,
+        "road_index": 0
+      },
+      {
+        "building_index": 61,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 3
+      },
+      {
+        "building_index": 62,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 3
+      },
+      {
+        "building_index": 64,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 3
+      },
+      {
+        "building_index": 64,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 7
+      },
+      {
+        "building_index": 66,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 3
+      },
+      {
+        "building_index": 68,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 3
+      },
+      {
+        "building_index": 69,
+        "building_type": "house_gable",
+        "penetration_m": 1.701,
+        "road_index": 6
+      },
+      {
+        "building_index": 73,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 6
+      },
+      {
+        "building_index": 79,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 7
+      },
+      {
+        "building_index": 84,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 8
+      },
+      {
+        "building_index": 90,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 9
+      },
+      {
+        "building_index": 97,
+        "building_type": "house_gable",
+        "penetration_m": 3.5,
+        "road_index": 1
+      },
+      {
+        "building_index": 97,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 6
+      },
+      {
+        "building_index": 108,
+        "building_type": "house_gable",
+        "penetration_m": 2.436,
+        "road_index": 6
+      },
+      {
+        "building_index": 114,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 7
+      },
+      {
+        "building_index": 121,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 8
+      },
+      {
+        "building_index": 127,
+        "building_type": "house_gable",
+        "penetration_m": 1.786,
+        "road_index": 9
+      },
+      {
+        "building_index": 134,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 6
+      },
+      {
+        "building_index": 140,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 7
+      },
+      {
+        "building_index": 147,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 8
+      },
+      {
+        "building_index": 153,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 9
+      },
+      {
+        "building_index": 199,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 2
+      },
+      {
+        "building_index": 213,
+        "building_type": "house_gable",
+        "penetration_m": 3.5,
+        "road_index": 1
+      },
+      {
+        "building_index": 217,
+        "building_type": "house_gable",
+        "penetration_m": 1.827,
+        "road_index": 9
+      },
+      {
+        "building_index": 227,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 9
+      },
+      {
+        "building_index": 229,
+        "building_type": "house_gable",
+        "penetration_m": 4.5,
+        "road_index": 0
+      },
+      {
+        "building_index": 234,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 4
+      },
+      {
+        "building_index": 234,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 7
+      },
+      {
+        "building_index": 237,
+        "building_type": "house_gable",
+        "penetration_m": 4.5,
+        "road_index": 0
+      },
+      {
+        "building_index": 244,
+        "building_type": "house_gable",
+        "penetration_m": 0.06,
+        "road_index": 8
+      },
+      {
+        "building_index": 245,
+        "building_type": "house_gable",
+        "penetration_m": 3.5,
+        "road_index": 1
+      },
+      {
+        "building_index": 257,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 7
+      },
+      {
+        "building_index": 258,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 5
+      },
+      {
+        "building_index": 262,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 8
+      },
+      {
+        "building_index": 264,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 4
+      },
+      {
+        "building_index": 266,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 9
+      },
+      {
+        "building_index": 267,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 7
+      },
+      {
+        "building_index": 268,
+        "building_type": "house_gable",
+        "penetration_m": 0.788,
+        "road_index": 0
+      },
+      {
+        "building_index": 268,
+        "building_type": "house_gable",
+        "penetration_m": 1.263,
+        "road_index": 5
+      },
+      {
+        "building_index": 273,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 9
+      },
+      {
+        "building_index": 285,
+        "building_type": "house_gable",
+        "penetration_m": 3.5,
+        "road_index": 1
+      },
+      {
+        "building_index": 285,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 7
+      },
+      {
+        "building_index": 286,
+        "building_type": "house_gable",
+        "penetration_m": 2.5,
+        "road_index": 4
+      }
+    ],
+    "frontage_records": [
+      {
+        "building_index": 12,
+        "building_type": "gate",
+        "facade_parallel_deviation_deg": 6.072,
+        "front_faces_road_dot": -0.994389,
+        "front_midpoint_cm": [
+          1200.0,
+          18400.0
+        ],
+        "nearest_road_index": 10,
+        "road_edge_distance_m": 7.933
+      },
+      {
+        "building_index": 13,
+        "building_type": "gate",
+        "facade_parallel_deviation_deg": 0.01,
+        "front_faces_road_dot": -1.0,
+        "front_midpoint_cm": [
+          17799.791,
+          -1200.0
+        ],
+        "nearest_road_index": 1,
+        "road_edge_distance_m": 8.5
+      },
+      {
+        "building_index": 16,
+        "building_type": "market_stall",
+        "facade_parallel_deviation_deg": 6.88,
+        "front_faces_road_dot": 0.992799,
+        "front_midpoint_cm": [
+          2971.059,
+          -6355.228
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 25.789
+      },
+      {
+        "building_index": 17,
+        "building_type": "market_stall",
+        "facade_parallel_deviation_deg": 6.88,
+        "front_faces_road_dot": 0.992799,
+        "front_midpoint_cm": [
+          3871.059,
+          -6355.228
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 16.789
+      },
+      {
+        "building_index": 18,
+        "building_type": "market_stall",
+        "facade_parallel_deviation_deg": 6.88,
+        "front_faces_road_dot": 0.992799,
+        "front_midpoint_cm": [
+          2971.059,
+          -5255.228
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 25.789
+      },
+      {
+        "building_index": 19,
+        "building_type": "market_stall",
+        "facade_parallel_deviation_deg": 6.88,
+        "front_faces_road_dot": 0.992799,
+        "front_midpoint_cm": [
+          3871.059,
+          -5255.228
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 16.789
+      },
+      {
+        "building_index": 20,
+        "building_type": "temple",
+        "facade_parallel_deviation_deg": 90.0,
+        "front_faces_road_dot": 0.0,
+        "front_midpoint_cm": [
+          1586.0,
+          -11200.0
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 9.5
+      },
+      {
+        "building_index": 34,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.72,
+        "front_faces_road_dot": 0.057216,
+        "front_midpoint_cm": [
+          914.482,
+          17004.731
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 4.645
+      },
+      {
+        "building_index": 35,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.78,
+        "front_faces_road_dot": -0.05617,
+        "front_midpoint_cm": [
+          -976.476,
+          16820.606
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 5.265
+      },
+      {
+        "building_index": 36,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.49,
+        "front_faces_road_dot": 0.061223,
+        "front_midpoint_cm": [
+          982.235,
+          14597.351
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 5.322
+      },
+      {
+        "building_index": 37,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 1.42,
+        "front_faces_road_dot": 0.999693,
+        "front_midpoint_cm": [
+          879.528,
+          12405.618
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 38,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 3.51,
+        "front_faces_road_dot": 0.998124,
+        "front_midpoint_cm": [
+          -973.51,
+          12233.28
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 39,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.96,
+        "front_faces_road_dot": 0.01815,
+        "front_midpoint_cm": [
+          1003.584,
+          10266.558
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 5.536
+      },
+      {
+        "building_index": 40,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.71,
+        "front_faces_road_dot": 0.074805,
+        "front_midpoint_cm": [
+          -785.127,
+          7601.568
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 3.351
+      },
+      {
+        "building_index": 41,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 4.54,
+        "front_faces_road_dot": -0.996862,
+        "front_midpoint_cm": [
+          863.082,
+          5845.063
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 5.049
+      },
+      {
+        "building_index": 42,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.17,
+        "front_faces_road_dot": 0.066796,
+        "front_midpoint_cm": [
+          -833.448,
+          5346.612
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 3.834
+      },
+      {
+        "building_index": 43,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.92,
+        "front_faces_road_dot": 0.018848,
+        "front_midpoint_cm": [
+          -1011.085,
+          3412.916
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 5.611
+      },
+      {
+        "building_index": 44,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.2,
+        "front_faces_road_dot": -0.04885,
+        "front_midpoint_cm": [
+          1076.438,
+          1373.902
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 6.264
+      },
+      {
+        "building_index": 45,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.96,
+        "front_faces_road_dot": -0.01815,
+        "front_midpoint_cm": [
+          -1006.044,
+          812.945
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 5.56
+      },
+      {
+        "building_index": 46,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 2.57,
+        "front_faces_road_dot": -0.998994,
+        "front_midpoint_cm": [
+          -914.418,
+          -1252.85
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 47,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.22,
+        "front_faces_road_dot": -0.08333,
+        "front_midpoint_cm": [
+          16937.694,
+          -3276.986
+        ],
+        "nearest_road_index": 1,
+        "road_edge_distance_m": 5.27
+      },
+      {
+        "building_index": 48,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.67,
+        "front_faces_road_dot": -0.999957,
+        "front_midpoint_cm": [
+          16462.037,
+          -1412.811
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 0.123
+      },
+      {
+        "building_index": 49,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.73,
+        "front_faces_road_dot": 0.039609,
+        "front_midpoint_cm": [
+          14756.777,
+          -3465.998
+        ],
+        "nearest_road_index": 1,
+        "road_edge_distance_m": 7.16
+      },
+      {
+        "building_index": 50,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.67,
+        "front_faces_road_dot": -0.058087,
+        "front_midpoint_cm": [
+          14416.896,
+          -1560.766
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 51,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 1.63,
+        "front_faces_road_dot": 0.999595,
+        "front_midpoint_cm": [
+          12449.638,
+          -3339.686
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 1.996
+      },
+      {
+        "building_index": 52,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.95,
+        "front_faces_road_dot": 0.035772,
+        "front_midpoint_cm": [
+          12131.281,
+          -1407.784
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 53,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 84.88,
+        "front_faces_road_dot": -0.089242,
+        "front_midpoint_cm": [
+          10313.539,
+          -3530.003
+        ],
+        "nearest_road_index": 1,
+        "road_edge_distance_m": 7.8
+      },
+      {
+        "building_index": 54,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.97,
+        "front_faces_road_dot": 0.052859,
+        "front_midpoint_cm": [
+          9810.411,
+          -1417.746
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 55,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.0,
+        "front_faces_road_dot": -0.052336,
+        "front_midpoint_cm": [
+          8085.224,
+          -3413.834
+        ],
+        "nearest_road_index": 1,
+        "road_edge_distance_m": 6.638
+      },
+      {
+        "building_index": 56,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.69,
+        "front_faces_road_dot": -0.075153,
+        "front_midpoint_cm": [
+          7824.852,
+          -1460.512
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 57,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 0.83,
+        "front_faces_road_dot": 0.999895,
+        "front_midpoint_cm": [
+          5810.046,
+          -3206.374
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 58,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.82,
+        "front_faces_road_dot": 0.003142,
+        "front_midpoint_cm": [
+          5423.998,
+          -1351.049
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 59,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 84.98,
+        "front_faces_road_dot": 0.087503,
+        "front_midpoint_cm": [
+          3493.741,
+          -3252.557
+        ],
+        "nearest_road_index": 1,
+        "road_edge_distance_m": 5.026
+      },
+      {
+        "building_index": 60,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.42,
+        "front_faces_road_dot": -0.010123,
+        "front_midpoint_cm": [
+          3189.982,
+          -1403.543
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 61,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.1,
+        "front_faces_road_dot": 0.033155,
+        "front_midpoint_cm": [
+          1114.256,
+          -1374.737
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 62,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.63,
+        "front_faces_road_dot": -0.076197,
+        "front_midpoint_cm": [
+          -3279.667,
+          -1480.593
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 63,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 3.0,
+        "front_faces_road_dot": 0.99863,
+        "front_midpoint_cm": [
+          -5330.855,
+          -3258.912
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 2.191
+      },
+      {
+        "building_index": 64,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 3.68,
+        "front_faces_road_dot": -0.997938,
+        "front_midpoint_cm": [
+          -5649.02,
+          -1587.076
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 65,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.28,
+        "front_faces_road_dot": -0.082286,
+        "front_midpoint_cm": [
+          -7551.203,
+          -3341.475
+        ],
+        "nearest_road_index": 1,
+        "road_edge_distance_m": 5.915
+      },
+      {
+        "building_index": 66,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.78,
+        "front_faces_road_dot": 0.038737,
+        "front_midpoint_cm": [
+          -7655.719,
+          -1523.552
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 67,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.34,
+        "front_faces_road_dot": -0.046409,
+        "front_midpoint_cm": [
+          -9708.602,
+          -3437.125
+        ],
+        "nearest_road_index": 1,
+        "road_edge_distance_m": 6.871
+      },
+      {
+        "building_index": 68,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.21,
+        "front_faces_road_dot": 0.0661,
+        "front_midpoint_cm": [
+          -9937.47,
+          -1389.315
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 69,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 3.06,
+        "front_faces_road_dot": 0.998574,
+        "front_midpoint_cm": [
+          -11903.367,
+          -3333.701
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 70,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.57,
+        "front_faces_road_dot": -0.024956,
+        "front_midpoint_cm": [
+          -15100.628,
+          -11449.781
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 7.002
+      },
+      {
+        "building_index": 71,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.0,
+        "front_faces_road_dot": -0.052336,
+        "front_midpoint_cm": [
+          -14946.083,
+          -13465.475
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 8.155
+      },
+      {
+        "building_index": 72,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 0.52,
+        "front_faces_road_dot": 0.999959,
+        "front_midpoint_cm": [
+          -12979.32,
+          -11325.637
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 7.293
+      },
+      {
+        "building_index": 73,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 3.36,
+        "front_faces_road_dot": -0.998281,
+        "front_midpoint_cm": [
+          -12536.438,
+          -13330.835
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 2.864
+      },
+      {
+        "building_index": 74,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.5,
+        "front_faces_road_dot": -0.061049,
+        "front_midpoint_cm": [
+          -10879.137,
+          -11339.152
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 8.108
+      },
+      {
+        "building_index": 75,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.75,
+        "front_faces_road_dot": -0.004363,
+        "front_midpoint_cm": [
+          -10427.346,
+          -13221.865
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 5.719
+      },
+      {
+        "building_index": 76,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.05,
+        "front_faces_road_dot": 0.034027,
+        "front_midpoint_cm": [
+          -8592.236,
+          -11393.883
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 7.561
+      },
+      {
+        "building_index": 77,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.75,
+        "front_faces_road_dot": -0.004363,
+        "front_midpoint_cm": [
+          -8302.996,
+          -13251.933
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 6.019
+      },
+      {
+        "building_index": 78,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 4.81,
+        "front_faces_road_dot": 0.996478,
+        "front_midpoint_cm": [
+          -6247.578,
+          -11503.613
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 1.976
+      },
+      {
+        "building_index": 79,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 4.5,
+        "front_faces_road_dot": -0.996917,
+        "front_midpoint_cm": [
+          -6008.176,
+          -13346.302
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 80,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.16,
+        "front_faces_road_dot": 0.06697,
+        "front_midpoint_cm": [
+          -3965.563,
+          -11513.187
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 6.368
+      },
+      {
+        "building_index": 81,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.77,
+        "front_faces_road_dot": -0.021466,
+        "front_midpoint_cm": [
+          -3857.188,
+          -13270.46
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 6.205
+      },
+      {
+        "building_index": 82,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.37,
+        "front_faces_road_dot": -0.063313,
+        "front_midpoint_cm": [
+          2975.772,
+          -13474.376
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 8.244
+      },
+      {
+        "building_index": 83,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 1.89,
+        "front_faces_road_dot": 0.999456,
+        "front_midpoint_cm": [
+          4853.807,
+          -11351.675
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 6.962
+      },
+      {
+        "building_index": 84,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 2.67,
+        "front_faces_road_dot": -0.998914,
+        "front_midpoint_cm": [
+          5143.22,
+          -13201.963
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 4.068
+      },
+      {
+        "building_index": 85,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.16,
+        "front_faces_road_dot": 0.06697,
+        "front_midpoint_cm": [
+          7105.246,
+          -11542.502
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 6.075
+      },
+      {
+        "building_index": 86,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.16,
+        "front_faces_road_dot": -0.084374,
+        "front_midpoint_cm": [
+          7465.661,
+          -13317.464
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 6.675
+      },
+      {
+        "building_index": 87,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.59,
+        "front_faces_road_dot": 0.076893,
+        "front_midpoint_cm": [
+          9285.019,
+          -11485.863
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 6.641
+      },
+      {
+        "building_index": 88,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.76,
+        "front_faces_road_dot": 0.056519,
+        "front_midpoint_cm": [
+          9504.547,
+          -13465.349
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 8.153
+      },
+      {
+        "building_index": 89,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 4.64,
+        "front_faces_road_dot": 0.996723,
+        "front_midpoint_cm": [
+          11578.311,
+          -11309.557
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 1.717
+      },
+      {
+        "building_index": 90,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 1.05,
+        "front_faces_road_dot": -0.999832,
+        "front_midpoint_cm": [
+          11876.918,
+          -13277.388
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 91,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.03,
+        "front_faces_road_dot": 0.016929,
+        "front_midpoint_cm": [
+          13695.438,
+          -11397.373
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 7.526
+      },
+      {
+        "building_index": 92,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.91,
+        "front_faces_road_dot": -0.036469,
+        "front_midpoint_cm": [
+          14039.26,
+          -13464.259
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 8.143
+      },
+      {
+        "building_index": 93,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.85,
+        "front_faces_road_dot": -0.05495,
+        "front_midpoint_cm": [
+          16126.43,
+          -11389.284
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 7.607
+      },
+      {
+        "building_index": 94,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.93,
+        "front_faces_road_dot": -0.070975,
+        "front_midpoint_cm": [
+          -15246.971,
+          -297.053
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 8.529
+      },
+      {
+        "building_index": 95,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.55,
+        "front_faces_road_dot": 0.077589,
+        "front_midpoint_cm": [
+          -14833.719,
+          -2257.025
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 6.07
+      },
+      {
+        "building_index": 96,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.25,
+        "front_faces_road_dot": 0.047978,
+        "front_midpoint_cm": [
+          -13125.874,
+          -475.569
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 6.744
+      },
+      {
+        "building_index": 97,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 1.12,
+        "front_faces_road_dot": -0.999809,
+        "front_midpoint_cm": [
+          -12564.723,
+          -2292.088
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 3.147
+      },
+      {
+        "building_index": 98,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.42,
+        "front_faces_road_dot": 0.045014,
+        "front_midpoint_cm": [
+          -8647.917,
+          -496.315
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 6.537
+      },
+      {
+        "building_index": 99,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 2.69,
+        "front_faces_road_dot": 0.998898,
+        "front_midpoint_cm": [
+          -6272.45,
+          -280.852
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 2.224
+      },
+      {
+        "building_index": 100,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.71,
+        "front_faces_road_dot": -0.005061,
+        "front_midpoint_cm": [
+          -4125.056,
+          -447.748
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 7.023
+      },
+      {
+        "building_index": 101,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.3,
+        "front_faces_road_dot": 0.081939,
+        "front_midpoint_cm": [
+          -1761.198,
+          -547.72
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 6.023
+      },
+      {
+        "building_index": 102,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.14,
+        "front_faces_road_dot": -0.049896,
+        "front_midpoint_cm": [
+          7111.325,
+          -378.952
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 7.71
+      },
+      {
+        "building_index": 103,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 4.93,
+        "front_faces_road_dot": 0.9963,
+        "front_midpoint_cm": [
+          11636.044,
+          -381.525
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 1.14
+      },
+      {
+        "building_index": 104,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.76,
+        "front_faces_road_dot": 0.073934,
+        "front_midpoint_cm": [
+          13785.378,
+          -503.019
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 6.47
+      },
+      {
+        "building_index": 105,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.02,
+        "front_faces_road_dot": 0.051987,
+        "front_midpoint_cm": [
+          -15201.458,
+          7402.376
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 5.524
+      },
+      {
+        "building_index": 106,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.19,
+        "front_faces_road_dot": 0.031585,
+        "front_midpoint_cm": [
+          -14980.285,
+          5593.597
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 7.564
+      },
+      {
+        "building_index": 107,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 3.9,
+        "front_faces_road_dot": 0.997684,
+        "front_midpoint_cm": [
+          -12901.085,
+          7653.331
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 6.511
+      },
+      {
+        "building_index": 108,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 2.83,
+        "front_faces_road_dot": -0.99878,
+        "front_midpoint_cm": [
+          -12817.515,
+          5500.35
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 5.675
+      },
+      {
+        "building_index": 109,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.99,
+        "front_faces_road_dot": -0.035074,
+        "front_midpoint_cm": [
+          -10889.253,
+          7474.415
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 6.244
+      },
+      {
+        "building_index": 110,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.86,
+        "front_faces_road_dot": -0.037341,
+        "front_midpoint_cm": [
+          -10527.266,
+          5524.782
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 8.252
+      },
+      {
+        "building_index": 111,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.99,
+        "front_faces_road_dot": 0.035074,
+        "front_midpoint_cm": [
+          -8472.276,
+          7664.287
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 8.143
+      },
+      {
+        "building_index": 112,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.59,
+        "front_faces_road_dot": 0.024607,
+        "front_midpoint_cm": [
+          -8327.365,
+          5631.011
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 7.19
+      },
+      {
+        "building_index": 113,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 0.4,
+        "front_faces_road_dot": 0.999976,
+        "front_midpoint_cm": [
+          -6365.509,
+          7522.614
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 3.155
+      },
+      {
+        "building_index": 114,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 4.9,
+        "front_faces_road_dot": -0.996345,
+        "front_midpoint_cm": [
+          -5835.234,
+          5699.597
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 115,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.53,
+        "front_faces_road_dot": 0.077937,
+        "front_midpoint_cm": [
+          -4062.712,
+          7528.942
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 6.789
+      },
+      {
+        "building_index": 116,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.73,
+        "front_faces_road_dot": 0.074457,
+        "front_midpoint_cm": [
+          -3673.073,
+          5764.869
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 5.851
+      },
+      {
+        "building_index": 117,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.25,
+        "front_faces_road_dot": -0.047978,
+        "front_midpoint_cm": [
+          -1768.486,
+          7460.247
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 6.102
+      },
+      {
+        "building_index": 118,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.3,
+        "front_faces_road_dot": -0.081939,
+        "front_midpoint_cm": [
+          2765.032,
+          7635.766
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 7.858
+      },
+      {
+        "building_index": 119,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.36,
+        "front_faces_road_dot": 0.063487,
+        "front_midpoint_cm": [
+          2973.342,
+          5686.506
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 6.635
+      },
+      {
+        "building_index": 120,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 2.12,
+        "front_faces_road_dot": 0.999316,
+        "front_midpoint_cm": [
+          4912.745,
+          7686.202
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 6.373
+      },
+      {
+        "building_index": 121,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 3.3,
+        "front_faces_road_dot": -0.998342,
+        "front_midpoint_cm": [
+          5366.604,
+          5540.953
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 1.834
+      },
+      {
+        "building_index": 122,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.73,
+        "front_faces_road_dot": 0.057041,
+        "front_midpoint_cm": [
+          7009.833,
+          7514.87
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 6.649
+      },
+      {
+        "building_index": 123,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.73,
+        "front_faces_road_dot": 0.039609,
+        "front_midpoint_cm": [
+          7280.011,
+          5588.234
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 7.618
+      },
+      {
+        "building_index": 124,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.54,
+        "front_faces_road_dot": 0.042922,
+        "front_midpoint_cm": [
+          9204.164,
+          7614.355
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 7.644
+      },
+      {
+        "building_index": 125,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.1,
+        "front_faces_road_dot": 0.050593,
+        "front_midpoint_cm": [
+          9801.972,
+          5788.643
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 5.614
+      },
+      {
+        "building_index": 126,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 2.35,
+        "front_faces_road_dot": 0.999159,
+        "front_midpoint_cm": [
+          11469.139,
+          7662.389
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 2.809
+      },
+      {
+        "building_index": 127,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 3.06,
+        "front_faces_road_dot": 0.998574,
+        "front_midpoint_cm": [
+          12086.005,
+          5681.076
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 128,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.22,
+        "front_faces_road_dot": -0.065926,
+        "front_midpoint_cm": [
+          13813.252,
+          7602.678
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 7.527
+      },
+      {
+        "building_index": 129,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.23,
+        "front_faces_road_dot": -0.048327,
+        "front_midpoint_cm": [
+          14030.085,
+          5665.812
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 6.842
+      },
+      {
+        "building_index": 130,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.77,
+        "front_faces_road_dot": -0.038911,
+        "front_midpoint_cm": [
+          15925.17,
+          7666.946
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 8.169
+      },
+      {
+        "building_index": 131,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.99,
+        "front_faces_road_dot": 0.035074,
+        "front_midpoint_cm": [
+          -15374.737,
+          13326.479
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 6.765
+      },
+      {
+        "building_index": 132,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.58,
+        "front_faces_road_dot": -0.00733,
+        "front_midpoint_cm": [
+          -14929.487,
+          11426.412
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 7.236
+      },
+      {
+        "building_index": 133,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.99,
+        "front_faces_road_dot": 0.035074,
+        "front_midpoint_cm": [
+          -12923.443,
+          13233.275
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 5.833
+      },
+      {
+        "building_index": 134,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 0.38,
+        "front_faces_road_dot": -0.999978,
+        "front_midpoint_cm": [
+          -12670.992,
+          11512.461
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 4.21
+      },
+      {
+        "building_index": 135,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.31,
+        "front_faces_road_dot": 0.046932,
+        "front_midpoint_cm": [
+          -10620.452,
+          13430.758
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 7.808
+      },
+      {
+        "building_index": 136,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.83,
+        "front_faces_road_dot": -0.020419,
+        "front_midpoint_cm": [
+          -10396.876,
+          11432.711
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 7.173
+      },
+      {
+        "building_index": 137,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.28,
+        "front_faces_road_dot": -0.030015,
+        "front_midpoint_cm": [
+          -8605.178,
+          13321.856
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 6.719
+      },
+      {
+        "building_index": 138,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.68,
+        "front_faces_road_dot": -0.040481,
+        "front_midpoint_cm": [
+          -8310.155,
+          11342.978
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 8.07
+      },
+      {
+        "building_index": 139,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 2.12,
+        "front_faces_road_dot": 0.999316,
+        "front_midpoint_cm": [
+          -6414.73,
+          13462.411
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 3.647
+      },
+      {
+        "building_index": 140,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 3.53,
+        "front_faces_road_dot": -0.998103,
+        "front_midpoint_cm": [
+          -6113.676,
+          11446.753
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 0.637
+      },
+      {
+        "building_index": 141,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.45,
+        "front_faces_road_dot": -0.027049,
+        "front_midpoint_cm": [
+          -4247.622,
+          13328.994
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 6.79
+      },
+      {
+        "building_index": 142,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.99,
+        "front_faces_road_dot": 0.017627,
+        "front_midpoint_cm": [
+          -3681.886,
+          11557.261
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 5.927
+      },
+      {
+        "building_index": 143,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.28,
+        "front_faces_road_dot": 0.030015,
+        "front_midpoint_cm": [
+          -1699.412,
+          13475.869
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 8.259
+      },
+      {
+        "building_index": 144,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.77,
+        "front_faces_road_dot": -0.038911,
+        "front_midpoint_cm": [
+          2531.741,
+          13363.308
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 7.133
+      },
+      {
+        "building_index": 145,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.39,
+        "front_faces_road_dot": 0.045537,
+        "front_midpoint_cm": [
+          2957.162,
+          11382.466
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 7.675
+      },
+      {
+        "building_index": 146,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 3.9,
+        "front_faces_road_dot": 0.997684,
+        "front_midpoint_cm": [
+          4856.15,
+          13385.038
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 6.938
+      },
+      {
+        "building_index": 147,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 2.44,
+        "front_faces_road_dot": -0.999093,
+        "front_midpoint_cm": [
+          5287.402,
+          11358.86
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 2.626
+      },
+      {
+        "building_index": 148,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.82,
+        "front_faces_road_dot": 0.038039,
+        "front_midpoint_cm": [
+          7261.188,
+          13483.586
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 8.336
+      },
+      {
+        "building_index": 149,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.61,
+        "front_faces_road_dot": 0.076545,
+        "front_midpoint_cm": [
+          7541.672,
+          11400.58
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 7.494
+      },
+      {
+        "building_index": 150,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.22,
+        "front_faces_road_dot": -0.031062,
+        "front_midpoint_cm": [
+          9254.281,
+          13264.118
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 6.141
+      },
+      {
+        "building_index": 151,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.68,
+        "front_faces_road_dot": 0.005585,
+        "front_midpoint_cm": [
+          9688.357,
+          11412.467
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 7.375
+      },
+      {
+        "building_index": 152,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 0.69,
+        "front_faces_road_dot": 0.999927,
+        "front_midpoint_cm": [
+          11468.471,
+          13324.799
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 2.815
+      },
+      {
+        "building_index": 153,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 1.05,
+        "front_faces_road_dot": -0.999832,
+        "front_midpoint_cm": [
+          11912.055,
+          11483.989
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 154,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.83,
+        "front_faces_road_dot": 0.002967,
+        "front_midpoint_cm": [
+          13805.998,
+          13318.795
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 6.688
+      },
+      {
+        "building_index": 155,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.79,
+        "front_faces_road_dot": -0.073412,
+        "front_midpoint_cm": [
+          14234.678,
+          11517.956
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 6.32
+      },
+      {
+        "building_index": 156,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.65,
+        "front_faces_road_dot": -0.041004,
+        "front_midpoint_cm": [
+          16068.198,
+          13377.162
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 7.272
+      },
+      {
+        "building_index": 157,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.54,
+        "front_faces_road_dot": 0.077763,
+        "front_midpoint_cm": [
+          -12798.7,
+          -14568.719
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 5.487
+      },
+      {
+        "building_index": 158,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.74,
+        "front_faces_road_dot": -0.004538,
+        "front_midpoint_cm": [
+          -11158.23,
+          -14329.996
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 5.918
+      },
+      {
+        "building_index": 159,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.62,
+        "front_faces_road_dot": -0.006632,
+        "front_midpoint_cm": [
+          -10976.768,
+          -9927.289
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 7.732
+      },
+      {
+        "building_index": 160,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.92,
+        "front_faces_road_dot": -0.071149,
+        "front_midpoint_cm": [
+          -12837.823,
+          -8099.941
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 5.878
+      },
+      {
+        "building_index": 161,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.9,
+        "front_faces_road_dot": -0.071497,
+        "front_midpoint_cm": [
+          -10930.861,
+          -7656.507
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 8.191
+      },
+      {
+        "building_index": 162,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.89,
+        "front_faces_road_dot": 0.036818,
+        "front_midpoint_cm": [
+          -12991.897,
+          -5608.633
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 7.419
+      },
+      {
+        "building_index": 163,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.6,
+        "front_faces_road_dot": 0.059306,
+        "front_midpoint_cm": [
+          -10940.698,
+          -5218.386
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 8.093
+      },
+      {
+        "building_index": 164,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.37,
+        "front_faces_road_dot": 0.080721,
+        "front_midpoint_cm": [
+          -12811.748,
+          -3371.142
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 5.617
+      },
+      {
+        "building_index": 165,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.01,
+        "front_faces_road_dot": -0.052162,
+        "front_midpoint_cm": [
+          -13028.204,
+          1008.525
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 7.782
+      },
+      {
+        "building_index": 166,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.61,
+        "front_faces_road_dot": -0.076545,
+        "front_midpoint_cm": [
+          -11056.282,
+          1330.792
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 6.937
+      },
+      {
+        "building_index": 167,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.7,
+        "front_faces_road_dot": -0.005236,
+        "front_midpoint_cm": [
+          -12902.136,
+          3177.994
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 6.521
+      },
+      {
+        "building_index": 168,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.74,
+        "front_faces_road_dot": 0.074283,
+        "front_midpoint_cm": [
+          -11069.936,
+          3418.113
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 6.801
+      },
+      {
+        "building_index": 169,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.44,
+        "front_faces_road_dot": -0.062094,
+        "front_midpoint_cm": [
+          -12935.489,
+          9909.708
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 6.855
+      },
+      {
+        "building_index": 170,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.71,
+        "front_faces_road_dot": 0.05739,
+        "front_midpoint_cm": [
+          -11073.099,
+          14578.163
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 6.769
+      },
+      {
+        "building_index": 171,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.89,
+        "front_faces_road_dot": -0.054253,
+        "front_midpoint_cm": [
+          -13071.104,
+          16488.427
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 8.211
+      },
+      {
+        "building_index": 172,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.34,
+        "front_faces_road_dot": 0.063836,
+        "front_midpoint_cm": [
+          -6852.018,
+          -14482.544
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 8.02
+      },
+      {
+        "building_index": 173,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.33,
+        "front_faces_road_dot": -0.046583,
+        "front_midpoint_cm": [
+          -4861.963,
+          -9886.78
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 6.88
+      },
+      {
+        "building_index": 174,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.98,
+        "front_faces_road_dot": -0.070105,
+        "front_midpoint_cm": [
+          -6629.574,
+          -8019.188
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 5.796
+      },
+      {
+        "building_index": 175,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 84.87,
+        "front_faces_road_dot": -0.089416,
+        "front_midpoint_cm": [
+          -4924.345,
+          -7647.153
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 6.257
+      },
+      {
+        "building_index": 176,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.61,
+        "front_faces_road_dot": 0.006807,
+        "front_midpoint_cm": [
+          -6667.353,
+          -5641.159
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 6.174
+      },
+      {
+        "building_index": 177,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.0,
+        "front_faces_road_dot": 0.017452,
+        "front_midpoint_cm": [
+          -4727.065,
+          -5434.738
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 8.229
+      },
+      {
+        "building_index": 178,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.77,
+        "front_faces_road_dot": 0.021466,
+        "front_midpoint_cm": [
+          -4920.744,
+          1199.615
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 6.293
+      },
+      {
+        "building_index": 179,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.55,
+        "front_faces_road_dot": 0.042748,
+        "front_midpoint_cm": [
+          -6862.531,
+          3298.276
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 8.125
+      },
+      {
+        "building_index": 180,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.5,
+        "front_faces_road_dot": -0.078459,
+        "front_midpoint_cm": [
+          -4843.925,
+          3621.617
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 7.061
+      },
+      {
+        "building_index": 181,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.23,
+        "front_faces_road_dot": 0.065751,
+        "front_midpoint_cm": [
+          -6826.349,
+          9928.922
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 7.763
+      },
+      {
+        "building_index": 182,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.25,
+        "front_faces_road_dot": -0.030539,
+        "front_midpoint_cm": [
+          -4976.613,
+          14721.854
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 5.734
+      },
+      {
+        "building_index": 183,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.26,
+        "front_faces_road_dot": 0.047804,
+        "front_midpoint_cm": [
+          -6600.185,
+          16574.026
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 5.502
+      },
+      {
+        "building_index": 184,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.24,
+        "front_faces_road_dot": 0.030713,
+        "front_midpoint_cm": [
+          4902.838,
+          -14742.197
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 6.472
+      },
+      {
+        "building_index": 185,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.3,
+        "front_faces_road_dot": -0.029666,
+        "front_midpoint_cm": [
+          6761.226,
+          -14368.233
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 7.112
+      },
+      {
+        "building_index": 186,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.2,
+        "front_faces_road_dot": 0.031411,
+        "front_midpoint_cm": [
+          6608.581,
+          -9843.371
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 5.586
+      },
+      {
+        "building_index": 187,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.27,
+        "front_faces_road_dot": -0.03019,
+        "front_midpoint_cm": [
+          4767.746,
+          -8074.285
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 7.823
+      },
+      {
+        "building_index": 188,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.44,
+        "front_faces_road_dot": -0.079503,
+        "front_midpoint_cm": [
+          6692.199,
+          -7633.718
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 6.422
+      },
+      {
+        "building_index": 189,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.61,
+        "front_faces_road_dot": -0.059132,
+        "front_midpoint_cm": [
+          4903.624,
+          -5624.731
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 6.464
+      },
+      {
+        "building_index": 190,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.03,
+        "front_faces_road_dot": 0.034376,
+        "front_midpoint_cm": [
+          6843.211,
+          -5508.111
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 7.932
+      },
+      {
+        "building_index": 191,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.75,
+        "front_faces_road_dot": -0.03926,
+        "front_midpoint_cm": [
+          4934.129,
+          1143.938
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 6.159
+      },
+      {
+        "building_index": 192,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.92,
+        "front_faces_road_dot": 0.001396,
+        "front_midpoint_cm": [
+          6809.37,
+          1319.0
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 7.594
+      },
+      {
+        "building_index": 193,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.43,
+        "front_faces_road_dot": 0.04484,
+        "front_midpoint_cm": [
+          4887.806,
+          3196.701
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 6.622
+      },
+      {
+        "building_index": 194,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.91,
+        "front_faces_road_dot": 0.071323,
+        "front_midpoint_cm": [
+          6669.285,
+          3430.447
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 6.193
+      },
+      {
+        "building_index": 195,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.21,
+        "front_faces_road_dot": 0.013788,
+        "front_midpoint_cm": [
+          4805.846,
+          9913.96
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 7.442
+      },
+      {
+        "building_index": 196,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.08,
+        "front_faces_road_dot": 0.068364,
+        "front_midpoint_cm": [
+          6759.441,
+          14644.046
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 7.094
+      },
+      {
+        "building_index": 197,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.14,
+        "front_faces_road_dot": 0.084721,
+        "front_midpoint_cm": [
+          4749.188,
+          16640.887
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 8.008
+      },
+      {
+        "building_index": 198,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.78,
+        "front_faces_road_dot": 0.038737,
+        "front_midpoint_cm": [
+          11074.429,
+          -14677.78
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 6.756
+      },
+      {
+        "building_index": 199,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 4.06,
+        "front_faces_road_dot": -0.99749,
+        "front_midpoint_cm": [
+          11050.802,
+          -12316.042
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 200,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.39,
+        "front_faces_road_dot": 0.080373,
+        "front_midpoint_cm": [
+          12961.588,
+          -9872.356
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 7.116
+      },
+      {
+        "building_index": 201,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 84.89,
+        "front_faces_road_dot": -0.089068,
+        "front_midpoint_cm": [
+          10887.579,
+          -7857.447
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 8.624
+      },
+      {
+        "building_index": 202,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.45,
+        "front_faces_road_dot": 0.079329,
+        "front_midpoint_cm": [
+          12829.26,
+          -7496.279
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 5.793
+      },
+      {
+        "building_index": 203,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 84.89,
+        "front_faces_road_dot": -0.089068,
+        "front_midpoint_cm": [
+          11033.838,
+          -5655.614
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 7.162
+      },
+      {
+        "building_index": 204,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.08,
+        "front_faces_road_dot": 0.068364,
+        "front_midpoint_cm": [
+          12898.454,
+          -5350.37
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 6.485
+      },
+      {
+        "building_index": 205,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.17,
+        "front_faces_road_dot": 0.049373,
+        "front_midpoint_cm": [
+          12902.399,
+          1423.935
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 6.524
+      },
+      {
+        "building_index": 206,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.52,
+        "front_faces_road_dot": 0.025828,
+        "front_midpoint_cm": [
+          11030.602,
+          3210.363
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 7.194
+      },
+      {
+        "building_index": 207,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.0,
+        "front_faces_road_dot": 0.052336,
+        "front_midpoint_cm": [
+          12860.845,
+          3704.502
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 6.108
+      },
+      {
+        "building_index": 208,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.09,
+        "front_faces_road_dot": 0.050767,
+        "front_midpoint_cm": [
+          11017.134,
+          9947.065
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 7.329
+      },
+      {
+        "building_index": 209,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.53,
+        "front_faces_road_dot": -0.060526,
+        "front_midpoint_cm": [
+          13097.064,
+          14783.67
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 8.471
+      },
+      {
+        "building_index": 210,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.96,
+        "front_faces_road_dot": -0.01815,
+        "front_midpoint_cm": [
+          11102.531,
+          16641.432
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 6.475
+      },
+      {
+        "building_index": 211,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 67.07,
+        "front_faces_road_dot": 0.389606,
+        "front_midpoint_cm": [
+          2234.216,
+          1468.254
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 17.842
+      },
+      {
+        "building_index": 212,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 84.34,
+        "front_faces_road_dot": 0.098625,
+        "front_midpoint_cm": [
+          3146.541,
+          15229.599
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 24.035
+      },
+      {
+        "building_index": 213,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 67.2,
+        "front_faces_road_dot": 0.387516,
+        "front_midpoint_cm": [
+          16445.479,
+          -2443.756
+        ],
+        "nearest_road_index": 1,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 214,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 36.42,
+        "front_faces_road_dot": -0.804687,
+        "front_midpoint_cm": [
+          4591.059,
+          15180.559
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 9.589
+      },
+      {
+        "building_index": 215,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 13.24,
+        "front_faces_road_dot": -0.973419,
+        "front_midpoint_cm": [
+          -9603.508,
+          -6543.77
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 21.465
+      },
+      {
+        "building_index": 216,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 65.83,
+        "front_faces_road_dot": -0.409445,
+        "front_midpoint_cm": [
+          13455.026,
+          10653.149
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 12.05
+      },
+      {
+        "building_index": 217,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 12.95,
+        "front_faces_road_dot": 0.974566,
+        "front_midpoint_cm": [
+          11867.602,
+          4536.027
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 218,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 32.54,
+        "front_faces_road_dot": 0.843016,
+        "front_midpoint_cm": [
+          -6985.598,
+          4155.083
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 9.356
+      },
+      {
+        "building_index": 219,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 47.47,
+        "front_faces_road_dot": 0.549463,
+        "front_midpoint_cm": [
+          -10208.62,
+          17090.134
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 15.647
+      },
+      {
+        "building_index": 220,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 47.72,
+        "front_faces_road_dot": 0.672754,
+        "front_midpoint_cm": [
+          14770.779,
+          -4184.69
+        ],
+        "nearest_road_index": 1,
+        "road_edge_distance_m": 14.347
+      },
+      {
+        "building_index": 221,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 46.21,
+        "front_faces_road_dot": -0.692017,
+        "front_midpoint_cm": [
+          -1744.351,
+          15095.759
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 12.944
+      },
+      {
+        "building_index": 222,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 6.35,
+        "front_faces_road_dot": -0.993865,
+        "front_midpoint_cm": [
+          4398.489,
+          -64.135
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 10.859
+      },
+      {
+        "building_index": 223,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 1.35,
+        "front_faces_road_dot": -0.999722,
+        "front_midpoint_cm": [
+          3102.599,
+          16038.423
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 24.474
+      },
+      {
+        "building_index": 224,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 17.75,
+        "front_faces_road_dot": 0.834657,
+        "front_midpoint_cm": [
+          16438.44,
+          -13249.994
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 6.328
+      },
+      {
+        "building_index": 225,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 59.98,
+        "front_faces_road_dot": -0.500302,
+        "front_midpoint_cm": [
+          -3090.455,
+          8743.529
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 18.935
+      },
+      {
+        "building_index": 226,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 48.45,
+        "front_faces_road_dot": 0.663273,
+        "front_midpoint_cm": [
+          7672.701,
+          -7188.404
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 16.227
+      },
+      {
+        "building_index": 227,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 4.35,
+        "front_faces_road_dot": -0.997119,
+        "front_midpoint_cm": [
+          12150.986,
+          15206.699
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 228,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 78.88,
+        "front_faces_road_dot": 0.192864,
+        "front_midpoint_cm": [
+          -1243.512,
+          -14097.965
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 14.48
+      },
+      {
+        "building_index": 229,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 9.57,
+        "front_faces_road_dot": -0.986083,
+        "front_midpoint_cm": [
+          236.533,
+          1183.367
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 230,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 9.35,
+        "front_faces_road_dot": 0.986714,
+        "front_midpoint_cm": [
+          8581.521,
+          -13814.1
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 11.641
+      },
+      {
+        "building_index": 231,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 32.33,
+        "front_faces_road_dot": -0.901302,
+        "front_midpoint_cm": [
+          -16448.892,
+          8731.652
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 18.961
+      },
+      {
+        "building_index": 232,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 80.56,
+        "front_faces_road_dot": 0.164015,
+        "front_midpoint_cm": [
+          -1890.545,
+          9207.591
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 14.405
+      },
+      {
+        "building_index": 233,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 53.62,
+        "front_faces_road_dot": -0.593138,
+        "front_midpoint_cm": [
+          8232.993,
+          -10131.512
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 20.185
+      },
+      {
+        "building_index": 234,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 47.04,
+        "front_faces_road_dot": -0.681488,
+        "front_midpoint_cm": [
+          -5342.02,
+          7399.993
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 2.08
+      },
+      {
+        "building_index": 235,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 42.32,
+        "front_faces_road_dot": 0.739396,
+        "front_midpoint_cm": [
+          840.932,
+          4481.427
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 3.909
+      },
+      {
+        "building_index": 236,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 83.28,
+        "front_faces_road_dot": -0.117017,
+        "front_midpoint_cm": [
+          -7763.829,
+          -7258.023
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 17.138
+      },
+      {
+        "building_index": 237,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 41.77,
+        "front_faces_road_dot": -0.745825,
+        "front_midpoint_cm": [
+          506.23,
+          3052.444
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 0.562
+      },
+      {
+        "building_index": 238,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.93,
+        "front_faces_road_dot": 0.053556,
+        "front_midpoint_cm": [
+          -14561.437,
+          -14809.006
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 21.59
+      },
+      {
+        "building_index": 239,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 85.18,
+        "front_faces_road_dot": -0.084026,
+        "front_midpoint_cm": [
+          -13902.581,
+          1876.379
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 16.526
+      },
+      {
+        "building_index": 240,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 24.29,
+        "front_faces_road_dot": -0.911475,
+        "front_midpoint_cm": [
+          2205.37,
+          16242.329
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 17.554
+      },
+      {
+        "building_index": 241,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 73.66,
+        "front_faces_road_dot": 0.281337,
+        "front_midpoint_cm": [
+          14159.575,
+          -14763.353
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 19.096
+      },
+      {
+        "building_index": 242,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 37.05,
+        "front_faces_road_dot": -0.79811,
+        "front_midpoint_cm": [
+          9725.128,
+          -15497.0
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 20.249
+      },
+      {
+        "building_index": 243,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 47.21,
+        "front_faces_road_dot": -0.679313,
+        "front_midpoint_cm": [
+          -4771.521,
+          -15030.771
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 7.785
+      },
+      {
+        "building_index": 244,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 45.89,
+        "front_faces_road_dot": 0.696038,
+        "front_midpoint_cm": [
+          5348.856,
+          -6962.028
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 2.011
+      },
+      {
+        "building_index": 245,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 23.25,
+        "front_faces_road_dot": 0.918791,
+        "front_midpoint_cm": [
+          -9110.655,
+          -1885.667
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 2.357
+      },
+      {
+        "building_index": 246,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 21.7,
+        "front_faces_road_dot": 0.929133,
+        "front_midpoint_cm": [
+          9387.378,
+          -4389.914
+        ],
+        "nearest_road_index": 1,
+        "road_edge_distance_m": 16.399
+      },
+      {
+        "building_index": 247,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 87.54,
+        "front_faces_road_dot": -0.042922,
+        "front_midpoint_cm": [
+          8289.659,
+          -174.119
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 9.759
+      },
+      {
+        "building_index": 248,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 37.01,
+        "front_faces_road_dot": 0.79853,
+        "front_midpoint_cm": [
+          -13895.032,
+          14475.123
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 16.45
+      },
+      {
+        "building_index": 249,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 9.55,
+        "front_faces_road_dot": 0.986141,
+        "front_midpoint_cm": [
+          1904.435,
+          9253.091
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 14.544
+      },
+      {
+        "building_index": 250,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 61.12,
+        "front_faces_road_dot": -0.482977,
+        "front_midpoint_cm": [
+          8856.034,
+          14678.8
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 20.288
+      },
+      {
+        "building_index": 251,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 39.53,
+        "front_faces_road_dot": -0.771291,
+        "front_midpoint_cm": [
+          8094.459,
+          -8575.747
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 20.445
+      },
+      {
+        "building_index": 252,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 7.51,
+        "front_faces_road_dot": -0.991422,
+        "front_midpoint_cm": [
+          -10071.429,
+          -15255.366
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 16.786
+      },
+      {
+        "building_index": 253,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 0.29,
+        "front_faces_road_dot": -0.999987,
+        "front_midpoint_cm": [
+          14229.495,
+          1071.87
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 19.795
+      },
+      {
+        "building_index": 254,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 73.79,
+        "front_faces_road_dot": 0.279159,
+        "front_midpoint_cm": [
+          2784.811,
+          5033.149
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 13.169
+      },
+      {
+        "building_index": 255,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 89.3,
+        "front_faces_road_dot": -0.012217,
+        "front_midpoint_cm": [
+          9765.59,
+          -7089.027
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 19.844
+      },
+      {
+        "building_index": 256,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 77.88,
+        "front_faces_road_dot": 0.20996,
+        "front_midpoint_cm": [
+          9191.137,
+          4301.359
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 20.486
+      },
+      {
+        "building_index": 257,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 43.52,
+        "front_faces_road_dot": -0.725134,
+        "front_midpoint_cm": [
+          -6520.357,
+          -9405.276
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 4.704
+      },
+      {
+        "building_index": 258,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 51.35,
+        "front_faces_road_dot": -0.624561,
+        "front_midpoint_cm": [
+          -14804.105,
+          12919.193
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 2.692
+      },
+      {
+        "building_index": 259,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 62.37,
+        "front_faces_road_dot": 0.46376,
+        "front_midpoint_cm": [
+          -11325.585,
+          10692.746
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 4.244
+      },
+      {
+        "building_index": 260,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 56.47,
+        "front_faces_road_dot": -0.552374,
+        "front_midpoint_cm": [
+          -7683.654,
+          -9307.389
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 16.337
+      },
+      {
+        "building_index": 261,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 6.36,
+        "front_faces_road_dot": 0.993845,
+        "front_midpoint_cm": [
+          -6829.045,
+          1385.806
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 7.79
+      },
+      {
+        "building_index": 262,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 64.61,
+        "front_faces_road_dot": 0.428777,
+        "front_midpoint_cm": [
+          5908.842,
+          9591.691
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 263,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 27.04,
+        "front_faces_road_dot": -0.890689,
+        "front_midpoint_cm": [
+          -9821.611,
+          9518.028
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 19.284
+      },
+      {
+        "building_index": 264,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 81.63,
+        "front_faces_road_dot": -0.145565,
+        "front_midpoint_cm": [
+          5301.287,
+          6607.571
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 265,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 5.66,
+        "front_faces_road_dot": 0.995125,
+        "front_midpoint_cm": [
+          -15818.193,
+          -13089.072
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 4.391
+      },
+      {
+        "building_index": 266,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 71.79,
+        "front_faces_road_dot": -0.312501,
+        "front_midpoint_cm": [
+          12120.157,
+          1285.641
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 267,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 54.66,
+        "front_faces_road_dot": 0.578427,
+        "front_midpoint_cm": [
+          -5817.183,
+          4988.333
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 268,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 67.67,
+        "front_faces_road_dot": 0.379941,
+        "front_midpoint_cm": [
+          -711.185,
+          13436.655
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 2.612
+      },
+      {
+        "building_index": 269,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.96,
+        "front_faces_road_dot": 0.053033,
+        "front_midpoint_cm": [
+          16099.493,
+          -4570.908
+        ],
+        "nearest_road_index": 1,
+        "road_edge_distance_m": 18.209
+      },
+      {
+        "building_index": 270,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 77.5,
+        "front_faces_road_dot": -0.21644,
+        "front_midpoint_cm": [
+          -1391.879,
+          1994.438
+        ],
+        "nearest_road_index": 0,
+        "road_edge_distance_m": 9.419
+      },
+      {
+        "building_index": 271,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 63.24,
+        "front_faces_road_dot": 0.450254,
+        "front_midpoint_cm": [
+          -15299.717,
+          -3363.537
+        ],
+        "nearest_road_index": 3,
+        "road_edge_distance_m": 17.135
+      },
+      {
+        "building_index": 272,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 21.2,
+        "front_faces_road_dot": -0.932324,
+        "front_midpoint_cm": [
+          14548.691,
+          -7482.509
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 22.987
+      },
+      {
+        "building_index": 273,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 41.2,
+        "front_faces_road_dot": -0.752415,
+        "front_midpoint_cm": [
+          12507.956,
+          -8109.159
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 2.58
+      },
+      {
+        "building_index": 274,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 84.77,
+        "front_faces_road_dot": 0.091154,
+        "front_midpoint_cm": [
+          -3644.092,
+          1112.443
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 19.059
+      },
+      {
+        "building_index": 275,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 38.61,
+        "front_faces_road_dot": 0.781412,
+        "front_midpoint_cm": [
+          -15152.203,
+          10580.21
+        ],
+        "nearest_road_index": 5,
+        "road_edge_distance_m": 15.698
+      },
+      {
+        "building_index": 276,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 6.13,
+        "front_faces_road_dot": -0.994282,
+        "front_midpoint_cm": [
+          7793.5,
+          9117.631
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 17.435
+      },
+      {
+        "building_index": 277,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 57.81,
+        "front_faces_road_dot": -0.532729,
+        "front_midpoint_cm": [
+          -10858.34,
+          18.584
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 8.917
+      },
+      {
+        "building_index": 278,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 67.01,
+        "front_faces_road_dot": 0.39057,
+        "front_midpoint_cm": [
+          6440.957,
+          16667.724
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 3.91
+      },
+      {
+        "building_index": 279,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 86.93,
+        "front_faces_road_dot": 0.053556,
+        "front_midpoint_cm": [
+          630.61,
+          -14179.116
+        ],
+        "nearest_road_index": 2,
+        "road_edge_distance_m": 15.291
+      },
+      {
+        "building_index": 280,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 29.55,
+        "front_faces_road_dot": 0.869926,
+        "front_midpoint_cm": [
+          -14931.282,
+          4667.602
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 16.824
+      },
+      {
+        "building_index": 281,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 61.97,
+        "front_faces_road_dot": -0.253654,
+        "front_midpoint_cm": [
+          12590.278,
+          17345.148
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 5.535
+      },
+      {
+        "building_index": 282,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 25.7,
+        "front_faces_road_dot": -0.901077,
+        "front_midpoint_cm": [
+          3113.888,
+          -9334.177
+        ],
+        "nearest_road_index": 8,
+        "road_edge_distance_m": 24.361
+      },
+      {
+        "building_index": 283,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 0.17,
+        "front_faces_road_dot": -0.999996,
+        "front_midpoint_cm": [
+          -9570.001,
+          2460.92
+        ],
+        "nearest_road_index": 6,
+        "road_edge_distance_m": 21.8
+      },
+      {
+        "building_index": 284,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 38.86,
+        "front_faces_road_dot": 0.778681,
+        "front_midpoint_cm": [
+          15886.725,
+          5409.514
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 9.405
+      },
+      {
+        "building_index": 285,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 43.5,
+        "front_faces_road_dot": 0.725374,
+        "front_midpoint_cm": [
+          -6231.594,
+          -2494.876
+        ],
+        "nearest_road_index": 1,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 286,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 79.51,
+        "front_faces_road_dot": 0.182064,
+        "front_midpoint_cm": [
+          2686.618,
+          6378.625
+        ],
+        "nearest_road_index": 4,
+        "road_edge_distance_m": 0.0
+      },
+      {
+        "building_index": 287,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 88.96,
+        "front_faces_road_dot": -0.01815,
+        "front_midpoint_cm": [
+          9592.622,
+          -5883.567
+        ],
+        "nearest_road_index": 9,
+        "road_edge_distance_m": 21.574
+      },
+      {
+        "building_index": 288,
+        "building_type": "house_gable",
+        "facade_parallel_deviation_deg": 71.91,
+        "front_faces_road_dot": -0.65846,
+        "front_midpoint_cm": [
+          -4570.871,
+          17324.078
+        ],
+        "nearest_road_index": 7,
+        "road_edge_distance_m": 10.862
+      }
+    ],
+    "house_frontage": {
+      "count": 255,
+      "facade_parallel_within_20deg_count": 51,
+      "front_faces_road_dot_gt_0_25_count": 49,
+      "near_parallel_and_facing_count": 24,
+      "road_edge_distance_median_m": 6.719,
+      "road_edge_distance_p90_m": 17.135,
+      "within_10m_count": 209
+    },
+    "market_frontage": {
+      "count": 4,
+      "facade_parallel_within_20deg_count": 4,
+      "front_faces_road_dot_gt_0_25_count": 4,
+      "near_parallel_and_facing_count": 0,
+      "road_edge_distance_median_m": 21.289,
+      "road_edge_distance_p90_m": 25.789,
+      "within_10m_count": 0
+    }
+  },
+  "schema": "terra.capital-physical-audit/v1",
+  "source": {
+    "buildings_sha256": "deecb1c950ec08a2325559bc5e5f0c3a48e076363d4d1d8b95f190c189289cf4",
+    "comparison_note": "2.3M is evaluated because it was requested; source meta actually declares 8,367,729",
+    "comparison_population": 2300000,
+    "meta_sha256": "8be26d2edf2e81d8825b9f1e44763cfa729ff552c0522e509d6c7cd93c3247c2",
+    "run_id": "terra-life",
+    "scene": "capital",
+    "source_declared_population": 8367729
+  }
+}

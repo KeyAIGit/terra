@@ -79,7 +79,7 @@ TERRA — интерактивная платформа, в которой мо�
 
 - Unreal-проект: `Terra.uproject`, ассоциация с UE 5.8.
 - Включены современные настройки рендера, включая динамическое GI, отражения, Virtual Shadow Maps и Substrate; фактическая поддержка и производительность должны проверяться на целевом Mac.
-- Текущая `GameDefaultMap` указывает на шаблон `/Engine/Maps/Templates/OpenWorld`, а не на TERRA-карту.
+- На исходном baseline `GameDefaultMap` указывала на шаблон `/Engine/Maps/Templates/OpenWorld`; в ходе takeover startup переведён на `/Game/Terra/Maps/L_capital`, а глобальный GameMode — на `TerraGameModeBase`.
 - В `Content` есть только карта `L_capital` и импортированные ассеты столицы; карт бронзы и неолита в `Content` пока нет.
 - Пакет `export_ue` содержит три структурно полных сцены:
 
@@ -92,7 +92,8 @@ TERRA — интерактивная платформа, в которой мо�
 - `capital` связан с прогоном `terra-life`; JSON содержит позиции, размеры, дороги, роли, черты, убеждения, деяния и дневные маршруты.
 - Импортёр создаёт статические прокси зданий и людей, подписи, свет, небо, туман, постпроцесс и `PlayerStart`.
 - Текущие «люди» на карте — `StaticMeshActor` плюс `TextRenderActor`, а не персонажи с навигацией, анимацией, памятью или диалоговым runtime.
-- Отдельного TERRA GameMode, игрового Pawn/Character, системы взаимодействий, runtime-базы, сохранений и NPC AI в исходном baseline не было.
+- В исходном baseline не было отдельного TERRA runtime. Теперь добавлен и включён C++-плагин `TerraRuntime` с базовыми GameMode, first-person Character, interaction contract и сериализуемыми scene/NPC-структурами. Это foundation: live PIE-проверка коллизий, спавна на карте, движения и RPC ещё остаётся обязательным gate.
+- Полноценной runtime-базы, сохранений и NPC AI пока нет.
 
 ### 5.2. Передано handoff и должно быть повторно проверено при интеграции
 

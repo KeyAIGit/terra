@@ -23,6 +23,8 @@ legacy-уровень и его ассеты не перезаписываютс
 - `generated/validation_report.md` — текущий результат в человекочитаемом
   виде.
 - `tests/` — unit/integration tests, не требующие Unreal.
+- `reality_slice.py` — физический аудит текущей столицы и независимый
+  deterministic generator/validator одного ward-scale reality slice.
 
 ## Что именно валидируется
 
@@ -48,6 +50,7 @@ legacy-уровень и его ассеты не перезаписываютс
 python3 Scripts/terra_data/terra_bridge.py validate --json
 python3 Scripts/terra_data/terra_bridge.py compare
 python3 Scripts/terra_data/terra_bridge.py generate
+python3 Scripts/terra_data/reality_slice.py all
 python3 -m unittest discover -s Scripts/terra_data/tests -v
 ```
 
@@ -141,6 +144,64 @@ digest-версию. Имена над NPC выключены по умолча�
 автоматически: сначала изучите Output Log и содержимое namespace. Новый
 export digest или новая версия identity scheme естественно создаст новую
 immutable-версию.
+
+## Физический аудит столицы
+
+`reality_slice.py audit` проверяет `capital` как городскую геометрию, а не
+только как корректный JSON. Результаты:
+
+- `generated/capital_physical_audit.json`;
+- `generated/capital_physical_audit.md`.
+
+Текущий source объявляет 8 367 729 жителей, а не 2,3 млн. В отчёте приведены
+оба сценария. Terrain занимает 1,44 км², bounding box зданий — около
+0,299 км², контур стен — около 0,127 км². Поэтому 300 proxy означают 27 892
+человека на proxy для source population или 7 667 для 2,3 млн. Также
+измеряются OBB-overlaps, проникновения в дорожный corridor, расстояние
+фасада до улицы, поворот фасада, ворота, рынок и отсутствие явного polygon
+общественной площади.
+
+Исходные `meta.json`, `buildings.json`, `people.json`, OBJ и Content при этом
+не изменяются.
+
+## Honest reality slice
+
+`reality_slice.py generate` создаёт отдельные артефакты:
+
+- `generated/reality_slice_capital.json` — rich source of truth;
+- `generated/reality_slice_capital_report.md` — validation/capacity report;
+- `generated/reality_slice_capital_runtime_v1.json` — flat adapter для
+  `TerraRuntime`.
+
+Scope намеренно ограничен одним южным рыночно-жилым ward Raflir размером
+200 × 200 м (4 га), а не всем городом. Текущая детерминированная версия:
+
+- 845 жителей и 290 рабочих мест;
+- 101 building/defensive structure: 92 street-front здания, 4 market
+  pavilion, temple, administration, gatehouse и 2 wall segment;
+- 6 улиц: main 8 м, secondary 4–4,5 м;
+- 27 service alley шириной 2,4 м, 4 shared courtyard;
+- явная market square 1 080 м² с четырьмя входами и public well;
+- flat-roof adobe/mud-brick courtyard/row fabric с party walls вместо
+  россыпи одинаковых gabled houses;
+- bilinear terrain sampling для центра и каждого угла здания, plinth Z и
+  grade validation; текущий maximum grade менее 2%;
+- area-overlap запрещён, касание party-wall edge разрешено.
+
+Вместимость использует явно записанное инженерное допущение 16 net
+residential м² на человека. Это даёт около 21 тыс. жителей/км² внутри slice,
+а не миллионы. Полный validator отвергает layout при выходе из диапазона
+800–1500, пересечении зданий/дорог/площади, неверном frontage/service access,
+terrain Z, ширине улиц или отсутствии ворот/двора/колодца.
+Порог 800–1500, maximum grade 5%, ровно одни ворота и микродопуск overlap
+заданы в коде validator: поле `validation_policy` в JSON только декларативно
+и обязано им точно соответствовать. `scope.residents_capacity` и
+`scope.jobs_capacity` также обязаны равняться сумме per-building capacity,
+поэтому изменением policy или одной итоговой цифры проверку обойти нельзя.
+
+Flat runtime adapter использует transform center в `location_cm`, full
+extents в `size_cm`; base-Z rich buildings преобразуется в
+`base_z + height/2`. PlayerStart — capsule center на `floor_z + 120 см`.
 
 ## Известные границы первого bridge
 

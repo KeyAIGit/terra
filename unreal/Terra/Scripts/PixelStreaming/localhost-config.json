@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "bind_address": "127.0.0.1",
+  "player_port": 8080,
+  "streamer_port": 8888,
+  "max_players": 1,
+  "player_keepalive_timeout_ms": 30000,
+  "homepage": "player.html",
+  "ice_servers": [],
+  "enable_stun": false,
+  "enable_turn": false,
+  "enable_sfu": false,
+  "enable_rest_api": false
+}

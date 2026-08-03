@@ -19,6 +19,9 @@ turns them into a playable, streamed representation.
   namespace. It never overwrites `/Game/Terra`.
 - The first simulated-person look reference is in
   `Art/Characters/ja_scribe/`.
+- Pixel Streaming 2 is enabled. The pinned official UE5.8 infrastructure and
+  the strictly localhost-only one-player launcher are documented in
+  `Scripts/PixelStreaming/README.md`.
 
 ## First launch after pulling source changes
 
@@ -59,8 +62,10 @@ user voice/video, or licensed assets without distribution rights.
 ## Product documents
 
 The product contract, architecture, and staged delivery gates live in the
-repository's `docs/` directory:
+repository's `Docs/` directory:
 
 - `TERRA_PRODUCT_SPEC_RU.md`
 - `TERRA_ARCHITECTURE.md`
 - `TERRA_ROADMAP.md`
+- `TERRA_PIXEL_STREAMING_2.md`
+- `TERRA_VISUAL_ASSET_AUDIT_RU.md`

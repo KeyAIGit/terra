@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "repository": "https://github.com/EpicGames/PixelStreamingInfrastructure.git",
+  "branch": "UE5.8",
+  "commit": "1d1e515e97c026d1f376f329d5f005f58eabb234",
+  "release": "0.1.0",
+  "checkout": "Tools/PixelStreamingInfrastructure-UE5.8",
+  "node": {
+    "version": "v22.14.0",
+    "platform": "darwin-arm64",
+    "archive": "node-v22.14.0-darwin-arm64.tar.gz",
+    "archive_sha256": "e9404633bc02a5162c5c573b1e2490f5fb44648345d64a958b17e325729a5e42",
+    "runtime": "Tools/.runtime/node-v22.14.0-darwin-arm64"
+  }
+}
