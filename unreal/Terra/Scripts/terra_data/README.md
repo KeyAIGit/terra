@@ -22,7 +22,10 @@ legacy-уровень и его ассеты не перезаписываютс
   файлов, хэшей и безопасных Unreal-путей.
 - `generated/validation_report.md` — текущий результат в человекочитаемом
   виде.
-- `tests/` — unit/integration tests, не требующие Unreal.
+- `tests/` — unit/integration tests, не требующие Unreal. В CI они используют
+  компактный fixture: семантически точный capital building/road JSON и полный
+  2×2 engineering terrain grid; локально при наличии проверяется настоящий
+  игнорируемый `export_ue/capital`.
 - `reality_slice.py` — физический аудит текущей столицы и независимый
   deterministic generator/validator одного ward-scale reality slice.
 

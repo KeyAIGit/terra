@@ -1,0 +1,12 @@
+{
+  "run_id": "terra-life",
+  "scene": "capital",
+  "year": 500,
+  "population": 8367729,
+  "biome": "пустыня",
+  "seed": 11,
+  "terrain": {
+    "size_cm": 120000.0
+  },
+  "player_start_cm": [0.0, -5600.0, 0.0]
+}

@@ -17,7 +17,20 @@ if str(MODULE_ROOT) not in sys.path:
 import reality_slice  # noqa: E402
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
+LOCAL_PROJECT_ROOT = Path(__file__).resolve().parents[3]
+FIXTURE_PROJECT_ROOT = Path(__file__).resolve().parent / "fixtures" / "project"
+CAPITAL_SOURCE_FILES = ("meta.json", "buildings.json", "terrain.obj")
+
+
+def capital_source_is_complete(project_root: Path) -> bool:
+    scene_root = project_root / "export_ue" / "capital"
+    return all((scene_root / filename).is_file() for filename in CAPITAL_SOURCE_FILES)
+
+
+# Developer workstations exercise the exact current export.  GitHub Actions
+# receives the compact committed regression fixture because export_ue is a
+# deliberately ignored local source package, not repository content.
+PROJECT_ROOT = LOCAL_PROJECT_ROOT if capital_source_is_complete(LOCAL_PROJECT_ROOT) else FIXTURE_PROJECT_ROOT
 
 
 def refresh_layout_digest(layout: dict) -> None:
