@@ -1,0 +1,36 @@
+# Unreal generated state
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+.vscode/
+.idea/
+*.VC.db
+*.opensdf
+*.sdf
+*.sln
+*.suo
+*.xcodeproj
+*.xcworkspace
+
+# Local snapshots and imported source packages
+Backups/
+export_ue/
+
+# Local credentials and developer overrides
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.key
+*token*
+*secret*
+Config/DefaultEditorPerProjectUserSettings.local.ini
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.log
+
