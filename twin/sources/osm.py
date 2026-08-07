@@ -45,7 +45,7 @@ QUERIES = {
               'way["natural"~"wood|scrub|sand|beach"]({bbox}););out tags geom;'),
     "pois": ('(node["name"]["amenity"]({bbox});'
              'node["name"]["shop"]({bbox});'
-             'node["name"]["tourism"]({bbox}););out tags 4000;'),
+             'node["name"]["tourism"]({bbox}););out body 4000;'),
 }
 FCLASS_OF = {"buildings": "building", "roads": "road", "water": "water",
              "green": "green", "pois": "poi"}

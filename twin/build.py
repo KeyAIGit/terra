@@ -330,8 +330,14 @@ def build_scene(key: str) -> str:
                         year = int(tok)
                         break
         if h >= BIG_H or area >= BIG_AREA:
+            pts = [[int(round(x * 10)), int(round(z * 10))] for x, z in outer]
+            # после квантования соседние точки могут совпасть (в т.ч. первая
+            # с последней) — JS-триангуляция такого не прощает
+            pts = [p for i, p in enumerate(pts) if p != pts[i - 1]]
+            if len(pts) < 3:
+                continue
             entry = {
-                "p": [[int(round(x * 10)), int(round(z * 10))] for x, z in outer],
+                "p": pts,
                 "h": int(round(h * 10)), "g": int(round(g * 10)), "c": cidx,
                 "id": rec["id"],
             }

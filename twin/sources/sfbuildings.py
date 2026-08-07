@@ -21,7 +21,7 @@ ROLL_URL = "https://data.sfgov.org/resource/wv5m-vpq2.json"
 PAGE = 20_000
 FOOT_PAGES = 10          # 177k / 20k
 ROLL_PAGES = 13          # ~220k+ участков свежего года
-ROLL_YEAR = "2023"
+ROLL_YEAR = 2025         # свежий closed_roll_year (числовой в SODA)
 
 
 def _page(ctx, url: str, params: dict) -> list[dict]:
@@ -72,7 +72,7 @@ def _foot_records(rows: list[dict]) -> list[dict]:
 def _roll_records(rows: list[dict]) -> list[dict]:
     out = []
     for d in rows:
-        blk = d.get("mapblklot") or d.get("blklot")
+        blk = d.get("parcel_number")
         yb = common.to_int(d.get("year_property_built"))
         if not blk:
             continue
@@ -120,9 +120,9 @@ def fetch(ctx) -> dict:
             continue
         ctx.check(60)
         rows = _page(ctx, ROLL_URL, {
-            "$select": "mapblklot,year_property_built,use_definition",
-            "$where": f"closed_roll_year='{ROLL_YEAR}'",
-            "$order": "mapblklot", "$limit": PAGE, "$offset": i * PAGE})
+            "$select": "parcel_number,year_property_built,use_definition",
+            "$where": f"closed_roll_year={ROLL_YEAR}",
+            "$order": "parcel_number", "$limit": PAGE, "$offset": i * PAGE})
         recs = _roll_records(rows)
         # один участок может повториться — оставляем первую запись чанка
         seen, uniq = set(), []

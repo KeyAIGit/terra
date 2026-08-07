@@ -179,18 +179,18 @@ function buildBig(){
     var base = PAL[b.c] || PAL[5];
     var vec2 = [];
     for (var i = 0; i < n; i++) vec2.push(new THREE.Vector2(ring[i][0]/10, ring[i][1]/10));
-    // крыша
-    var tris;
-    try { tris = THREE.ShapeUtils.triangulateShape(vec2, []); }
+    // крыша: triangulateShape МУТИРУЕТ вход (снимает замыкающие дубли),
+    // поэтому триангулируем копию, а стены строим по исходному кольцу
+    var triPts = vec2.slice(), tris;
+    try { tris = THREE.ShapeUtils.triangulateShape(triPts, []); }
     catch(e){ tris = []; }
     var rc = shade(base, 0.82);
     for (var ti = 0; ti < tris.length; ti++){
       var tr = tris[ti];
-      for (var v = 0; v < 3; v++){
-        var p = vec2[tr[v]];
-        pos.push(p.x, top, p.y);
-        col.push(rc[0], rc[1], rc[2]);
-      }
+      var pa = triPts[tr[0]], pb = triPts[tr[1]], pc = triPts[tr[2]];
+      if (!pa || !pb || !pc) continue;
+      pos.push(pa.x, top, pa.y, pb.x, top, pb.y, pc.x, top, pc.y);
+      col.push(rc[0], rc[1], rc[2], rc[0], rc[1], rc[2], rc[0], rc[1], rc[2]);
       owner.push(bi);
     }
     // стены
@@ -262,7 +262,7 @@ function buildRoads(){
       var dx = x2-x1, dz = z2-z1, len = Math.sqrt(dx*dx+dz*dz);
       if (len < 0.01) continue;
       var px = -dz/len*w, pz = dx/len*w;
-      var y1 = gH(x1, z1) + 0.55, y2 = gH(x2, z2) + 0.55;
+      var y1 = gH(x1, z1) + 0.9, y2 = gH(x2, z2) + 0.9;
       pos.push(x1+px, y1, z1+pz,  x1-px, y1, z1-pz,  x2+px, y2, z2+pz);
       pos.push(x1-px, y1, z1-pz,  x2-px, y2, z2-pz,  x2+px, y2, z2+pz);
       for (var v = 0; v < 6; v++) col.push(c[0], c[1], c[2]);

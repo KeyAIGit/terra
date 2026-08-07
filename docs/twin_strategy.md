@@ -36,6 +36,19 @@ imagery, meter-class thermal, interiors. Those are exactly what Planet,
 Hivemapper, SatVu and Matterport charge for — and none is required for the
 game.
 
+**The proof-of-concept reference** (user-provided): Bilawal Sidhu's
+*WorldView* "spy satellite simulator"
+([spatialintelligence.ai](https://www.spatialintelligence.ai/p/i-built-a-spy-satellite-simulator))
+— a weekend browser app layering live feeds (OpenSky/ADS-B aircraft,
+CelesTrak satellite orbits, OSM traffic as particle systems, public CCTV
+projected onto 3D city models) and sensor-style shaders (FLIR thermal, night
+vision, CRT) over Google Photorealistic 3D Tiles. Every live layer he used
+has a zero-key path in our inventory (adsb.lol, CelesTrak+SGP4, our own OSM
+roads, Caltrans CWWP2 cams); the one paid piece is Google's mesh, which our
+DataSF-lidar base replaces with redistributable data. His stated end-goal —
+a continuously updating physical world model *queryable by AI agents* — is
+exactly the twin-meets-TERRA-agents direction of this project.
+
 ## 3. Architecture (implemented)
 
 `twin/` mirrors the atlas discipline: resumable manifest, chunked ingest,
@@ -153,8 +166,12 @@ The de-building plan, layer by layer; tiers K/T/R as in the atlas:
    years; USGS 1 m DEM for the city core; Overture for the other 8 counties.
 3. **Textures:** NAIP orthophoto ground texture + Sentinel-2 seasonal
    refresh; ESA WorldCover material masks; night lights from CAISO demand.
-4. **The living layer:** transit vehicles (511), planes (adsb.lol), ships
-   (AIS), tides, quakes, air quality — the twin breathes in real time.
+4. **The living layer** (WorldView-style, all zero-key unless noted):
+   synthesized traffic as particle flow along the road graph; planes
+   (adsb.lol), ships (AIS — key), transit vehicles (511 — key), tides,
+   quakes, air-quality haze; satellite passes overhead (CelesTrak TLE +
+   SGP4 client-side); Caltrans freeway-camera billboards; sensor view
+   modes (thermal / night-vision shaders) as a game aesthetic.
 5. **Time machine v1:** year slider 2026→1906 driven by assessor years +
    burn polygon; then 1849/1776/pre-colonial layers.
 6. **People:** population per block (TIGER POP20) spawns agents; TERRA's
