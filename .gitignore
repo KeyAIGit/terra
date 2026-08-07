@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 atlas/data/
+twin/data/
 node_modules/
 runs/
 logs/

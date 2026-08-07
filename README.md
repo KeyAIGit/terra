@@ -58,6 +58,26 @@ traits, beliefs, gods and chronicle events. Paste an Anthropic API key into the
 dialogue panel and NPCs converse freely in character (browser-side call,
 `claude-haiku-4-5`).
 
+## TERRA Twin — a digital twin of the present (new)
+
+The mirror problem: instead of simulating a civilization forward from nothing,
+assemble a faithful simulation of *the present* from real data and de-build it
+into the past. First region: the San Francisco Bay Area.
+
+```bash
+python3 -m twin.ingest --budget 1500    # resumable open-data ingest (no API keys)
+python3 -m twin.doctor                  # schema + physical sanity checks
+python3 -m twin.view sf                 # twin_sf.html — fly over the real SF
+```
+
+`twin_sf.html` is a self-contained page: real 30 m terrain, all ~177k city
+buildings (lidar heights from DataSF, names from OSM), streets, water, parks,
+live NOAA weather, a day-time slider, click any building to identify it. Every
+record carries provenance (`source/license/tier/retrieved`) in the same K/T/R
+discipline as the atlas; per-parcel construction years from the assessor roll
+are the seed of the time machine (2026 → 1950 → 1906 → 1849 → 1776 →
+pre-colonial). Strategy: [docs/twin_strategy.md](docs/twin_strategy.md).
+
 ## Unreal Engine 5 export
 
 ```bash
@@ -102,6 +122,7 @@ python3 -m tests.test_terra --slow                      # 70+ checks incl. deter
 | UE bridge | `terra/export_ue.py`, `terra/ue/` | terrain/manifest export + UE editor-Python importer |
 | viewers | `terra/globe.py`, `report.py`, `compact.py`, `gallery.py` | 3D globe, dashboard, light atlas, faces |
 | atlas | `atlas/` | (early) real-history data pipeline: Wikidata, Pleiades, museum APIs |
+| twin | `twin/` | digital twin of the present: SF Bay Area from open geodata, time machine to the past |
 
 Pure Python 3.11 + numpy/scipy/Pillow; three.js is inlined into self-contained
 HTML files. The simulation is the single source of truth — visualizations only read.
