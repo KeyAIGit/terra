@@ -10,6 +10,7 @@ from twin.sources import (
     sfbuildings,
     live,
     imagery,
+    population,
 )
 
 REGISTRY = [
@@ -18,6 +19,7 @@ REGISTRY = [
     weather,      # погода NOAA (мгновенно)
     live,         # живой слой: борта, спутники, толчки, прилив, камеры
     imagery,      # аэрофотоснимок под здания
+    population,   # переписные кварталы с населением
     osm,          # здания/дороги/вода — самый долгий, чанками
     sfbuildings,  # городской лидар + годы постройки (машина времени)
 ]

@@ -217,6 +217,31 @@ def test_forecast():
           fc.quake_probability([1.6, 2.0], 30, 4.0, 30)["p"] is None)
 
 
+def test_people():
+    section("синтетические жители")
+    from twin import people as tp
+    import random as _r
+    rnd = _r.Random(3)
+    # доли распределений должны складываться в единицу
+    for name, tbl in (("возраст", [(a, b, w) for a, b, w in tp.AGE_BANDS]),
+                      ("домохозяйства", tp.HOUSEHOLD_SIZES),
+                      ("поездки", tp.COMMUTE), ("занятость", tp.SECTORS)):
+        w = sum(t[-1] for t in tbl)
+        check(f"доли {name} дают 1.0", abs(w - 1.0) < 0.02, f"{w:.3f}")
+    ages = [tp._age(rnd) for _ in range(20000)]
+    med = sorted(ages)[len(ages) // 2]
+    check("медианный возраст выборки как в городе", 33 <= med <= 44, f"{med}")
+    check("возраст в разумных границах", 0 <= min(ages) and max(ages) <= 95)
+    kids = sum(1 for a in ages if a < 18) / len(ages)
+    check("детей около 13 %", 0.10 <= kids <= 0.16, f"{kids:.3f}")
+    # выбор из таблицы устойчив к сиду: тот же сид — тот же человек
+    a = [tp._pick(_r.Random(9), tp.SECTORS) for _ in range(5)]
+    b = [tp._pick(_r.Random(9), tp.SECTORS) for _ in range(5)]
+    check("выбор детерминирован сидом", a == b)
+    check("жилая доля жилого дома выше складской",
+          tp.RESIDENTIAL_SHARE[0] > tp.RESIDENTIAL_SHARE[2])
+
+
 def test_regions():
     section("регионы")
     sc = regions.scene("sf")
@@ -245,6 +270,7 @@ def main():
     test_time_machine()
     test_sky_dir()
     test_forecast()
+    test_people()
     test_regions()
     print("\n" + "=" * 64)
     if _FAILS:

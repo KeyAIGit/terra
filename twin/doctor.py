@@ -190,6 +190,37 @@ def _check_live(errors: list, warns: list, done: bool) -> None:
         warns.append("live: нет уровня воды")
 
 
+def _check_population(errors: list, warns: list, done: bool) -> None:
+    """Кварталы переписи и синтетические жители: сходятся ли суммы."""
+    blocks = _read_kind("population", "feature")
+    if not blocks:
+        (errors if done else warns).append("population: нет кварталов")
+        return
+    total = sum(json.loads(b["tags_json"]).get("pop20", 0) for b in blocks)
+    print(f"{OK} population: {len(blocks)} кварталов, {total:,} человек по переписи"
+          .replace(",", " "))
+    # девять округов Залива по переписи 2020 — около 7.76 млн
+    if not (6_500_000 <= total <= 8_500_000):
+        errors.append(f"population: {total} человек — не похоже на Залив")
+
+    res = _read_kind("people", "feature")
+    if not res:
+        warns.append("people: выборка жителей не построена "
+                     "(python3 -m twin.people sf)")
+        return
+    ages = sorted(json.loads(r["tags_json"])["age"] for r in res)
+    med = ages[len(ages) // 2]
+    print(f"{OK} people: выборка {len(res)} жителей, медианный возраст {med}")
+    # Сан-Франциско: медиана около 38 лет
+    if not (30 <= med <= 46):
+        errors.append(f"people: медианный возраст {med} не похож на город")
+    if any(r["tier"] != "R" for r in res):
+        errors.append("people: синтетический житель обязан быть яруса R")
+    if any(r.get("name") for r in res):
+        errors.append("people: у синтетического жителя не должно быть имени "
+                      "живого человека")
+
+
 def _check_time_machine(errors: list, warns: list) -> None:
     """Собранная сцена: шкала лет и правдоподобие известных зданий."""
     import gzip
@@ -268,6 +299,7 @@ def main() -> int:
     _check_weather(errors, warns, st.get("weather") == "done")
     _check_sfbuildings(errors, warns, st.get("sfbuildings") == "done")
     _check_live(errors, warns, st.get("live") == "done")
+    _check_population(errors, warns, st.get("population") == "done")
     _check_time_machine(errors, warns)
 
     for w in warns:
