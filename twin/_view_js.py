@@ -80,6 +80,7 @@ BODY = """
   <label><input type="checkbox" id="lSat" checked> спутники <span class="n" id="nSat"></span></label>
   <label><input type="checkbox" id="lQ"> толчки за месяц <span class="n" id="nQ"></span></label>
   <label><input type="checkbox" id="lCam"> дорожные камеры <span class="n" id="nCam"></span></label>
+  <label><input type="checkbox" id="lRes"> жители <span class="n" id="nRes"></span></label>
   <div class="dim" id="tideTxt"></div>
   <label class="dim">время ×<span id="spdV">1</span>
     <input type="range" id="spd" min="0" max="3" step="1" value="0"></label>
@@ -692,6 +693,8 @@ function setupControls(){
     if (quakeGroup) quakeGroup.visible = this.checked; });
   $('lCam').addEventListener('change', function(){
     if (camGroup) camGroup.visible = this.checked; });
+  $('lRes').addEventListener('change', function(){
+    if (resMesh) resMesh.visible = this.checked; });
   $('aer').addEventListener('change', applyAerial);
   $('spd').addEventListener('input', function(){
     LIVE_SPEED = [1, 10, 60, 300][parseInt(this.value, 10)];
@@ -721,11 +724,24 @@ function onPick(e){
   ray.setFromCamera(mouse, camera);
   // сначала живой слой: борта, камеры, толчки — они поверх города
   var liveHit = [];
+  if (resMesh && resMesh.visible) liveHit.push(resMesh);
   if (airMesh && airMesh.visible) liveHit.push(airMesh);
   if (camGroup && camGroup.visible) liveHit = liveHit.concat(camGroup.children);
   if (quakeGroup && quakeGroup.visible) liveHit = liveHit.concat(quakeGroup.children);
   var lh = ray.intersectObjects(liveHit, false);
-  if (lh.length && showLive(lh[0])) return;
+  if (lh.length){
+    var h0 = lh[0];
+    if (h0.object === resMesh){
+      var card = residentCard(h0.instanceId);
+      if (card){
+        $('iName').textContent = card.name;
+        $('iMeta').innerHTML = card.meta;
+        $('info').style.display = 'block';
+        return;
+      }
+    }
+    if (showLive(h0)) return;
+  }
 
   var meshes = [];
   if (bigMesh) meshes.push(bigMesh);
@@ -835,6 +851,7 @@ function fillHud(){
   $('nSat').textContent = cn.sats || 0;
   $('nQ').textContent = cn.quakes || 0;
   $('nCam').textContent = cn.cams || 0;
+  $('nRes').textContent = (h.people || {}).n || 0;
   if (lv.stamp){
     var s = lv.stamp;
     $('liveStamp').textContent = s.slice(6,8) + '.' + s.slice(4,6) + ' '
@@ -1032,6 +1049,55 @@ function buildCams(){
   scene.add(camGroup);
 }
 
+// ── жители ──────────────────────────────────────────────────────────────────
+var resMesh = null, resData = [];
+function buildResidents(){
+  var arr = S.res || [];
+  resData = arr;
+  if (!arr.length) return;
+  var g = new THREE.CapsuleGeometry(0.32, 1.05, 3, 6);
+  g.translate(0, 0.85, 0);
+  g.setAttribute('aMat', new THREE.BufferAttribute(
+    new Float32Array(g.attributes.position.count).fill(M_BLD), 1));
+  var mat = sensorized(new THREE.MeshLambertMaterial());
+  resMesh = new THREE.InstancedMesh(g, mat, arr.length);
+  resMesh.frustumCulled = false;
+  var m = new THREE.Matrix4(), q = new THREE.Quaternion(),
+      p = new THREE.Vector3(), s = new THREE.Vector3(1,1,1), c = new THREE.Color();
+  for (var i = 0; i < arr.length; i++){
+    var r = arr[i];
+    // немного разводим по двору, чтобы жильцы дома не стояли одной точкой
+    var a = (i * 2.399963), rad = 3 + (i % 7);
+    p.set(r[0]/10 + Math.cos(a) * rad, r[2]/10, r[1]/10 + Math.sin(a) * rad);
+    m.compose(p, q, s);
+    resMesh.setMatrixAt(i, m);
+    var age = r[3];
+    c.setHSL(age < 18 ? 0.13 : (age >= 65 ? 0.58 : 0.05), 0.42, 0.58);
+    resMesh.setColorAt(i, c);
+  }
+  resMesh.instanceMatrix.needsUpdate = true;
+  if (resMesh.instanceColor) resMesh.instanceColor.needsUpdate = true;
+  resMesh.visible = false;
+  scene.add(resMesh);
+}
+
+function residentCard(i){
+  var r = resData[i];
+  if (!r) return null;
+  var age = r[3];
+  var who = age < 18 ? 'школьник' : (age >= 65 ? 'на покое' : 'взрослый');
+  return {
+    name: 'Житель, ' + age + ' ' + (age % 10 === 1 && age % 100 !== 11 ? 'год'
+          : (age % 10 >= 2 && age % 10 <= 4 && (age % 100 < 10 || age % 100 >= 20)
+             ? 'года' : 'лет')),
+    meta: who + ' · домохозяйство ' + r[4] + ' чел. · ' + r[5]
+        + '<br>занятость: ' + r[7] + ' · дорога: ' + r[6]
+        + '<br><span style="color:#88929c">синтетический житель (ярус R): '
+        + 'население квартала измерено переписью, человек — выдуман; '
+        + 'реальным людям не соответствует</span>'
+  };
+}
+
 function applyTide(){
   var td = (S.head.live || {}).tide || {};
   if (!waterMesh || td.level_m == null) return;
@@ -1194,7 +1260,7 @@ function start(){
   chain = chain.then(function(){ return boot('подписи…'); }).then(buildLabels);
   chain = chain.then(function(){ return boot('живой слой: борта и спутники…'); })
     .then(function(){ buildAircraft(); buildSats(); buildQuakes(); buildCams();
-                      applyTide(); });
+                      applyTide(); buildResidents(); });
   chain = chain.then(function(){
     var tm = S.head.time_machine;
     if (tm){

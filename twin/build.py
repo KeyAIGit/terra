@@ -646,6 +646,25 @@ def build_scene(key: str) -> str:
                       "bbox": list(sc.bbox),
                       "source": "USDA NAIP · Microsoft Planetary Computer"}
 
+    # ── синтетические жители: люди в городе, но ни один не настоящий ──
+    residents = []
+    import pyarrow.parquet as pq
+    for path in sorted(glob.glob(os.path.join(DATA_DIR, "people", "*.parquet"))):
+        if schema.table_kind(pq.ParquetFile(path).schema_arrow) != "feature":
+            continue
+        for rec in pq.read_table(path).to_pylist():
+            if rec.get("scene") != key or rec["fclass"] != "resident":
+                continue
+            t = json.loads(rec["tags_json"])
+            x, z = proj.xz(rec["lat"], rec["lon"])
+            residents.append([
+                int(round(x * 10)), int(round(z * 10)),
+                int(round(ground.at(rec["lat"], rec["lon"]) * 10)),
+                t.get("age", 30), t.get("household", 1),
+                t.get("tenure", ""), t.get("commute", ""), t.get("sector", ""),
+            ])
+    residents.sort(key=lambda r: (r[0], r[1], r[3]))
+
     wx = _latest_weather(key)
     head = {
         "key": key, "title": sc.title, "date": schema.today(),
@@ -656,6 +675,10 @@ def build_scene(key: str) -> str:
         "weather": wx,
         "time_machine": time_machine,
         "aerial": aerial,
+        "people": {"n": len(residents),
+                   "note": "синтетические жители: население квартала измерено "
+                           "переписью, сам житель — реконструкция (ярус R); "
+                           "никто из них не соответствует живому человеку"},
         "live": {"stamp": live["stamp"], "tide": tide,
                  "counts": {"aircraft": len(air), "sats": len(sats),
                             "quakes": len(quakes), "cams": len(cams)}},
@@ -671,7 +694,8 @@ def build_scene(key: str) -> str:
     payload = {"head": head, "terrain": terrain,
                "big": big, "small": small, "roads": roads,
                "lakes": lakes, "pois": poi_out,
-               "air": air, "sats": sats, "quakes": quakes, "cams": cams}
+               "air": air, "sats": sats, "quakes": quakes, "cams": cams,
+               "res": residents}
     os.makedirs(BUILD_DIR, exist_ok=True)
     out = os.path.join(BUILD_DIR, f"scene_{key}.json.gz")
     raw = json.dumps(payload, ensure_ascii=False,
