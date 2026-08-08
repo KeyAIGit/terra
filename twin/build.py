@@ -634,6 +634,18 @@ def build_scene(key: str) -> str:
         tide["next"] = [{"t": o["t"], "v": round(o["value"], 2),
                          "k": o["var"].split("_")[1]} for o in hilo]
 
+    # аэрофотоснимок: сам файл кладёт в страницу view.py — JPEG уже сжат,
+    # заворачивать его в gzip сцены бессмысленно
+    aerial = None
+    ap = os.path.join(DATA_DIR, "imagery", f"naip_{key}.jpg")
+    if os.path.exists(ap):
+        from PIL import Image
+        with Image.open(ap) as im:
+            aerial = {"path": os.path.relpath(ap, DATA_DIR),
+                      "w": im.width, "h": im.height,
+                      "bbox": list(sc.bbox),
+                      "source": "USDA NAIP · Microsoft Planetary Computer"}
+
     wx = _latest_weather(key)
     head = {
         "key": key, "title": sc.title, "date": schema.today(),
@@ -643,6 +655,7 @@ def build_scene(key: str) -> str:
                    "lakes": len(lakes), "pois": len(poi_out)},
         "weather": wx,
         "time_machine": time_machine,
+        "aerial": aerial,
         "live": {"stamp": live["stamp"], "tide": tide,
                  "counts": {"aircraft": len(air), "sats": len(sats),
                             "quakes": len(quakes), "cams": len(cams)}},

@@ -70,7 +70,9 @@ BODY = """
   <div class="dim" id="yrN"></div>
   <div class="dim" id="yrNote" style="display:none;max-width:230px;margin-top:4px"></div>
   <label style="user-select:none"><input type="checkbox" id="unk" checked> здания без года</label><br>
-  <label style="user-select:none"><input type="checkbox" id="lbl" checked> подписи мест</label>
+  <label style="user-select:none"><input type="checkbox" id="lbl" checked> подписи мест</label><br>
+  <label style="user-select:none"><input type="checkbox" id="aer" checked> аэрофотоснимок</label>
+  <div class="dim" id="aerSrc" style="font-size:11px"></div>
 </div>
 <div id="live" class="panel">
   <div class="hd">живой слой <span class="dim" id="liveStamp"></span></div>
@@ -140,6 +142,7 @@ function boot(t){ $('bootT').textContent = t; return new Promise(function(res){
 // ── глобальное состояние ────────────────────────────────────────────────────
 var S = null;                       // данные сцены
 var renderer, scene, camera, sun, hemi, amb, waterMesh;
+var groundMesh = null, matClasses = null, matAerial = null, roadMesh = null;
 var TER = null;                     // {elev:Int16Array, surf, nx,nz,x0,z0,dx,dz}
 var bigMesh = null, bigOwner = null, instMesh = null;
 var labels = [];
@@ -297,7 +300,15 @@ function buildTerrain(){
           nx: t.nx, nz: t.nz, x0: t.x0, z0: t.z0, dx: t.dx, dz: t.dz };
   var nx = t.nx, nz = t.nz;
   var pos = new Float32Array(nx*nz*3), col = new Float32Array(nx*nz*3);
-  var mats = new Float32Array(nx*nz);
+  var mats = new Float32Array(nx*nz), uvs = new Float32Array(nx*nz*2);
+  // Снимок NAIP лежит в Меркаторе, а сетка рельефа — ровная по широте.
+  // Без этой поправки фотография сползает относительно земли на десятки метров.
+  var bb = S.head.bbox;                       // [lat_min, lon_min, lat_max, lon_max]
+  function mercY(lat){
+    var r = lat * Math.PI / 180;
+    return Math.log(Math.tan(r) + 1 / Math.cos(r));
+  }
+  var mTop = mercY(bb[2]), mBot = mercY(bb[0]);
   var k = 0;
   for (var i = 0; i < nz; i++){
     for (var j = 0; j < nx; j++){
@@ -316,6 +327,9 @@ function buildTerrain(){
       }
       col[k] = r; col[k+1] = g; col[k+2] = b;
       mats[i*nx+j] = s;          // 0 земля, 1 зелень, 2 песок, 3 вода
+      var lat = bb[2] - (bb[2] - bb[0]) * (i / (nz - 1));
+      uvs[(i*nx+j)*2]     = j / (nx - 1);
+      uvs[(i*nx+j)*2 + 1] = 1 - (mTop - mercY(lat)) / (mTop - mBot);
       k += 3;
     }
   }
@@ -331,10 +345,26 @@ function buildTerrain(){
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
   geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
   geo.setAttribute('aMat', new THREE.BufferAttribute(mats, 1));
+  geo.setAttribute('uv', new THREE.BufferAttribute(uvs, 2));
   geo.setIndex(new THREE.BufferAttribute(idx, 1));
   geo.computeVertexNormals();
-  var mat = sensorized(new THREE.MeshLambertMaterial({ vertexColors: true }));
-  scene.add(new THREE.Mesh(geo, mat));
+  matClasses = sensorized(new THREE.MeshLambertMaterial({ vertexColors: true }));
+  groundMesh = new THREE.Mesh(geo, matClasses);
+  scene.add(groundMesh);
+  if (typeof TWIN_TEX === 'string' && TWIN_TEX.length > 100){
+    var img = new Image();
+    img.onload = function(){
+      var tex = new THREE.Texture(img);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.minFilter = THREE.LinearMipmapLinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      tex.needsUpdate = true;
+      matAerial = sensorized(new THREE.MeshLambertMaterial({ map: tex }));
+      if ($('yr')) applyAerial();
+    };
+    img.src = TWIN_TEX;
+  }
 
   // водная гладь: океан и залив
   var wgeo = setMat(new THREE.PlaneGeometry(60000, 60000), M_WATER);
@@ -465,7 +495,8 @@ function buildRoads(){
   geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(col), 3));
   // дороги светятся в тепловизоре: асфальт копит дневное солнце
   var mat = sensorized(new THREE.MeshLambertMaterial({ vertexColors: true }));
-  scene.add(new THREE.Mesh(setMat(geo, M_ASPHALT), mat));
+  roadMesh = new THREE.Mesh(setMat(geo, M_ASPHALT), mat);
+  scene.add(roadMesh);
 }
 
 // ── озёра ───────────────────────────────────────────────────────────────────
@@ -531,6 +562,26 @@ function buildLabels(){
   }
 }
 
+// Снимок — это СЕГОДНЯШНЯЯ земля. В прошлом он врёт: парковка на месте
+// снесённого квартала, шоссе там, где его не было. Уезжая назад во времени,
+// возвращаемся к раскраске по классам и говорим, почему.
+function applyAerial(){
+  if (!groundMesh) return;
+  var tm = S.head.time_machine || {};
+  var y = parseInt($('yr').value, 10);
+  var today = y >= (tm.max || 2026);
+  var want = $('aer').checked && matAerial && today;
+  groundMesh.material = want ? matAerial : matClasses;
+  // под фотографией нарисованные ленты дорог только мешают: улицы уже сняты
+  if (roadMesh) roadMesh.visible = !want;
+  var st = $('aerSrc');
+  if (st){
+    st.textContent = !matAerial ? ''
+      : (today ? (S.head.aerial ? S.head.aerial.source : '')
+               : 'снимок 2022 года выключен: он показывает сегодняшнюю землю');
+  }
+}
+
 // ── машина времени ──────────────────────────────────────────────────────────
 function applyYear(){
   var y = parseInt($('yr').value, 10);
@@ -559,6 +610,7 @@ function applyYear(){
     var want = $('lbl').checked && builtBy(y, labels[k].userData.year || 0);
     labels[k].visible = want;
   }
+  applyAerial();
 }
 
 // ── солнце и небо ───────────────────────────────────────────────────────────
@@ -640,6 +692,7 @@ function setupControls(){
     if (quakeGroup) quakeGroup.visible = this.checked; });
   $('lCam').addEventListener('change', function(){
     if (camGroup) camGroup.visible = this.checked; });
+  $('aer').addEventListener('change', applyAerial);
   $('spd').addEventListener('input', function(){
     LIVE_SPEED = [1, 10, 60, 300][parseInt(this.value, 10)];
     $('spdV').textContent = LIVE_SPEED; });

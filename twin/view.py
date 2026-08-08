@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import base64
+import io
 import json
 import os
 import sys
@@ -19,8 +20,30 @@ from twin.build import BUILD_DIR, build_scene
 from twin._view_js import CSS, BODY, APP_JS
 
 
+def _aerial_data_uri(key: str, max_px: int) -> str:
+    """Аэрофотоснимок как data:URI. max_px ограничивает ширину: страница на
+    четыре мегабайта хороша дома, но не в чужом окне."""
+    import gzip as _gz
+    from twin.state import DATA_DIR
+    src = os.path.join(DATA_DIR, "imagery", f"naip_{key}.jpg")
+    if not os.path.exists(src):
+        return ""
+    from PIL import Image
+    Image.MAX_IMAGE_PIXELS = None
+    with Image.open(src) as im:
+        if im.width > max_px:
+            im = im.resize((max_px, round(max_px * im.height / im.width)),
+                           Image.LANCZOS)
+            buf = io.BytesIO()
+            im.save(buf, "JPEG", quality=84, optimize=True)
+            raw = buf.getvalue()
+        else:
+            raw = open(src, "rb").read()
+    return "data:image/jpeg;base64," + base64.b64encode(raw).decode("ascii")
+
+
 def build_view(key: str, out_path: str | None = None,
-               fragment: bool = False) -> str:
+               fragment: bool = False, tex_max: int = 4096) -> str:
     """Собрать обозреватель. fragment=True — без <html>/<head>/<body>,
     для встраивания (страница-артефакт, HF Space, чужой шаблон)."""
     sc = regions.scene(key)
@@ -28,6 +51,7 @@ def build_view(key: str, out_path: str | None = None,
     if not os.path.exists(gz_path):
         build_scene(key)
     gz64 = base64.b64encode(open(gz_path, "rb").read()).decode("ascii")
+    tex = _aerial_data_uri(key, tex_max)
 
     meta = {"key": key, "title": sc.title}
     default_name = f"twin_{key}{'_embed' if fragment else ''}.html"
@@ -40,6 +64,7 @@ def build_view(key: str, out_path: str | None = None,
         "\nvar THREE=module.exports;</script>\n"
         "<script>var TWIN=" + json.dumps(meta, ensure_ascii=False) + ";</script>\n"
         "<script>var TWIN_GZ=\"" + gz64 + "\";</script>\n"
+        "<script>var TWIN_TEX=\"" + tex + "\";</script>\n"
         "<script>\n" + APP_JS + "\n</script>\n"
     )
     if fragment:
@@ -64,8 +89,10 @@ def main() -> int:
     ap.add_argument("-o", "--out", default=None)
     ap.add_argument("--fragment", action="store_true",
                     help="без обёртки html/head/body — для встраивания")
+    ap.add_argument("--tex", type=int, default=4096,
+                    help="предел ширины аэрофотоснимка в пикселях")
     args = ap.parse_args()
-    build_view(args.scene, args.out, fragment=args.fragment)
+    build_view(args.scene, args.out, fragment=args.fragment, tex_max=args.tex)
     return 0
 
 

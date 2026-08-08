@@ -70,7 +70,15 @@ python3 -m twin.doctor                  # schema + physical sanity checks
 python3 -m twin.view sf                 # twin_sf.html — fly over the real SF
 ```
 
-![Downtown San Francisco in the twin](docs/twin_downtown.jpg)
+![Downtown San Francisco in the twin](docs/twin_aerial_downtown.jpg)
+
+The ground is a real photograph: USDA NAIP aerial imagery at 0.6 m/pixel,
+public domain and keyless, stitched from Planetary Computer mosaic tiles and
+laid under the buildings with Mercator-correct UVs. Travel back in time and it
+switches itself off — that photo shows *today's* ground, and pretending
+otherwise would be a lie the rest of the page doesn't tell.
+
+![Golden Gate Park from the air](docs/twin_aerial_park.jpg)
 
 `twin_sf.html` is a self-contained page: real 30 m terrain, all ~177k city
 buildings (lidar heights from DataSF, names from OSM), streets, water, parks,

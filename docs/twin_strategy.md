@@ -194,8 +194,19 @@ requests, so level 3 degrades to the snapshot there by design.
 2. **Precision pass:** switch scene buildings to DataSF lidar footprints
    (real heights for *every* building, not just OSM's 140k), join assessor
    years; USGS 1 m DEM for the city core; Overture for the other 8 counties.
-3. **Textures:** NAIP orthophoto ground texture + Sentinel-2 seasonal
-   refresh; ESA WorldCover material masks; night lights from CAISO demand.
+3. ~~**Textures**~~ — **done for the base layer.** `twin/sources/imagery.py`
+   pulls USDA **NAIP at 0.6 m/pixel** (public domain, keyless) as Planetary
+   Computer mosaic tiles — z16, ~1000 tiles, stitched and cropped to the scene
+   bbox, downscaled to a 4096 px JPEG. The terrain carries Mercator-correct
+   UVs, because the tiles are EPSG:3857 while the DEM grid is uniform in
+   latitude; ignoring that slides the photo tens of metres against the ground.
+   Two rules keep it honest: the drawn road ribbons hide under the photo
+   (the real streets are already in it), and travelling back in time switches
+   the photo off with a note — it shows today's ground, and 1930 did not have
+   these parking lots. Historical aerials (UCSB FrameFinder, 1938+) are the
+   natural next layer for the past.
+   Still open here: Sentinel-2 seasonal refresh, ESA WorldCover material
+   masks, night lights from CAISO demand.
 4. ~~**The living layer**~~ — **done, and it goes past the reference.**
    `twin/sources/live.py` bakes a timestamped snapshot of the present, all
    keyless: **aircraft** over the Bay (adsb.lol — ~250 contacts with type,
