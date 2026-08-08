@@ -8,12 +8,14 @@ from twin.sources import (
     counties,
     weather,
     sfbuildings,
+    live,
 )
 
 REGISTRY = [
     dem,          # рельеф — фундамент всего
     counties,     # границы округов (лёгкие)
     weather,      # погода NOAA (мгновенно)
+    live,         # живой слой: борта, спутники, толчки, прилив, камеры
     osm,          # здания/дороги/вода — самый долгий, чанками
     sfbuildings,  # городской лидар + годы постройки (машина времени)
 ]

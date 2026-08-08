@@ -164,6 +164,28 @@ def test_time_machine():
     check("пусто -> прочее", tb._use_color(None) == 5)
 
 
+def test_sky_dir():
+    section("небо: азимут и высота спутника")
+    # прямо над головой — высота 90°
+    az, el = tb._sky_dir(37.77, -122.42, 37.77, -122.42, 500.0)
+    check("зенит даёт 90°", abs(el - 90) < 0.5, f"{el:.1f}")
+    # на север от наблюдателя — азимут около 0
+    az, el = tb._sky_dir(37.0, -122.0, 40.0, -122.0, 500.0)
+    check("север — азимут ≈ 0", abs(az) < 1.0, f"{az:.1f}")
+    check("в трёхстах км высота меньше зенита", 0 < el < 60, f"{el:.1f}")
+    # на восток
+    az, el = tb._sky_dir(37.0, -122.0, 37.0, -119.0, 500.0)
+    check("восток — азимут ≈ 90", abs(az - 90) < 2.0, f"{az:.1f}")
+    # далёкий аппарат уходит под горизонт
+    az, el = tb._sky_dir(37.0, -122.0, 10.0, -122.0, 500.0)
+    check("за три тысячи км — под горизонтом", el < 0, f"{el:.1f}")
+    # чем выше орбита, тем дольше виден
+    _, el_low = tb._sky_dir(37.0, -122.0, 41.0, -122.0, 400.0)
+    _, el_high = tb._sky_dir(37.0, -122.0, 41.0, -122.0, 20000.0)
+    check("высокая орбита видна лучше", el_high > el_low,
+          f"{el_low:.1f} vs {el_high:.1f}")
+
+
 def test_regions():
     section("регионы")
     sc = regions.scene("sf")
@@ -190,6 +212,7 @@ def main():
     test_mosaic()
     test_point_in_ring()
     test_time_machine()
+    test_sky_dir()
     test_regions()
     print("\n" + "=" * 64)
     if _FAILS:

@@ -27,7 +27,7 @@ def run(budget: float, only: str | None = None) -> int:
     for mod in todo:
         name = mod.NAME
         st = man.src(name)["status"]
-        if st == "done" and not only and name != "weather":
+        if st == "done" and not only and name not in ("weather", "live"):
             print(f"[=] {name}: уже done, пропуск")
             continue
         if st == "failed" and not only:

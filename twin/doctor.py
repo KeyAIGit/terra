@@ -145,6 +145,51 @@ def _check_sfbuildings(errors: list, warns: list, done: bool) -> None:
                   f"({n1900} участков против {n1901} в 1901); учтено в подсказке сцены")
 
 
+def _check_live(errors: list, warns: list, done: bool) -> None:
+    """Живой слой: борта над Заливом, витки, толчки, прилив, камеры."""
+    feats = _read_kind("live", "feature")
+    obs = _read_kind("live", "obs")
+    if not feats:
+        (errors if done else warns).append("live: нет живых объектов")
+        return
+    by = {}
+    for f in feats:
+        by.setdefault(f["fclass"], []).append(f)
+    n_air = len({f["id"] for f in by.get("aircraft", [])})
+    n_sat = len({f["id"] for f in by.get("satellite", [])})
+    n_q = len({f["id"] for f in by.get("quake", [])})
+    n_cam = len({f["id"] for f in by.get("camera", [])})
+    print(f"{OK} live: бортов {n_air}, витков {n_sat}, толчков {n_q}, камер {n_cam}")
+
+    for f in by.get("aircraft", []):
+        t = json.loads(f["tags_json"])
+        alt = t.get("alt_ft") or 0
+        if alt > 60000:
+            errors.append(f"live: борт {t.get('callsign')} на {alt} футах — "
+                          f"выше потолка гражданской и военной авиации")
+        if (t.get("gs_kt") or 0) > 1200:
+            errors.append(f"live: борт {t.get('callsign')} идёт "
+                          f"{t.get('gs_kt')} узлов — быстрее любого самолёта")
+    for f in by.get("satellite", []):
+        t = json.loads(f["tags_json"])
+        alts = t.get("alt_km") or []
+        if alts and (min(alts) < 140 or max(alts) > 60000):
+            errors.append(f"live: {f['name']} на высоте {min(alts):.0f}–"
+                          f"{max(alts):.0f} км — вне разумных орбит")
+        per = t.get("period_min")
+        if per and not (80 <= per <= 1600):
+            errors.append(f"live: у {f['name']} период {per} мин — не орбита")
+    lev = [o for o in obs if o["var"] == "water_level"]
+    if lev:
+        v = lev[-1]["value"]
+        if not (-1.0 <= v <= 3.5):
+            errors.append(f"live: уровень воды {v} м вне диапазона залива")
+        else:
+            print(f"{OK} live: прилив {v:.2f} м (станция {lev[-1]['station']})")
+    elif done:
+        warns.append("live: нет уровня воды")
+
+
 def _check_time_machine(errors: list, warns: list) -> None:
     """Собранная сцена: шкала лет и правдоподобие известных зданий."""
     import gzip
@@ -222,6 +267,7 @@ def main() -> int:
     _check_counties(errors, warns, st.get("counties") == "done")
     _check_weather(errors, warns, st.get("weather") == "done")
     _check_sfbuildings(errors, warns, st.get("sfbuildings") == "done")
+    _check_live(errors, warns, st.get("live") == "done")
     _check_time_machine(errors, warns)
 
     for w in warns:

@@ -89,7 +89,25 @@ Pyramid 1972, Salesforce Tower 2018, Coit Tower 1933.
 The page states its own uncertainty rather than hiding it: the assessor uses
 1900 as a placeholder for "old" (14.5k parcels), everything downtown is dated
 1906 or later because the fire took the city, and the 11k buildings with no
-year at all can be toggled off to see exactly how much is unknown. Every
+year at all can be toggled off to see exactly how much is unknown.
+
+**A living present, and sensors to look at it with.** A timestamped snapshot
+carries ~250 aircraft over the Bay (type, flight level, heading), 60 satellite
+passes propagated through SGP4 and drawn where a viewer in San Francisco would
+actually see them, a month of earthquakes, live Caltrans freeway cameras, and
+the real tide — the bay surface sits at the water level measured at Fort Point.
+Keys 1–4 switch the sensor: optical, night vision, thermal, CRT.
+
+| night vision | thermal, after dark |
+|---|---|
+| ![NVG](docs/twin_nvg.jpg) | ![Thermal](docs/twin_thermal_night.jpg) |
+
+The thermal channel is not a palette on the rendered image. It computes a
+surface temperature per vertex from the material's albedo and thermal inertia,
+the sun's angle of incidence, the heat stored through the day and the
+building's own internal load by use — with air temperature from the live NOAA
+observation. Asphalt glows after dark, parks go cold, the bay stays flat. The
+scale is printed in °C. Every
 record carries provenance (`source/license/tier/retrieved`) in the same K/T/R
 discipline as the atlas; per-parcel construction years from the assessor roll
 are the seed of the time machine (2026 → 1950 → 1906 → 1849 → 1776 →

@@ -166,12 +166,34 @@ The de-building plan, layer by layer; tiers K/T/R as in the atlas:
    years; USGS 1 m DEM for the city core; Overture for the other 8 counties.
 3. **Textures:** NAIP orthophoto ground texture + Sentinel-2 seasonal
    refresh; ESA WorldCover material masks; night lights from CAISO demand.
-4. **The living layer** (WorldView-style, all zero-key unless noted):
-   synthesized traffic as particle flow along the road graph; planes
-   (adsb.lol), ships (AIS — key), transit vehicles (511 — key), tides,
-   quakes, air-quality haze; satellite passes overhead (CelesTrak TLE +
-   SGP4 client-side); Caltrans freeway-camera billboards; sensor view
-   modes (thermal / night-vision shaders) as a game aesthetic.
+4. ~~**The living layer**~~ — **done, and it goes past the reference.**
+   `twin/sources/live.py` bakes a timestamped snapshot of the present, all
+   keyless: **aircraft** over the Bay (adsb.lol — ~250 contacts with type,
+   flight level, heading, military flag), **satellites** (CelesTrak GP
+   elements propagated through SGP4 in Python, then converted to the
+   azimuth/elevation a viewer in San Francisco would actually see — so the
+   passes arc across the sky dome, and sink below the horizon when they
+   should), **earthquakes** (USGS, 30 days of Bay Area shocks), the
+   **real tide** (NOAA CO-OPS station 9414290 — the bay surface in the twin
+   sits at the water level measured at Fort Point), and **Caltrans freeway
+   cameras**, whose stills carry `Access-Control-Allow-Origin: *` and so
+   load live in the browser: clicking a camera in an offline HTML file shows
+   the road as it is this minute.
+
+   **Sensor modes** (keys 1–4): optical, night vision, thermal, CRT. The
+   thermal channel is where we beat the reference outright. WorldView maps a
+   FLIR palette onto rendered luminance; ours computes a **surface
+   temperature** per vertex from the material's albedo and thermal inertia,
+   the sun's angle of incidence, the stored heat of the day, and the
+   building's own internal load by use class — with the air temperature
+   coming from the live NOAA observation. So asphalt glows after dark
+   because it really does, parks go cold because vegetation really cools
+   fast, the bay stays flat because water really has enormous inertia, and
+   industrial roofs run hotter than housing. The scale is printed in °C:
+   ours is a measurement, not a colour ramp.
+
+   Still to add here: traffic particles along the road graph, ships (AIS
+   needs a free key), transit vehicles (511 key), air-quality haze.
 5. ~~**Time machine v1**~~ — **done**: a year slider de-builds the city from
    2026 back to the 1790s. 165k buildings carry a construction year; the
    filter runs in the vertex shader (one uniform per slider move, geometry

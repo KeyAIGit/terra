@@ -234,6 +234,70 @@ def _raster_fill(mask: np.ndarray, rings_rc: list[list[tuple[float, float]]],
                 mask[r, c0:c1 + 1] = value
 
 
+def _read_live(scene_key: str) -> dict:
+    """Живой слой: борта, спутники, толчки, камеры, прилив — свежий слепок."""
+    import pyarrow.parquet as pq
+    feats: dict[str, list] = {}
+    obs: list[dict] = []
+    stamp = ""
+    for path in sorted(glob.glob(os.path.join(DATA_DIR, "live", "*.parquet"))):
+        pf = pq.ParquetFile(path)
+        kind = schema.table_kind(pf.schema_arrow)
+        rows = pq.read_table(path).to_pylist()
+        # имя чанка кончается меткой времени: берём только самый свежий слепок
+        tag = os.path.basename(path).rsplit("_", 1)[-1].split(".")[0]
+        stamp = max(stamp, tag)
+        for r in rows:
+            r["_stamp"] = tag
+            if kind == "obs":
+                obs.append(r)
+            else:
+                feats.setdefault(r["fclass"], []).append(r)
+    seen_obs, uniq_obs = set(), []
+    for r in sorted(obs, key=lambda r: (r["id"], r["_stamp"]), reverse=True):
+        if r["id"] in seen_obs:
+            continue
+        seen_obs.add(r["id"])
+        uniq_obs.append(r)
+    obs = uniq_obs
+    for k in feats:
+        # борта/камеры/спутники — только свежий слепок; толчки копятся, но
+        # один и тот же толчок приходит в каждом слепке, поэтому по id
+        rows = [r for r in feats[k] if r["_stamp"] == stamp or k == "quake"]
+        seen, uniq = set(), []
+        for r in sorted(rows, key=lambda r: (r["id"], r["_stamp"]), reverse=True):
+            if r["id"] in seen:
+                continue
+            seen.add(r["id"])
+            uniq.append(r)
+        uniq.sort(key=lambda r: r["id"])
+        feats[k] = uniq
+    return {"feats": feats, "obs": obs, "stamp": stamp}
+
+
+def _sky_dir(lat0: float, lon0: float, lat: float, lon: float,
+             alt_km: float) -> tuple[float, float]:
+    """Азимут и высота над горизонтом спутника, как его видно из точки сцены.
+
+    Плоская Земля тут не годится: аппарат за тысячу километров уходит под
+    горизонт, и это должно быть видно.
+    """
+    R = 6371.0
+    p = math.pi / 180.0
+    # угловое расстояние по поверхности
+    d_sigma = math.acos(max(-1.0, min(1.0,
+        math.sin(lat0 * p) * math.sin(lat * p)
+        + math.cos(lat0 * p) * math.cos(lat * p) * math.cos((lon - lon0) * p))))
+    # высота над горизонтом из треугольника «центр Земли — наблюдатель — аппарат»
+    rs = R + alt_km
+    el = math.atan2(math.cos(d_sigma) - R / rs, math.sin(d_sigma))
+    y = math.sin((lon - lon0) * p) * math.cos(lat * p)
+    x = (math.cos(lat0 * p) * math.sin(lat * p)
+         - math.sin(lat0 * p) * math.cos(lat * p) * math.cos((lon - lon0) * p))
+    az = math.atan2(y, x)
+    return math.degrees(az), math.degrees(el)
+
+
 def _latest_weather(scene_key: str) -> dict:
     import pyarrow.parquet as pq
     out = {}
@@ -500,6 +564,76 @@ def build_scene(key: str) -> str:
                      "у его зданий год постройки 1906 и позже",
     }
 
+    # ── живой слой ──
+    live = _read_live(key)
+    lat0, lon0 = sc.center
+
+    air = []
+    for rec in live["feats"].get("aircraft", []):
+        t = json.loads(rec["tags_json"])
+        x, z = proj.xz(rec["lat"], rec["lon"])
+        air.append({
+            "x": round(x, 1), "z": round(z, 1),
+            "alt": round((t.get("alt_ft") or 0) * 0.3048, 1),
+            "hdg": round(t.get("track_deg") or 0, 1),
+            "v": round((t.get("gs_kt") or 0) * 0.5144, 1),
+            "cs": t.get("callsign") or rec["id"].split(":")[-1],
+            "ty": t.get("type"), "mil": bool(t.get("military")),
+            "gnd": bool(t.get("on_ground")),
+        })
+    air.sort(key=lambda a: a["cs"])
+
+    sats = []
+    for rec in live["feats"].get("satellite", []):
+        t = json.loads(rec["tags_json"])
+        coords = json.loads(rec["geometry"])["coordinates"]
+        alts = t.get("alt_km") or []
+        pts = []
+        for i, (lo, la) in enumerate(coords):
+            alt = alts[i] if i < len(alts) else 500.0
+            az, el = _sky_dir(lat0, lon0, la, lo, alt)
+            pts.append([round(az, 1), round(el, 1)] if el > -2 else None)
+        if not any(p is not None and p[1] > 8 for p in pts):
+            continue        # ниже восьми градусов — за крышами, не показываем
+        sats.append({
+            "n": rec["name"], "id": t.get("norad"),
+            "p": pts, "t0": t.get("t0_iso"), "step": t.get("step_s"),
+            "alt": round(sum(alts) / len(alts), 0) if alts else None,
+            "per": t.get("period_min"),
+        })
+    sats.sort(key=lambda s: s["n"] or "")
+
+    quakes = []
+    for rec in live["feats"].get("quake", []):
+        t = json.loads(rec["tags_json"])
+        x, z = proj.xz(rec["lat"], rec["lon"])
+        quakes.append({"x": round(x, 1), "z": round(z, 1),
+                       "m": t.get("mag"), "d": t.get("depth_km"),
+                       "pl": t.get("place"), "t": t.get("t_iso")})
+    quakes.sort(key=lambda q: q["t"] or "", reverse=True)
+
+    cams = []
+    for rec in live["feats"].get("camera", []):
+        t = json.loads(rec["tags_json"])
+        x, z = proj.xz(rec["lat"], rec["lon"])
+        cams.append({"x": round(x, 1), "z": round(z, 1),
+                     "g": round(ground.at(rec["lat"], rec["lon"]), 1),
+                     "n": rec["name"], "u": t.get("still_url"),
+                     "r": t.get("route"), "d": t.get("direction")})
+    cams.sort(key=lambda c: c["n"] or "")
+
+    tide = {}
+    tobs = [o for o in live["obs"] if o["var"] == "water_level"]
+    if tobs:
+        tobs.sort(key=lambda o: o["t"])
+        tide = {"level_m": round(tobs[-1]["value"], 2), "t": tobs[-1]["t"],
+                "station": tobs[-1]["station"]}
+    hilo = sorted((o for o in live["obs"] if o["var"].startswith("tide_")),
+                  key=lambda o: o["t"])
+    if hilo:
+        tide["next"] = [{"t": o["t"], "v": round(o["value"], 2),
+                         "k": o["var"].split("_")[1]} for o in hilo]
+
     wx = _latest_weather(key)
     head = {
         "key": key, "title": sc.title, "date": schema.today(),
@@ -509,6 +643,9 @@ def build_scene(key: str) -> str:
                    "lakes": len(lakes), "pois": len(poi_out)},
         "weather": wx,
         "time_machine": time_machine,
+        "live": {"stamp": live["stamp"], "tide": tide,
+                 "counts": {"aircraft": len(air), "sats": len(sats),
+                            "quakes": len(quakes), "cams": len(cams)}},
         "sources": [
             {"name": "Copernicus DEM GLO-30", "license": "ESA, свободно с атрибуцией"},
             {"name": "OpenStreetMap", "license": "ODbL-1.0"},
@@ -520,7 +657,8 @@ def build_scene(key: str) -> str:
 
     payload = {"head": head, "terrain": terrain,
                "big": big, "small": small, "roads": roads,
-               "lakes": lakes, "pois": poi_out}
+               "lakes": lakes, "pois": poi_out,
+               "air": air, "sats": sats, "quakes": quakes, "cams": cams}
     os.makedirs(BUILD_DIR, exist_ok=True)
     out = os.path.join(BUILD_DIR, f"scene_{key}.json.gz")
     raw = json.dumps(payload, ensure_ascii=False,
@@ -528,7 +666,9 @@ def build_scene(key: str) -> str:
     with gzip.open(out, "wb", compresslevel=9) as f:
         f.write(raw)
     print(f"сцена {key}: зданий {len(big)}+{len(small)}, дорог {len(roads)}, "
-          f"озёр {len(lakes)}, POI {len(poi_out)}; "
+          f"озёр {len(lakes)}, POI {len(poi_out)}; живое: бортов {len(air)}, "
+          f"спутников {len(sats)}, толчков {len(quakes)}, камер {len(cams)}"
+          + (f", прилив {tide['level_m']} м" if tide else "") + "; "
           f"json {len(raw)/1e6:.1f} МБ -> {os.path.getsize(out)/1e6:.1f} МБ gz")
     return out
 
