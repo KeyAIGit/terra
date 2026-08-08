@@ -449,8 +449,13 @@ function buildTerrain(){
   matClasses = sensorized(new THREE.MeshLambertMaterial({ vertexColors: true }));
   groundMesh = new THREE.Mesh(geo, matClasses);
   scene.add(groundMesh);
-  if (typeof TWIN_TEX === 'string' && TWIN_TEX.length > 100){
+  var texSrc = (typeof TWIN_TEX === 'string' && TWIN_TEX.length > 100) ? TWIN_TEX
+             : (typeof TWIN_TEX_URL === 'string' ? TWIN_TEX_URL : '');
+  if (texSrc){
     var img = new Image();
+    // Снимок может лежать на чужом домене (хостинг уводит файлы на CDN).
+    // Без явного запроса CORS WebGL откажется брать такую картинку в текстуру.
+    if (texSrc.slice(0, 5) !== 'data:') img.crossOrigin = 'anonymous';
     img.onload = function(){
       var tex = new THREE.Texture(img);
       tex.colorSpace = THREE.SRGBColorSpace;
@@ -461,7 +466,7 @@ function buildTerrain(){
       matAerial = sensorized(new THREE.MeshLambertMaterial({ map: tex }));
       if ($('yr')) applyAerial();
     };
-    img.src = TWIN_TEX;
+    img.src = texSrc;
   }
 
   // водная гладь: океан и залив
@@ -1400,5 +1405,25 @@ function start(){
   return chain;
 }
 
-ungzip(TWIN_GZ).then(function(data){ S = data; return start(); }).catch(fail);
+// Сцена приходит либо вшитой в страницу (офлайн-файл), либо файлом рядом
+// (хостинг). Во втором случае не полагаемся на заголовки: смотрим на подпись
+// gzip в первых байтах — сервер мог распаковать поток за нас.
+function loadScene(){
+  if (typeof TWIN_GZ === 'string' && TWIN_GZ.length > 100) return ungzip(TWIN_GZ);
+  if (typeof TWIN_SCENE_URL !== 'string' || !TWIN_SCENE_URL)
+    return Promise.reject(new Error('нет данных сцены'));
+  return fetch(TWIN_SCENE_URL).then(function(r){
+    if (!r.ok) throw new Error('сцена не загрузилась: HTTP ' + r.status);
+    return r.arrayBuffer();
+  }).then(function(buf){
+    var u8 = new Uint8Array(buf);
+    if (u8.length > 2 && u8[0] === 0x1f && u8[1] === 0x8b){
+      var st = new Blob([u8]).stream().pipeThrough(new DecompressionStream('gzip'));
+      return new Response(st).json();
+    }
+    return JSON.parse(new TextDecoder('utf-8').decode(u8));
+  });
+}
+
+loadScene().then(function(data){ S = data; return start(); }).catch(fail);
 """

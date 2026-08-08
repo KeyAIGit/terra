@@ -42,6 +42,78 @@ def _aerial_data_uri(key: str, max_px: int) -> str:
     return "data:image/jpeg;base64," + base64.b64encode(raw).decode("ascii")
 
 
+def build_split(key: str, out_dir: str, tex_max: int = 4096) -> list[str]:
+    """Оболочка + данные рядом, вместо одного тяжёлого файла.
+
+    Зачем: хостинги (HF Spaces) уводят файлы тяжелее 10 МБ в LFS и отдают их
+    редиректом на CDN — браузер такую страницу СКАЧИВАЕТ, а не открывает.
+    Оболочка весит около полутора мегабайт и отдаётся как обычный html,
+    а сцену и снимок она подтягивает сама.
+    """
+    sc = regions.scene(key)
+    gz_path = os.path.join(BUILD_DIR, f"scene_{key}.json.gz")
+    if not os.path.exists(gz_path):
+        build_scene(key)
+    os.makedirs(out_dir, exist_ok=True)
+    written = []
+
+    # БЕЗ расширения .gz: у HF в .gitattributes есть правило *.gz filter=lfs,
+    # а файл из LFS отдаётся редиректом на CDN — браузер такое скачивает.
+    # Содержимое всё равно gzip, обозреватель узнаёт его по подписи в байтах.
+    scene_name = f"twin_{key}.scene"
+    with open(gz_path, "rb") as src, open(os.path.join(out_dir, scene_name), "wb") as dst:
+        dst.write(src.read())
+    written.append(os.path.join(out_dir, scene_name))
+
+    tex_name = ""
+    tex_uri = _aerial_data_uri(key, tex_max)
+    if tex_uri:
+        tex_name = f"twin_{key}.jpg"
+        raw = base64.b64decode(tex_uri.split(",", 1)[1])
+        with open(os.path.join(out_dir, tex_name), "wb") as f:
+            f.write(raw)
+        written.append(os.path.join(out_dir, tex_name))
+
+    # Скрипты — отдельными файлами: страница должна остаться КРОШЕЧНОЙ.
+    # Файл покрупнее HF отдаёт редиректом на свой CDN, и браузер такую
+    # страницу скачивает вместо того, чтобы открыть. На <script src> редирект
+    # не влияет — он важен только для самой навигации.
+    three_name = f"twin_{key}.three.js"
+    with open(os.path.join(out_dir, three_name), "w", encoding="utf-8") as f:
+        f.write("var module={exports:{}},exports=module.exports;\n"
+                + _three_source() + "\nvar THREE=module.exports;\n")
+    written.append(os.path.join(out_dir, three_name))
+
+    app_name = f"twin_{key}.app.js"
+    with open(os.path.join(out_dir, app_name), "w", encoding="utf-8") as f:
+        f.write(APP_JS)
+    written.append(os.path.join(out_dir, app_name))
+
+    meta = {"key": key, "title": sc.title}
+    html = (
+        "<!DOCTYPE html>\n<html lang=\"ru\"><head>\n"
+        "<meta charset=\"utf-8\">\n"
+        "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n"
+        "<title>TERRA · твин · " + sc.title + "</title>\n"
+        "<style>\n" + CSS + "\n</style>\n"
+        "</head>\n<body>\n" + BODY + "\n"
+        "<script>var TWIN=" + json.dumps(meta, ensure_ascii=False) + ";\n"
+        "var TWIN_GZ=\"\";var TWIN_TEX=\"\";\n"
+        "var TWIN_SCENE_URL=" + json.dumps(scene_name) + ";\n"
+        "var TWIN_TEX_URL=" + json.dumps(tex_name) + ";</script>\n"
+        "<script src=\"" + three_name + "\"></script>\n"
+        "<script src=\"" + app_name + "\"></script>\n"
+        "</body></html>\n"
+    )
+    shell = os.path.join(out_dir, f"twin_{key}.html")
+    with open(shell, "w", encoding="utf-8") as f:
+        f.write(html)
+    written.insert(0, shell)
+    for p in written:
+        print(f"  {os.path.basename(p)}: {os.path.getsize(p)/1e6:.1f} МБ")
+    return written
+
+
 def build_view(key: str, out_path: str | None = None,
                fragment: bool = False, tex_max: int = 4096) -> str:
     """Собрать обозреватель. fragment=True — без <html>/<head>/<body>,
@@ -91,8 +163,14 @@ def main() -> int:
                     help="без обёртки html/head/body — для встраивания")
     ap.add_argument("--tex", type=int, default=4096,
                     help="предел ширины аэрофотоснимка в пикселях")
+    ap.add_argument("--split", metavar="КАТАЛОГ", default=None,
+                    help="оболочка + данные рядом (для хостинга: файл тяжелее "
+                         "10 МБ уходит в LFS и скачивается вместо открытия)")
     args = ap.parse_args()
-    build_view(args.scene, args.out, fragment=args.fragment, tex_max=args.tex)
+    if args.split:
+        build_split(args.scene, args.split, tex_max=args.tex)
+    else:
+        build_view(args.scene, args.out, fragment=args.fragment, tex_max=args.tex)
     return 0
 
 
