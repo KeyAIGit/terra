@@ -381,6 +381,38 @@ function builtBy(year, y){
   return y <= year;
 }
 
+// Тень отбрасывается ОТДЕЛЬНЫМ проходом со своим материалом глубины — если
+// не повторить в нём фильтр года, снесённый в прошлое небоскрёб исчезнет,
+// а его тень останется лежать на квартале.
+// Теневая камера едет за наблюдателем и меняет охват вместе с высотой полёта:
+// у земли резкая тень от карниза, с высоты — мягкая тень квартала.
+function updateShadow(){
+  if (!sun || !sun.castShadow) return;
+  var h = Math.max(40, camera.position.y);
+  var span = Math.max(260, Math.min(2600, h * 2.2));
+  var ahead = Math.min(900, span * 0.45);
+  var dir = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
+  var cx = camera.position.x + dir.x * ahead;
+  var cz = camera.position.z + dir.z * ahead;
+  var cy = gH(cx, cz);
+  sun.target.position.set(cx, cy, cz);
+  sun.target.updateMatrixWorld();
+  sun.position.set(cx + SUN_WORLD.x * 3000, cy + SUN_WORLD.y * 3000,
+                   cz + SUN_WORLD.z * 3000);
+  var c = sun.shadow.camera;
+  if (c.right !== span){
+    c.left = -span; c.right = span; c.top = span; c.bottom = -span;
+    c.updateProjectionMatrix();
+  }
+  // ночью тени нет — гасим, чтобы не платить за лишний проход
+  sun.castShadow = U_SUNEL.value > 0.06;
+}
+
+function shadowDepth(){
+  var d = new THREE.MeshDepthMaterial({ depthPacking: THREE.RGBADepthPacking });
+  return yearFiltered(d);
+}
+
 function gH(x, z){                  // высота рельефа в точке (м)
   var fx = (x*10 - TER.x0) / TER.dx, fz = (z*10 - TER.z0) / TER.dz;
   var j = Math.max(0, Math.min(TER.nx - 2, Math.floor(fx)));
@@ -448,6 +480,7 @@ function buildTerrain(){
   geo.computeVertexNormals();
   matClasses = sensorized(new THREE.MeshLambertMaterial({ vertexColors: true }));
   groundMesh = new THREE.Mesh(geo, matClasses);
+  groundMesh.receiveShadow = true;
   scene.add(groundMesh);
   var texSrc = (typeof TWIN_TEX === 'string' && TWIN_TEX.length > 100) ? TWIN_TEX
              : (typeof TWIN_TEX_URL === 'string' ? TWIN_TEX_URL : '');
@@ -535,6 +568,9 @@ function buildBig(){
   var mat = facaded(sensorized(yearFiltered(new THREE.MeshLambertMaterial({
     vertexColors: true, side: THREE.DoubleSide }))));
   bigMesh = new THREE.Mesh(geo, mat);
+  bigMesh.castShadow = true;
+  bigMesh.receiveShadow = true;
+  bigMesh.customDepthMaterial = shadowDepth();
   scene.add(bigMesh);
 }
 function buildSmall(){
@@ -552,6 +588,9 @@ function buildSmall(){
   geo.setAttribute('aGnd', new THREE.InstancedBufferAttribute(gnd, 1));
   var mat = facaded(sensorized(yearFiltered(new THREE.MeshLambertMaterial())));
   instMesh = new THREE.InstancedMesh(geo, mat, n);
+  instMesh.castShadow = true;
+  instMesh.receiveShadow = true;
+  instMesh.customDepthMaterial = shadowDepth();
   var m = new THREE.Matrix4(), q = new THREE.Quaternion(),
       p = new THREE.Vector3(), sc = new THREE.Vector3(),
       up = new THREE.Vector3(0, 1, 0), c = new THREE.Color();
@@ -604,6 +643,7 @@ function buildRoads(){
   // дороги светятся в тепловизоре: асфальт копит дневное солнце
   var mat = sensorized(new THREE.MeshLambertMaterial({ vertexColors: true }));
   roadMesh = new THREE.Mesh(setMat(geo, M_ASPHALT), mat);
+  roadMesh.receiveShadow = true;
   scene.add(roadMesh);
 }
 
@@ -739,12 +779,13 @@ function applyTime(){
   var az = (0.25 + 0.5 * f) * 2 * Math.PI;      // восток -> запад
   var sunV = new THREE.Vector3(Math.cos(az) * Math.cos(el * Math.PI/2), Math.sin(el * Math.PI/2),
                                -Math.sin(az) * Math.cos(el * Math.PI/2));
-  sun.position.copy(sunV.multiplyScalar(20000));
+  SUN_WORLD.copy(sunV);          // единичное направление до масштабирования
+  sun.position.copy(sunV.clone().multiplyScalar(3000));
   var day = Math.max(0, Math.min(1, el * 1.6));
   var warm = Math.max(0, 1 - el * 2.2);
   sun.color.setRGB(1.0, 0.96 - warm * 0.3, 0.88 - warm * 0.45);
   sun.intensity = 0.4 + 2.0 * day;
-  hemi.intensity = 0.25 + 0.75 * day;
+  hemi.intensity = 0.42 + 0.58 * day;   // тень держит небесную подсветку
   var sky = new THREE.Color().setRGB(
     0.34 + 0.28 * day + warm * 0.24 * day,
     0.44 + 0.28 * day - warm * 0.06 * day,
@@ -753,9 +794,8 @@ function applyTime(){
   scene.background = sky;
   scene.fog.color.copy(sky);
 
-  // то же солнце — для теплового расчёта; направление в системе камеры
-  SUN_WORLD.set(sun.position.x, sun.position.y, sun.position.z).normalize();
   U_SUNEL.value = Math.max(0, Math.min(1, el));
+  sun.castShadow = U_SUNEL.value > 0.06;
   U_STORED.value = storedHeat(t);
   U_NIGHT.value = Math.max(0, Math.min(1, 1.0 - el * 2.2));
   applyMode();
@@ -1341,6 +1381,8 @@ function start(){
   renderer = new THREE.WebGLRenderer({ canvas: $('c3d'), antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   scene = new THREE.Scene();
   scene.fog = new THREE.Fog(0x9db8cc, 4000, 26000);
   SUN_WORLD = new THREE.Vector3(0.5, 0.8, -0.3).normalize();
@@ -1349,7 +1391,18 @@ function start(){
   camera = new THREE.PerspectiveCamera(58, window.innerWidth/window.innerHeight, 1, 500000);
   camera.position.set(3400, 520, -900);
   sun = new THREE.DirectionalLight(0xffffff, 2.0);
+  // Тень на весь город одной картой была бы по три метра на тексель —
+  // бесполезно. Поэтому она накрывает только окрестности камеры и едет
+  // за ней, как это делают движки с каскадами.
+  sun.castShadow = true;
+  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.camera.near = 10;
+  sun.shadow.camera.far = 6000;
+  sun.shadow.bias = -0.0004;
+  sun.shadow.radius = 2.0;
+  sun.shadow.normalBias = 0.6;
   scene.add(sun);
+  scene.add(sun.target);
   hemi = new THREE.HemisphereLight(0xbcd3e8, 0x4a4238, 0.9);
   scene.add(hemi);
   window.addEventListener('resize', function(){
@@ -1385,6 +1438,7 @@ function start(){
       tSum += dt;
       LIVE_T += dt * LIVE_SPEED;
       stepCamera(dt);
+      updateShadow();
       updateAircraft(dt);
       updateSats();
       // солнце в системе камеры — для теплового расчёта в вершинах
