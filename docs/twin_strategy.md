@@ -186,6 +186,70 @@ handful of feeds that allow it (cameras, weather, tide). Note that a page
 published as an Artifact runs under a strict CSP that blocks *all* external
 requests, so level 3 degrades to the snapshot there by design.
 
+## 5b. Predicting forward — and being scored for it
+
+The owner's goal is not only to reconstruct the past but to estimate what
+happens next, with probabilities. The design principle here is the same one
+that governs the time machine: **a forecast is worth nothing unless it is
+recorded before the fact and scored after.** So `twin/forecast.py` has two
+verbs, not one — `issue` writes dated, falsifiable predictions with a
+timestamp, and `score` fetches what actually happened and grades them. Point
+forecasts get mean absolute error; probabilistic ones get a Brier score and,
+once there are enough, a calibration curve: if we said 30% twenty times, it
+should have happened about six times.
+
+Three predictors ship, all from data already ingested and all keyless:
+
+- **Tide** — the harmonic prediction from NOAA CO-OPS 9414290. This is the
+  loop's proving ground: a prediction issued now is scorable in hours against
+  the station's own observation, so the whole issue→score machinery is
+  validated end to end within a single day.
+- **Temperature** — the NWS gridpoint forecast, converted to °C.
+- **Seismicity** — a real estimate rather than a vibe. The Gutenberg–Richter
+  law (log N = a − bM) is fitted to the USGS catalogue by Aki's
+  maximum-likelihood estimator, the rate is extrapolated to the target
+  magnitude, and a Poisson process gives P(at least one). On live Bay Area
+  data this returns **b = 1.00**, the textbook California value, and
+  P(M≥5 within a year) ≈ 43%, which sits inside USGS's own range.
+  The stated caveat matters: a Poisson process assumes independence, and
+  earthquakes cluster into aftershock sequences, so short horizons are
+  overconfident. That limitation is written into the forecast's own method
+  string rather than hidden — and the scoring loop will expose it in the
+  Brier score, which is exactly what the loop is for. Declustering
+  (Reasenberg) or ETAS is the honest next step.
+
+What this framework buys later: the same issue→score discipline applies to
+the interesting urban questions — where construction appears next (DataSF
+permits are a genuine leading indicator: a filed permit is a stated intention
+with a historical completion rate), population change, and inundation under
+sea-level scenarios, which is deterministic given the DEM. Each is a
+prediction the twin can be graded on, so the simulator earns credibility
+instead of asserting it.
+
+## 5c. People: synthetic, never real
+
+The game layer wants a city you can walk through and talk to. The line drawn
+here is deliberate and permanent:
+
+- **Yes:** a synthetic population generated from public aggregate statistics
+  — TIGER block populations (POP20, keyless), household size, age structure,
+  occupation mix — assigned to real buildings by capacity and land use.
+  Nobody in it corresponds to a real person; each resident is a draw from a
+  distribution. This is ordinary practice in transport and epidemiological
+  agent-based modelling, and it is also the better game: half a million
+  plausible residents beat a handful of scraped names.
+- **Yes:** institutions as institutions — agencies, budgets, transit
+  operators, published policy — from open records.
+- **No:** modelling identifiable real residents or named officials, or
+  putting invented words in their mouths. That is profiling living people
+  and fabricating their speech, the data for it is not open, and assembling
+  it would be the wrong thing to do. Nothing about the game requires it.
+
+TERRA's existing `agents.py` (traits, needs, beliefs, action choice) and
+`play.py` (dialogue from recorded data) already provide the machinery; the
+twin only needs to seed it from census distributions instead of simulation
+history.
+
 ## 6. Roadmap
 
 1. **Done (this PR):** `twin/` pipeline + SF scene demo (`twin_sf.html`):

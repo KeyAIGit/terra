@@ -186,6 +186,37 @@ def test_sky_dir():
           f"{el_low:.1f} vs {el_high:.1f}")
 
 
+def test_forecast():
+    section("прогнозы и их проверка")
+    from twin import forecast as fc
+
+    # каталог с ЗАДАННЫМ b: проверяем, что оценка его возвращает
+    import random as _r
+    rnd = _r.Random(7)
+    for true_b in (0.8, 1.0, 1.3):
+        mags = [fc.M_COMPLETE - math.log10(rnd.random()) / true_b
+                for _ in range(6000)]
+        got, n = fc.b_value(mags)
+        check(f"b={true_b} восстанавливается", abs(got - true_b) < 0.06,
+              f"вышло {got:.3f} по {n}")
+
+    check("на пустом каталоге b не выдумывается",
+          fc.b_value([]) [0] != fc.b_value([])[0])   # NaN != NaN
+
+    # вероятность растёт со сроком и падает с магнитудой
+    mags = [fc.M_COMPLETE - math.log10(rnd.random()) / 1.0 for _ in range(2000)]
+    p30 = fc.quake_probability(mags, 365, 4.0, 30)["p"]
+    p90 = fc.quake_probability(mags, 365, 4.0, 90)["p"]
+    p5 = fc.quake_probability(mags, 365, 5.0, 30)["p"]
+    check("дольше срок — выше вероятность", p90 > p30, f"{p30:.3f} vs {p90:.3f}")
+    check("выше магнитуда — ниже вероятность", p5 < p30, f"{p5:.3f} vs {p30:.3f}")
+    check("вероятность в пределах [0,1]", 0 <= p30 <= 1 and 0 <= p90 <= 1)
+    check("редкий толчок за год реже чем наверняка",
+          fc.quake_probability(mags, 365, 7.0, 365)["p"] < 0.5)
+    check("скудный каталог не даёт прогноза",
+          fc.quake_probability([1.6, 2.0], 30, 4.0, 30)["p"] is None)
+
+
 def test_regions():
     section("регионы")
     sc = regions.scene("sf")
@@ -213,6 +244,7 @@ def main():
     test_point_in_ring()
     test_time_machine()
     test_sky_dir()
+    test_forecast()
     test_regions()
     print("\n" + "=" * 64)
     if _FAILS:
