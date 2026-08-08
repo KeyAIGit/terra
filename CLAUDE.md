@@ -11,7 +11,7 @@
   прогонов НЕ нужно хранить — они воспроизводятся (полный прогон до 500 н. э.:
   ~2.5 ч в облачном контейнере кусками, на M3 Max заметно быстрее).
 - Онлайн-витрина мира: https://bekzod25-terra-world.static.hf.space/
-  (двойник настоящего лежит там же: /twin_sf.html — 15 МБ, выкладывать
+  (двойник настоящего: /twin.html — сборка --split, выкладывать
   huggingface_hub'ом с токеном из terra-secrets; через MCP не выйдет,
   содержимое не влезает в вызов)
   (HF Space Bekzod25/terra-world; тяжёлые страницы на CDN; сейчас там мир terra-1,
@@ -113,7 +113,8 @@ python3 -m terra multiverse           # реестр всех миров на д
 python3 -m twin.ingest --budget 1500   # резюмируемый сбор (манифест twin/data/manifest.json)
 python3 -m twin.doctor                 # схема parquet + физика (Твин-Пикс, Трансамерика…)
 python3 -m twin.build sf               # scene_sf.json.gz из данных
-python3 -m twin.view sf                # twin_sf.html — 3D-полёт/прогулка
+python3 -m twin.view sf                # twin_sf.html — офлайн-файл целиком
+python3 -m twin.view sf --split site   # для хостинга: оболочка 6 КБ + данные рядом
 python3 -m tests.test_twin             # офлайн-проверки твина
 ```
 
