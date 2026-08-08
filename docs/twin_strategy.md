@@ -250,6 +250,80 @@ TERRA's existing `agents.py` (traits, needs, beliefs, action choice) and
 twin only needs to seed it from census distributions instead of simulation
 history.
 
+## 5d. Generative world models: appearance layer, not foundation (Aug 2026)
+
+Asked whether Genie or Seedance could build this instead of a data pipeline
+plus UE5, the answer from a survey of the field is unambiguous:
+
+**No system in August 2026 generates an interactive 3D world that is
+geometrically faithful to a real place.** These are autoregressive video
+models with a context window; persistence and geographic fidelity are the
+same limitation, and it has not been beaten.
+
+- **Genie 3** (still current; no Genie 4) — 720p, 20–24 fps, a few minutes of
+  interaction, memory of specific changes for about a minute. Since May 2026
+  Project Genie can seed a world from a Google Maps pin. DeepMind's own words:
+  *"currently unable to simulate real-world locations with perfect geographic
+  accuracy"*; Google's own team: *"can't yet create a faithful reconstruction
+  of a street."* The sharpest test is from the same author whose WorldView
+  project prompted this whole direction: seeded in San Francisco, Genie put
+  the Bay Bridge correctly beside the Ferry Building — and filled the back of
+  the Palace of Fine Arts with **phantom houses where the Marina bay actually
+  is**. Correct at the seed panorama, invented a block away. Output is video;
+  no 3D export, no API, $200/mo tier.
+- **Seedance 2.5** (released 31 Jul 2026) — real, and irrelevant as a
+  substitute: video only, not interactive, no persistence, no 3D. 30 s native
+  single-shot, up to 4K, multi-shot consistency. One useful hook: it accepts a
+  **3D blockout to lock camera and composition** — i.e. render our greybox,
+  let it skin the shot. Cinematics, not infrastructure.
+
+**What can take our accurate geometry as input** — this is the real question,
+and three systems answer it:
+
+1. **NVIDIA Cosmos Transfer 2.5** — open weights (OpenMDW/Apache), generates
+   photoreal video conditioned on depth, segmentation, LiDAR and HD maps from
+   a simulation engine or real logs. Our geometry, its photorealism. Output
+   is video.
+2. **World Labs Marble** — "Chisel" blockout plus mesh import, and it is the
+   only one that hands back a **reusable asset**: Gaussian splats (PLY/SPZ)
+   and textured GLB. Since Jan 2026 assets are "roughly scaled and grounded to
+   real-world units" — metric, though still not georeferenced. $20–95/mo.
+3. **Tencent HY-World 2.0** — open source, exports 3DGS, meshes, point clouds,
+   camera parameters, importable into Blender/UE/Isaac; its WorldMirror stage
+   reconstructs real places from multi-view images or casual video. The
+   self-hostable analogue to Marble.
+
+None of the three knows what a latitude is. We supply the georeferencing —
+which is precisely what this pipeline already produces.
+
+**Two findings that change our planning:**
+
+- **Gaussian splatting is production-ready and free to integrate.** NanoGS for
+  UE5 (Mar 2026) gives Nanite-style LOD clusters for splats; XV3DGS renders
+  splats and conventional geometry in one scene; three.js loaders exist, so
+  splat "hero blocks" could land in our own viewer, not only in UE. Aerial →
+  splat at city scale is a solved commercial path (DJI Terra outputs PLY and
+  3D Tiles).
+- **UE 5.8 (Jun 2026) is the final UE5 release**; UE6 early access is expected
+  late 2027. More usefully, **PCG became production-ready in 5.7** — which is
+  exactly the tool for instantiating tens of thousands of buildings from real
+  footprints and heights. Our export already produces that input.
+
+One architecture is worth watching: **Seoul World Model** (ECCV 2026,
+research-only) does retrieval-augmented generation — given coordinates, it
+retrieves nearby real street imagery and re-grounds continuously, achieving
+multi-kilometre trajectories without drift. That is the missing step Google
+skipped. If retrieval-grounding reaches a shipping product, this section needs
+rewriting.
+
+**Standing decision:** the accurate skeleton stays conventional — real data,
+real coordinates, UE5 PCG for anything with collision. Generative models are
+an appearance layer on top: Marble or HY-World for hero blocks exported as
+splats, Cosmos Transfer for photoreal video out of the finished simulation,
+Seedance for trailers. Where they genuinely earn their place is the layer with
+no open data at all — **building interiors** — and the deep past, where
+plausible reconstruction is the honest answer and tier R already says so.
+
 ## 6. Roadmap
 
 1. **Done (this PR):** `twin/` pipeline + SF scene demo (`twin_sf.html`):
