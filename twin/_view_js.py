@@ -160,7 +160,8 @@ var SUN_WORLD = null;               // направление на солнце 
 var U_SUNV = { value: null };       // оно же в СИСТЕМЕ КАМЕРЫ (пересчёт покадрово)
 var U_SUNEL = { value: 0.0 };       // высота солнца 0..1
 var U_STORED = { value: 0.0 };      // суточный запас тепла в материалах 0..1
-var U_AIRT = { value: 14.0 };       // температура воздуха, °C (данные NOAA)
+var U_AIRT = { value: 14.0 };
+var U_NIGHT = { value: 0.0 };   // 0 день, 1 ночь — для света в окнах       // температура воздуха, °C (данные NOAA)
 var MODE_NAMES = ['оптика', 'ПНВ', 'тепловизор', 'ЭЛТ'];
 
 // Классы материалов для теплового расчёта (атрибут aMat):
@@ -206,6 +207,52 @@ var THERMAL_GLSL = [
 '}'
 ].join('\n');
 
+// ── фасады ──────────────────────────────────────────────────────────────────
+// Окна не текстура и не выдумка: сетка считается из НАСТОЯЩИХ данных здания —
+// высоты (сколько этажей), года постройки (какая эпоха остекления) и
+// назначения участка (жильё, контора, склад). Довоенный дом получает узкие
+// частые окна, башня 2010-х — сплошную ленту, склад почти глухую стену.
+var FACADE_GLSL = [
+'struct Fac { float floorH; float winW; float winH; float gap; float glass; float lit; };',
+'Fac facadeOf(float use, float year, float h){',
+'  Fac f;',
+'  bool office = (use > 0.5 && use < 2.5) || use > 4.5;',
+'  bool store  = use > 1.5 && use < 2.5;',
+'  f.floorH = office ? 3.9 : 3.15;',                 // конторский этаж выше жилого
+'  if (year > 1.0 && year < 1945.0){',               // довоенная кладка
+'    f.winW = 0.34; f.winH = 0.46; f.gap = 0.22; f.glass = 0.10;',
+'  } else if (year < 1980.0){',                      // послевоенный модернизм
+'    f.winW = 0.52; f.winH = 0.44; f.gap = 0.14; f.glass = 0.26;',
+'  } else if (year < 2005.0){',
+'    f.winW = 0.66; f.winH = 0.50; f.gap = 0.10; f.glass = 0.42;',
+'  } else {',                                        // стекло нового века
+'    f.winW = 0.88; f.winH = 0.66; f.gap = 0.05; f.glass = 0.72;',
+'  }',
+'  if (store){ f.winW *= 0.35; f.winH *= 0.5; f.glass *= 0.3; }',
+'  f.lit = office ? 0.55 : 0.30;',                   // сколько окон горит ночью
+'  return f;',
+'}',
+'float hash21(vec2 p){',
+'  return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);',
+'}',
+// Возвращает: x — доля окна (0 стена, 1 стекло), y — свет в окне
+'vec2 facadeAt(vec3 wpos, vec3 nrm, float use, float year, float h, float night){',
+'  Fac f = facadeOf(use, year, h);',
+'  if (abs(nrm.y) > 0.72) return vec2(0.0, 0.0);',   // крыша — не фасад
+'  float along = abs(nrm.x) > abs(nrm.z) ? wpos.z : wpos.x;',
+'  float floorIdx = floor(wpos.y / f.floorH);',
+'  float u = fract(along / 3.4);',
+'  float v = fract(wpos.y / f.floorH);',
+'  float halfW = f.winW * 0.5, halfH = f.winH * 0.5;',
+'  float inW = step(0.5 - halfW, u) * step(u, 0.5 + halfW)',
+'            * step(0.55 - halfH, v) * step(v, 0.55 + halfH);',
+'  if (wpos.y < f.floorH * 0.9) inW *= 0.55;',       // первый этаж иной
+'  float r = hash21(vec2(floor(along / 3.4), floorIdx));',
+'  float lit = step(1.0 - f.lit, r) * night * inW;',
+'  return vec2(inW * (0.35 + 0.65 * f.glass), lit);',
+'}'
+].join('\n');
+
 // Прививает материалу тепловой расчёт: температура считается в вершине
 // (там есть нормаль), фрагмент только красит. Инстансы и фильтр года
 // продолжают работать — мы не подменяем материал, а дополняем его.
@@ -240,6 +287,56 @@ function sensorized(mat){
     shader.fragmentShader = THERMAL_GLSL + '\n' + shader.fragmentShader;
   };
   mat.customProgramCacheKey = function(){ return 'sensorized'; };
+  return mat;
+}
+
+// Дорисовывает зданию фасад поверх его собственного затенения. Нужны
+// атрибуты aMat (назначение), aYear (год) и aGnd (отметка земли у дома —
+// иначе этажи считались бы от уровня моря и первый этаж уехал бы на холме).
+function facaded(mat){
+  var prev = mat.onBeforeCompile;
+  mat.onBeforeCompile = function(shader){
+    if (prev) prev(shader);
+    shader.uniforms.uNight = U_NIGHT;
+    shader.vertexShader = 'attribute float aGnd;\nvarying vec3 vWorld;\n'
+      + 'varying vec3 vNrmW;\nvarying float vGnd;\n' + shader.vertexShader;
+    shader.vertexShader = shader.vertexShader.replace(
+      '#include <project_vertex>',
+      '#ifdef USE_INSTANCING\n'
+      + '  vWorld = (modelMatrix * instanceMatrix * vec4(transformed, 1.0)).xyz;\n'
+      + '  vNrmW = normalize(mat3(modelMatrix) * mat3(instanceMatrix) * normal);\n'
+      + '#else\n'
+      + '  vWorld = (modelMatrix * vec4(transformed, 1.0)).xyz;\n'
+      + '  vNrmW = normalize(mat3(modelMatrix) * normal);\n'
+      + '#endif\n'
+      + '  vGnd = aGnd;\n#include <project_vertex>');
+    shader.fragmentShader = 'uniform float uNight;\nvarying vec3 vWorld;\n'
+      + 'varying vec3 vNrmW;\nvarying float vGnd;\n'
+      + FACADE_GLSL + '\n' + shader.fragmentShader;
+    var tail = shader.fragmentShader.indexOf('#include <dithering_fragment>') >= 0
+      ? '#include <dithering_fragment>' : '#include <colorspace_fragment>';
+    shader.fragmentShader = shader.fragmentShader.replace(tail,
+      '  if (uMode < 0.5 || uMode > 2.5){\n'
+      + '    vec3 lp = vec3(vWorld.x, vWorld.y - vGnd, vWorld.z);\n'
+      + '    vec2 fw = facadeAt(lp, vNrmW, aMatF, aYearF, 0.0, uNight);\n'
+      + '    vec3 glass = mix(vec3(0.30, 0.38, 0.46), vec3(0.42, 0.55, 0.70),\n'
+      + '                     clamp(vNrmW.y * 0.5 + 0.5, 0.0, 1.0));\n'
+      + '    gl_FragColor.rgb = mix(gl_FragColor.rgb, glass * (0.55 + 0.75 * (1.0 - uNight)), fw.x * 0.85);\n'
+      + '    gl_FragColor.rgb += vec3(1.0, 0.86, 0.58) * fw.y * 0.85;\n'
+      + '  }\n' + tail);
+    // назначение и год нужны и во фрагменте — прокидываем варьирующими
+    shader.vertexShader = shader.vertexShader.replace(
+      'vGnd = aGnd;', 'vGnd = aGnd; aMatV = aMat; aYearV = aYear;');
+    shader.vertexShader = 'varying float aMatV;\nvarying float aYearV;\n'
+      + shader.vertexShader;
+    shader.fragmentShader = ('varying float aMatV;\nvarying float aYearV;\n'
+      + shader.fragmentShader)
+      .replace(/aMatF/g, 'aMatV').replace(/aYearF/g, 'aYearV');
+  };
+  var oldKey = mat.customProgramCacheKey;
+  mat.customProgramCacheKey = function(){
+    return (oldKey ? oldKey() : '') + ':facaded';
+  };
   return mat;
 }
 
@@ -380,7 +477,7 @@ function buildTerrain(){
 // ── здания ──────────────────────────────────────────────────────────────────
 function shade(c, f){ return [c[0]*f, c[1]*f, c[2]*f]; }
 function buildBig(){
-  var pos = [], col = [], owner = [], yrs = [], mts = [];
+  var pos = [], col = [], owner = [], yrs = [], mts = [], gnds = [];
   for (var bi = 0; bi < S.big.length; bi++){
     var b = S.big[bi];
     var ring = b.p, n = ring.length;
@@ -418,17 +515,20 @@ function buildBig(){
       for (var v2 = 0; v2 < 6; v2++) col.push(wc[0], wc[1], wc[2]);
       owner.push(bi); owner.push(bi);
     }
-    for (var v3 = v0; v3 < pos.length / 3; v3++){ yrs.push(by); mts.push(M_BLD + b.c); }
+    for (var v3 = v0; v3 < pos.length / 3; v3++){
+      yrs.push(by); mts.push(M_BLD + b.c); gnds.push(g);
+    }
   }
   var geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
   geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(col), 3));
   geo.setAttribute('aYear', new THREE.BufferAttribute(new Float32Array(yrs), 1));
   geo.setAttribute('aMat', new THREE.BufferAttribute(new Float32Array(mts), 1));
+  geo.setAttribute('aGnd', new THREE.BufferAttribute(new Float32Array(gnds), 1));
   geo.computeVertexNormals();
   bigOwner = owner;
-  var mat = sensorized(yearFiltered(new THREE.MeshLambertMaterial({
-    vertexColors: true, side: THREE.DoubleSide })));
+  var mat = facaded(sensorized(yearFiltered(new THREE.MeshLambertMaterial({
+    vertexColors: true, side: THREE.DoubleSide }))));
   bigMesh = new THREE.Mesh(geo, mat);
   scene.add(bigMesh);
 }
@@ -436,14 +536,16 @@ function buildSmall(){
   var arr = S.small, n = arr.length;
   if (!n) return;
   var geo = new THREE.BoxGeometry(1, 1, 1);
-  var yrs = new Float32Array(n), mts = new Float32Array(n);
+  var yrs = new Float32Array(n), mts = new Float32Array(n), gnd = new Float32Array(n);
   for (var yi = 0; yi < n; yi++){
     yrs[yi] = arr[yi][8] || 0;
     mts[yi] = M_BLD + arr[yi][7];
+    gnd[yi] = arr[yi][6] / 10;
   }
   geo.setAttribute('aYear', new THREE.InstancedBufferAttribute(yrs, 1));
   geo.setAttribute('aMat', new THREE.InstancedBufferAttribute(mts, 1));
-  var mat = sensorized(yearFiltered(new THREE.MeshLambertMaterial()));
+  geo.setAttribute('aGnd', new THREE.InstancedBufferAttribute(gnd, 1));
+  var mat = facaded(sensorized(yearFiltered(new THREE.MeshLambertMaterial())));
   instMesh = new THREE.InstancedMesh(geo, mat, n);
   var m = new THREE.Matrix4(), q = new THREE.Quaternion(),
       p = new THREE.Vector3(), sc = new THREE.Vector3(),
@@ -650,6 +752,7 @@ function applyTime(){
   SUN_WORLD.set(sun.position.x, sun.position.y, sun.position.z).normalize();
   U_SUNEL.value = Math.max(0, Math.min(1, el));
   U_STORED.value = storedHeat(t);
+  U_NIGHT.value = Math.max(0, Math.min(1, 1.0 - el * 2.2));
   applyMode();
 }
 
