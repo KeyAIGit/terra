@@ -44,6 +44,11 @@ BODY = """
 <div id="ctl" class="panel">
   <label>время суток <input type="range" id="tod" min="5.5" max="20.5" step="0.1" value="15"></label>
   <span id="todV" class="dim">15:00</span><br>
+  <label>год <input type="range" id="yr" min="1850" max="2026" step="1" value="2026"></label>
+  <b id="yrV">сегодня</b>
+  <div class="dim" id="yrN"></div>
+  <div class="dim" id="yrNote" style="display:none;max-width:230px;margin-top:4px"></div>
+  <label style="user-select:none"><input type="checkbox" id="unk" checked> здания без года</label><br>
   <label style="user-select:none"><input type="checkbox" id="lbl" checked> подписи мест</label>
 </div>
 <div id="help" class="panel">ЛКМ-тянуть — осмотреться · WASD — лететь · Q/E — вниз/вверх ·
@@ -95,6 +100,8 @@ var renderer, scene, camera, sun, hemi, amb;
 var TER = null;                     // {elev:Int16Array, surf, nx,nz,x0,z0,dx,dz}
 var bigMesh = null, bigOwner = null, instMesh = null;
 var labels = [];
+var U_YEAR = { value: 3000 };       // общий uniform машины времени
+var U_UNK = { value: 1 };           // показывать ли здания без года в реестре
 var PAL = [                         // цвета классов зданий
   [0.78, 0.72, 0.62],   // жильё — тёплый песочный
   [0.62, 0.68, 0.74],   // коммерция — голубо-серый
@@ -103,6 +110,30 @@ var PAL = [                         // цвета классов зданий
   [0.72, 0.62, 0.55],   // школы/больницы
   [0.68, 0.66, 0.62]    // прочее
 ];
+
+// Здание, построенное позже выбранного года, схлопывается в точку прямо в
+// вершинном шейдере: один uniform на движение слайдера, геометрия не трогается.
+// Год 0 — реестр молчит; такие здания показываем или прячем по выбору игрока.
+function yearFiltered(mat){
+  mat.onBeforeCompile = function(shader){
+    shader.uniforms.uYear = U_YEAR;
+    shader.uniforms.uUnk = U_UNK;
+    shader.vertexShader =
+      'attribute float aYear;\nuniform float uYear;\nuniform float uUnk;\n'
+      + shader.vertexShader;
+    shader.vertexShader = shader.vertexShader.replace(
+      '#include <begin_vertex>',
+      '#include <begin_vertex>\n'
+      + '  bool tooNew = aYear > uYear + 0.5;\n'
+      + '  bool hidUnk = aYear < 0.5 && uUnk < 0.5;\n'
+      + '  if (tooNew || hidUnk) transformed = vec3(0.0);');
+  };
+  return mat;
+}
+function builtBy(year, y){
+  if (!y) return U_UNK.value > 0.5;
+  return y <= year;
+}
 
 function gH(x, z){                  // высота рельефа в точке (м)
   var fx = (x*10 - TER.x0) / TER.dx, fz = (z*10 - TER.z0) / TER.dz;
@@ -170,11 +201,13 @@ function buildTerrain(){
 // ── здания ──────────────────────────────────────────────────────────────────
 function shade(c, f){ return [c[0]*f, c[1]*f, c[2]*f]; }
 function buildBig(){
-  var pos = [], col = [], owner = [];
+  var pos = [], col = [], owner = [], yrs = [];
   for (var bi = 0; bi < S.big.length; bi++){
     var b = S.big[bi];
     var ring = b.p, n = ring.length;
     if (n < 3) continue;
+    var by = b.y || 0;
+    var v0 = pos.length / 3;
     var g = b.g/10, h = b.h/10, top = g + h;
     var base = PAL[b.c] || PAL[5];
     var vec2 = [];
@@ -206,13 +239,16 @@ function buildBig(){
       for (var v2 = 0; v2 < 6; v2++) col.push(wc[0], wc[1], wc[2]);
       owner.push(bi); owner.push(bi);
     }
+    for (var v3 = v0; v3 < pos.length / 3; v3++) yrs.push(by);
   }
   var geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(pos), 3));
   geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(col), 3));
+  geo.setAttribute('aYear', new THREE.BufferAttribute(new Float32Array(yrs), 1));
   geo.computeVertexNormals();
   bigOwner = owner;
-  var mat = new THREE.MeshLambertMaterial({ vertexColors: true, side: THREE.DoubleSide });
+  var mat = yearFiltered(new THREE.MeshLambertMaterial({
+    vertexColors: true, side: THREE.DoubleSide }));
   bigMesh = new THREE.Mesh(geo, mat);
   scene.add(bigMesh);
 }
@@ -220,7 +256,10 @@ function buildSmall(){
   var arr = S.small, n = arr.length;
   if (!n) return;
   var geo = new THREE.BoxGeometry(1, 1, 1);
-  var mat = new THREE.MeshLambertMaterial();
+  var yrs = new Float32Array(n);
+  for (var yi = 0; yi < n; yi++) yrs[yi] = arr[yi][8] || 0;
+  geo.setAttribute('aYear', new THREE.InstancedBufferAttribute(yrs, 1));
+  var mat = yearFiltered(new THREE.MeshLambertMaterial());
   instMesh = new THREE.InstancedMesh(geo, mat, n);
   var m = new THREE.Matrix4(), q = new THREE.Quaternion(),
       p = new THREE.Vector3(), sc = new THREE.Vector3(),
@@ -317,6 +356,7 @@ function makeLabel(text, x, y, z, big){
   sp.position.set(x, y, z);
   scene.add(sp);
   labels.push(sp);
+  return sp;
 }
 function buildLabels(){
   var named = [];
@@ -328,11 +368,42 @@ function buildLabels(){
     var cx = 0, cz = 0;
     for (var v = 0; v < b.p.length; v++){ cx += b.p[v][0]; cz += b.p[v][1]; }
     cx /= b.p.length * 10; cz /= b.p.length * 10;
-    makeLabel(b.n, cx, b.g/10 + b.h/10 + 26, cz, true);
+    var sp = makeLabel(b.n, cx, b.g/10 + b.h/10 + 26, cz, true);
+    sp.userData.year = b.y || 0;      // подпись гаснет вместе со зданием
   }
   for (var k2 = 0; k2 < Math.min(20, S.pois.length); k2++){
     var p = S.pois[k2];
     makeLabel(p[2], p[0]/10, gH(p[0]/10, p[1]/10) + 16, p[1]/10, false);
+  }
+}
+
+// ── машина времени ──────────────────────────────────────────────────────────
+function applyYear(){
+  var y = parseInt($('yr').value, 10);
+  var tm = S.head.time_machine || {};
+  U_YEAR.value = y;
+  U_UNK.value = $('unk').checked ? 1 : 0;
+  var standing = 0;
+  for (var i = 0; i < S.big.length; i++)
+    if (builtBy(y, S.big[i].y)) standing++;
+  for (var j = 0; j < S.small.length; j++)
+    if (builtBy(y, S.small[j][8])) standing++;
+  $('yrV').textContent = y >= (tm.max || 2026) ? 'сегодня' : String(y);
+  $('yrN').textContent = 'зданий ' + standing.toLocaleString('ru-RU')
+    + (tm.unknown ? ' · без года в реестре ' + tm.unknown.toLocaleString('ru-RU') : '');
+  var note = $('yrNote'), txt = '';
+  if (y < 1906){
+    txt = 'до пожара 1906 года: центр отстроен заново, у его зданий год 1906 '
+        + 'и позже — этот слой достраивается по картам Сэнборна';
+  } else if (y <= 1901 + 5 && tm.placeholder_1900){
+    txt = 'в реестре ' + tm.placeholder_1900.toLocaleString('ru-RU')
+        + ' участков помечены 1900 годом — это отметка «старое», а не дата';
+  }
+  note.textContent = txt;
+  note.style.display = txt ? 'block' : 'none';
+  for (var k = 0; k < labels.length; k++){
+    var want = $('lbl').checked && builtBy(y, labels[k].userData.year || 0);
+    labels[k].visible = want;
   }
 }
 
@@ -383,9 +454,9 @@ function setupControls(){
   }, { passive: true });
   cv.addEventListener('click', onPick);
   $('tod').addEventListener('input', applyTime);
-  $('lbl').addEventListener('change', function(){
-    for (var i = 0; i < labels.length; i++) labels[i].visible = $('lbl').checked;
-  });
+  $('yr').addEventListener('input', applyYear);
+  $('lbl').addEventListener('change', applyYear);
+  $('unk').addEventListener('change', applyYear);
 }
 function stepCamera(dt){
   var dir = new THREE.Vector3(Math.sin(yaw) * Math.cos(pitch), Math.sin(pitch),
@@ -412,7 +483,19 @@ function onPick(e){
   var meshes = [];
   if (bigMesh) meshes.push(bigMesh);
   if (instMesh) meshes.push(instMesh);
-  var hits = ray.intersectObjects(meshes, false);
+  // луч не знает про фильтр года (он живёт в шейдере) — отсеиваем сами
+  var hits = ray.intersectObjects(meshes, false).filter(function(h){
+    var y = parseInt($('yr').value, 10);
+    if (h.object === bigMesh && bigOwner){
+      var b = S.big[bigOwner[h.faceIndex]];
+      return b && builtBy(y, b.y);
+    }
+    if (h.object === instMesh){
+      var s = S.small[h.instanceId];
+      return s && builtBy(y, s[8]);
+    }
+    return true;
+  });
   if (!hits.length){ $('info').style.display = 'none'; return; }
   var h = hits[0], name = '', meta = '';
   if (h.object === bigMesh && bigOwner){
@@ -420,13 +503,18 @@ function onPick(e){
     if (!b) return;
     name = b.n || 'Здание';
     meta = 'высота ' + (b.h/10).toFixed(0) + ' м';
-    if (b.y) meta += ' · построено ' + b.y;
-    meta += '<br><span style="color:#88929c">' + b.id + ' · OpenStreetMap</span>';
+    meta += b.y ? (' · построено ' + b.y + (b.yt ? ' (вывод: нет в лидарной '
+                   + 'съёмке города, значит новее её)' : ''))
+                : ' · года постройки нет в реестре';
+    var src = b.id.indexOf('sfbld:') === 0 ? 'DataSF (лидар)' : 'OpenStreetMap';
+    meta += '<br><span style="color:#88929c">' + b.id + ' · ' + src + '</span>';
   } else if (h.object === instMesh){
     var s = S.small[h.instanceId];
     if (!s) return;
     name = 'Здание';
-    meta = 'высота ~' + (s[5]/10).toFixed(0) + ' м · OpenStreetMap';
+    meta = 'высота ~' + (s[5]/10).toFixed(0) + ' м'
+         + (s[8] ? ' · построено ' + s[8] : ' · года постройки нет в реестре')
+         + '<br><span style="color:#88929c">DataSF · лидар</span>';
   }
   $('iName').textContent = name;
   $('iMeta').innerHTML = meta;
@@ -480,7 +568,11 @@ function start(){
   chain = chain.then(function(){ return boot('вода и парки…'); }).then(buildLakes);
   chain = chain.then(function(){ return boot('подписи…'); }).then(buildLabels);
   chain = chain.then(function(){
-    fillHud(); setupControls(); applyTime();
+    var tm = S.head.time_machine;
+    if (tm){
+      $('yr').min = tm.min; $('yr').max = tm.max; $('yr').value = tm.max;
+    }
+    fillHud(); setupControls(); applyTime(); applyYear();
     $('boot').classList.add('gone');
     var clock = new THREE.Clock();
     (function tick(){

@@ -138,6 +138,32 @@ def test_mosaic():
     check("даунсэмпл усредняет", d.shape == (2, 2) and abs(d[0, 0] - 2.5) < 0.01)
 
 
+def test_point_in_ring():
+    section("точка внутри контура")
+    sq = [(0.0, 0.0), (0.0, 10.0), (10.0, 10.0), (10.0, 0.0)]
+    check("центр внутри", tb._point_in_ring(5.0, 5.0, sq))
+    check("снаружи справа", not tb._point_in_ring(5.0, 15.0, sq))
+    check("снаружи сверху", not tb._point_in_ring(15.0, 5.0, sq))
+    check("снаружи слева", not tb._point_in_ring(5.0, -1.0, sq))
+    # П-образный контур: точка в вырезе снаружи, хотя внутри bbox
+    u = [(0.0, 0.0), (0.0, 10.0), (10.0, 10.0), (10.0, 6.0),
+         (4.0, 6.0), (4.0, 4.0), (10.0, 4.0), (10.0, 0.0)]
+    check("вырез буквы П — снаружи", not tb._point_in_ring(7.0, 5.0, u))
+    check("тело буквы П — внутри", tb._point_in_ring(2.0, 5.0, u))
+
+
+def test_time_machine():
+    section("машина времени")
+    check("год лидарной съёмки задан", 2000 < tb.LIDAR_SURVEY_YEAR < 2030)
+    check("границы шкалы разумны",
+          tb.CITY_YEAR_MIN < 1900 < tb.CITY_YEAR_MAX)
+    # назначение участка -> цветовой класс
+    check("жильё -> класс 0", tb._use_color("Single Family Residential") == 0)
+    check("контора -> класс 1", tb._use_color("Commercial Retail") == 1)
+    check("склад -> класс 2", tb._use_color("Industrial") == 2)
+    check("пусто -> прочее", tb._use_color(None) == 5)
+
+
 def test_regions():
     section("регионы")
     sc = regions.scene("sf")
@@ -162,6 +188,8 @@ def main():
     test_raster_fill()
     test_ground()
     test_mosaic()
+    test_point_in_ring()
+    test_time_machine()
     test_regions()
     print("\n" + "=" * 64)
     if _FAILS:

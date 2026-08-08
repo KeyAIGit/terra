@@ -135,6 +135,53 @@ def _check_sfbuildings(errors: list, warns: list, done: bool) -> None:
         print(f"{OK} sfbuildings: годов постройки {len(years)}, медиана {my:.0f}")
         if not (1890 <= my <= 1990):
             warns.append(f"sfbuildings: медианный год {my:.0f} странный")
+        # оценщик ставит 1900 вместо «неизвестно»: у соседних годов записей
+        # на порядок меньше. Это не ошибка сбора — это свойство источника,
+        # и машина времени обязана про него говорить вслух.
+        n1900 = sum(1 for y in years if y == 1900)
+        n1901 = sum(1 for y in years if y == 1901)
+        if n1900 > 10 * max(n1901, 1):
+            print(f"{OK} sfbuildings: 1900 год — отметка «старое» "
+                  f"({n1900} участков против {n1901} в 1901); учтено в подсказке сцены")
+
+
+def _check_time_machine(errors: list, warns: list) -> None:
+    """Собранная сцена: шкала лет и правдоподобие известных зданий."""
+    import gzip
+    path = os.path.join(DATA_DIR, "build", "scene_sf.json.gz")
+    if not os.path.exists(path):
+        warns.append("сцена не собрана — python3 -m twin.build sf")
+        return
+    with gzip.open(path, "rt", encoding="utf-8") as f:
+        scene = json.load(f)
+    tm = scene["head"].get("time_machine")
+    if not tm:
+        errors.append("в сцене нет шкалы времени")
+        return
+    print(f"{OK} машина времени: {tm['known']} зданий с годом, "
+          f"{tm['unknown']} без, {tm.get('inferred', 0)} выведено; "
+          f"шкала {tm['min']}–{tm['max']}")
+    if tm["known"] < 100_000:
+        errors.append(f"машина времени: годов всего {tm['known']} (< 100000)")
+    if tm["unknown"] > tm["known"]:
+        errors.append("машина времени: без года больше, чем с годом")
+
+    # опорные здания: год в сцене против общеизвестного
+    LANDMARKS = {"Transamerica Pyramid": 1972, "Salesforce Tower": 2018,
+                 "Coit Tower": 1933, "555 California Street": 1969}
+    named = {b.get("n"): b for b in scene["big"] if b.get("n")}
+    for name, real in sorted(LANDMARKS.items()):
+        b = named.get(name)
+        if b is None:
+            warns.append(f"машина времени: нет здания {name}")
+            continue
+        got = b.get("y")
+        if got is None:
+            warns.append(f"машина времени: у {name} нет года")
+        elif abs(got - real) > 5:
+            errors.append(f"машина времени: {name} датирован {got}, а построен {real}")
+        else:
+            print(f"{OK} машина времени: {name} — {got} (в жизни {real})")
 
 
 def main() -> int:
@@ -175,6 +222,7 @@ def main() -> int:
     _check_counties(errors, warns, st.get("counties") == "done")
     _check_weather(errors, warns, st.get("weather") == "done")
     _check_sfbuildings(errors, warns, st.get("sfbuildings") == "done")
+    _check_time_machine(errors, warns)
 
     for w in warns:
         print(f"{WARN} {w}")

@@ -28,6 +28,13 @@ BIG_H = 25.0            # м высоты
 BIG_AREA = 2000.0       # м² подошвы
 SMALL_CAP = 260_000     # предохранитель на число мелких
 
+# машина времени: границы шкалы, если реестр молчит
+CITY_YEAR_MIN = 1850
+CITY_YEAR_MAX = 2026
+# год лидарной съёмки контуров DataSF (sf16_bldgid): чего в ней нет, а в OSM
+# есть — построено позже
+LIDAR_SURVEY_YEAR = 2016
+
 # классы дорог: ширина в метрах (0 = не рисуем геометрией)
 ROAD_W = {
     "motorway": 18.0, "motorway_link": 9.0, "trunk": 15.0, "trunk_link": 8.0,
@@ -167,6 +174,20 @@ def _area_m2(pts_xz: list[tuple[float, float]]) -> float:
     return abs(s) / 2.0
 
 
+def _point_in_ring(la: float, lo: float, ring: list[tuple[float, float]]) -> bool:
+    """Луч вправо по долготе: нечётное число пересечений — точка внутри."""
+    inside = False
+    n = len(ring)
+    for i in range(n):
+        la1, lo1 = ring[i]
+        la2, lo2 = ring[(i + 1) % n]
+        if (la1 > la) != (la2 > la):
+            t = (la - la1) / (la2 - la1)
+            if lo < lo1 + t * (lo2 - lo1):
+                inside = not inside
+    return inside
+
+
 def _oriented_box(pts: list[tuple[float, float]]):
     """Прямоугольник по доминирующему ребру: центр, полуоси, угол (рад)."""
     best_len, ang = 0.0, 0.0
@@ -288,20 +309,59 @@ def build_scene(key: str) -> str:
                             int(r["lon_max"] / CELL) + 1):
                 named_grid.setdefault((gy, gx), []).append(r)
 
-    def covered_by_named(rec) -> bool:
+    # контуры именованных зданий для теста «точка внутри»: bbox соседа
+    # захватывает чужие дома, а по многоугольнику наследование года честное
+    named_ring = {}
+    for r in named:
+        rings = _rings(r)
+        if rings and len(rings[0]) >= 4:
+            named_ring[r["id"]] = rings[0]
+
+    def covered_by_named(rec) -> dict | None:
+        """Именованное здание OSM, накрывающее лидарный контур (или None)."""
         cell = (int(rec["lat"] / CELL), int(rec["lon"] / CELL))
+        la, lo = rec["lat"], rec["lon"]
         for r in named_grid.get(cell, []):
-            if (r["lat_min"] - 1e-5 <= rec["lat"] <= r["lat_max"] + 1e-5 and
-                    r["lon_min"] - 1e-5 <= rec["lon"] <= r["lon_max"] + 1e-5):
-                return True
-        return False
+            if not (r["lat_min"] - 1e-5 <= la <= r["lat_max"] + 1e-5 and
+                    r["lon_min"] - 1e-5 <= lo <= r["lon_max"] + 1e-5):
+                continue
+            ring = named_ring.get(r["id"])
+            if ring is None or _point_in_ring(la, lo, ring):
+                return r
+        return None
+
+    # Предпроход: у именованных зданий OSM тега start_date почти нет, поэтому
+    # год они наследуют от накрытых ими лидарных контуров (у тех есть участок
+    # в реестре оценщика). Берём самый частый год — башня стоит на одном
+    # участке, а разнобой соседних пристроек не должен перевесить.
+    inherited: dict[str, dict[int, int]] = {}
+    covered_n: dict[str, int] = {}
+    for rec in feats:
+        if rec["fclass"] != "building" or rec.get("subclass") != "citylidar":
+            continue
+        host = covered_by_named(rec)
+        if host is None:
+            continue
+        covered_n[host["id"]] = covered_n.get(host["id"], 0) + 1
+        blk = json.loads(rec.get("tags_json") or "{}").get("mapblklot")
+        y = years.get(blk, (None, None))[0] if blk else None
+        if y:
+            inherited.setdefault(host["id"], {})
+            inherited[host["id"]][y] = inherited[host["id"]].get(y, 0) + 1
+    named_year = {k: max(sorted(v), key=lambda y: v[y])
+                  for k, v in inherited.items()}
+    # Здание, которого НЕТ в лидарной съёмке города, но которое есть в OSM
+    # сегодня, построено после этой съёмки. Это уже вывод, а не факт из
+    # источника — помечаем ярусом R, чтобы не выдавать за измерение.
+    inferred_year = {r["id"]: LIDAR_SURVEY_YEAR + 1 for r in named
+                     if r["id"] not in named_year and not covered_n.get(r["id"])}
 
     big, small = [], []
     for rec in feats:
         if rec["fclass"] != "building":
             continue
         is_lidar = rec.get("subclass") == "citylidar"
-        if is_lidar and covered_by_named(rec):
+        if is_lidar and covered_by_named(rec) is not None:
             continue
         rings = _rings(rec)
         if not rings or len(rings[0]) < 4 or rings[0][0] != rings[0][-1]:
@@ -315,7 +375,7 @@ def build_scene(key: str) -> str:
         h = float(rec.get("height_m") or 5.0)
         g = ground.at(rec["lat"], rec["lon"])
         tags = json.loads(rec.get("tags_json") or "{}")
-        year, use = None, None
+        year, use, year_tier = None, None, "K"
         blk = tags.get("mapblklot")
         if blk and blk in years:
             year, use = years[blk]
@@ -329,6 +389,11 @@ def build_scene(key: str) -> str:
                     if tok.isdigit() and len(tok) == 4:
                         year = int(tok)
                         break
+            if not year:
+                year = named_year.get(rec["id"])
+            if not year and rec["id"] in inferred_year:
+                year = inferred_year[rec["id"]]
+                year_tier = "R"
         if h >= BIG_H or area >= BIG_AREA:
             pts = [[int(round(x * 10)), int(round(z * 10))] for x, z in outer]
             # после квантования соседние точки могут совпасть (в т.ч. первая
@@ -345,13 +410,16 @@ def build_scene(key: str) -> str:
                 entry["n"] = rec["name"]
             if year:
                 entry["y"] = year
+                if year_tier != "K":
+                    entry["yt"] = year_tier   # год выведен, а не из источника
             big.append(entry)
         elif len(small) < SMALL_CAP:
             cx, cz, hw, hd, ang = _oriented_box(outer)
             small.append([int(round(cx * 10)), int(round(cz * 10)),
                           max(1, int(round(hw * 10))), max(1, int(round(hd * 10))),
                           int(round(math.degrees(ang))) % 180,
-                          int(round(h * 10)), int(round(g * 10)), cidx])
+                          int(round(h * 10)), int(round(g * 10)), cidx,
+                          int(year or 0)])   # 0 = год неизвестен
 
     # ── дороги ──
     roads = []
@@ -412,6 +480,26 @@ def build_scene(key: str) -> str:
         "surf": surf.flatten().tolist(),
     }
 
+    # ── машина времени: сколько зданий стоит в каждый год ──
+    all_years = [b["y"] for b in big if b.get("y")] + [s[8] for s in small if s[8]]
+    n_unknown = (len(big) + len(small)) - len(all_years)
+    decades = {}
+    for y in all_years:
+        decades[(y // 10) * 10] = decades.get((y // 10) * 10, 0) + 1
+    time_machine = {
+        "min": min(all_years) if all_years else CITY_YEAR_MIN,
+        "max": max(all_years) if all_years else CITY_YEAR_MAX,
+        "known": len(all_years),
+        "unknown": n_unknown,
+        "inferred": sum(1 for b in big if b.get("yt")),
+        # оценщик ставит 1900 там, где настоящий год неизвестен: у соседних
+        # годов на порядок меньше записей — это отметка «старое», не дата
+        "placeholder_1900": sum(1 for y in all_years if y == 1900),
+        "decades": {str(k): v for k, v in sorted(decades.items())},
+        "burn_1906": "после пожара 1906 года центр отстроен заново — "
+                     "у его зданий год постройки 1906 и позже",
+    }
+
     wx = _latest_weather(key)
     head = {
         "key": key, "title": sc.title, "date": schema.today(),
@@ -420,9 +508,11 @@ def build_scene(key: str) -> str:
         "counts": {"big": len(big), "small": len(small), "roads": len(roads),
                    "lakes": len(lakes), "pois": len(poi_out)},
         "weather": wx,
+        "time_machine": time_machine,
         "sources": [
             {"name": "Copernicus DEM GLO-30", "license": "ESA, свободно с атрибуцией"},
             {"name": "OpenStreetMap", "license": "ODbL-1.0"},
+            {"name": "DataSF (лидар + реестр оценщика)", "license": "PDDL/ODC"},
             {"name": "NOAA/NWS", "license": "Public Domain"},
             {"name": "US Census Bureau", "license": "Public Domain"},
         ],

@@ -74,7 +74,22 @@ python3 -m twin.view sf                 # twin_sf.html — fly over the real SF
 
 `twin_sf.html` is a self-contained page: real 30 m terrain, all ~177k city
 buildings (lidar heights from DataSF, names from OSM), streets, water, parks,
-live NOAA weather, a day-time slider, click any building to identify it. Every
+live NOAA weather, a day-time slider, click any building to identify it.
+
+**And a year slider that de-builds the city.** 165k buildings carry their
+construction year from the assessor roll, so dragging back to 1930 removes
+every tower that had not been built — the filter runs in the vertex shader,
+so the whole city re-dates at frame rate. Dated against reality: Transamerica
+Pyramid 1972, Salesforce Tower 2018, Coit Tower 1933.
+
+| 2026 | 1930 |
+|---|---|
+| ![San Francisco in 2026](docs/twin_year_2026.jpg) | ![The same view in 1930](docs/twin_year_1930.jpg) |
+
+The page states its own uncertainty rather than hiding it: the assessor uses
+1900 as a placeholder for "old" (14.5k parcels), everything downtown is dated
+1906 or later because the fire took the city, and the 11k buildings with no
+year at all can be toggled off to see exactly how much is unknown. Every
 record carries provenance (`source/license/tier/retrieved`) in the same K/T/R
 discipline as the atlas; per-parcel construction years from the assessor roll
 are the seed of the time machine (2026 → 1950 → 1906 → 1849 → 1776 →

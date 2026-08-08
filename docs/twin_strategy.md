@@ -172,8 +172,21 @@ The de-building plan, layer by layer; tiers K/T/R as in the atlas:
    quakes, air-quality haze; satellite passes overhead (CelesTrak TLE +
    SGP4 client-side); Caltrans freeway-camera billboards; sensor view
    modes (thermal / night-vision shaders) as a game aesthetic.
-5. **Time machine v1:** year slider 2026→1906 driven by assessor years +
-   burn polygon; then 1849/1776/pre-colonial layers.
+5. ~~**Time machine v1**~~ — **done**: a year slider de-builds the city from
+   2026 back to the 1790s. 165k buildings carry a construction year; the
+   filter runs in the vertex shader (one uniform per slider move, geometry
+   untouched), so 175k buildings re-date at frame rate. Named OSM landmarks
+   inherit their year from the DataSF footprints they contain
+   (point-in-polygon, not bbox — a neighbour's bbox would import the wrong
+   date). Verified against reality: Transamerica Pyramid 1972, Salesforce
+   Tower 2018, Coit Tower 1933, 555 California 1969.
+   Two source caveats the UI states out loud rather than hides:
+   the assessor writes **1900 as a placeholder for "old"** (14,628 parcels
+   against 161 in 1901), and everything downtown carries **1906 or later**
+   because the fire took the city — that layer needs Sanborn sheets.
+   Buildings with no year at all (11k) are shown by default and can be
+   switched off, so the player can see exactly how much is unknown.
+   Next: the 1906 burn polygon, then 1849/1776/pre-colonial layers.
 6. **People:** population per block (TIGER POP20) spawns agents; TERRA's
    agent/dialog machinery moves in — NPCs who *live in the real city*.
 7. **UE5:** the twin scene compiler feeds the existing `export_ue` pipeline
