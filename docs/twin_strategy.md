@@ -156,6 +156,36 @@ The de-building plan, layer by layer; tiers K/T/R as in the atlas:
   TERRA simulation: the de-built landscape becomes a world the simulator can
   inhabit.
 
+## 5a. How current is "the present"? (three levels, honestly)
+
+The twin is built, not streamed, so "live" needs defining. There are three
+levels and we currently ship the first:
+
+1. **Snapshot (today).** `twin.ingest --source live` writes a timestamped
+   capture — aircraft where they were at that minute, the tide at that
+   reading, satellites propagated around that epoch. `twin.build` bakes it
+   into the scene and the HUD prints the stamp. Reopening the page a week
+   later shows that week-old minute, correctly labelled. Aircraft and
+   satellites keep *moving* from their captured state (dead reckoning and
+   SGP4 ephemeris stay valid for tens of minutes either side), but the
+   underlying capture does not refresh itself.
+2. **Refreshed on a schedule.** The same three commands on a timer
+   (`ingest --source live` → `build` → `view`) regenerate the page. Every
+   source involved is keyless, so nothing blocks this; it needs a machine
+   that runs the job and a place to put the result. Cheap: the live capture
+   takes under two minutes, the rest of the data does not move.
+3. **Live in the browser.** Feeds fetched by the page itself at view time.
+   Only possible where the source sends permissive CORS headers — verified
+   true for the Caltrans camera stills (which is why clicking a camera shows
+   the road as of a minute ago even in an offline file) and worth checking
+   per feed for the rest. This is the only level that is genuinely "always
+   current", and it costs the page its offline self-sufficiency.
+
+The right answer is probably 2 for the world (rebuild nightly) plus 3 for the
+handful of feeds that allow it (cameras, weather, tide). Note that a page
+published as an Artifact runs under a strict CSP that blocks *all* external
+requests, so level 3 degrades to the snapshot there by design.
+
 ## 6. Roadmap
 
 1. **Done (this PR):** `twin/` pipeline + SF scene demo (`twin_sf.html`):
