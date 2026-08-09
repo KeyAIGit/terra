@@ -41,6 +41,9 @@ class Manifest:
 
     def __init__(self, path: str = MANIFEST_PATH):
         self.path = path
+        # корень данных: пути files в манифесте — относительно него
+        # (наследники, напр. twin.state.Manifest, задают свой)
+        self.data_dir = os.path.dirname(path)
         self.data: dict = {"version": 1, "updated": None, "sources": {}}
         if os.path.exists(path):
             with open(path, "r", encoding="utf-8") as f:
@@ -104,7 +107,7 @@ class Manifest:
             entry["note"] = note
         s["chunks"][chunk] = entry
         for rel in files or []:
-            full = os.path.join(DATA_DIR, rel)
+            full = os.path.join(self.data_dir, rel)
             info = {
                 "path": rel,
                 "bytes": os.path.getsize(full),

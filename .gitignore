@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 atlas/data/
+twin/data/
 node_modules/
 runs/
 logs/
@@ -10,3 +11,7 @@ export_ue/
 docs/faces/
 docs/test_portrait.png
 docs/hosted_play_menu.png
+
+# ключи твина: только локально, никогда в репозиторий
+twin/.keys.json
+.env
