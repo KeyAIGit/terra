@@ -454,16 +454,25 @@ def _check_scene_photos(scene: dict, errors: list, warns: list) -> None:
     bad = [p for p in items if not (p[3] == -1 or 0 <= p[3] < 360)]
     if bad:
         errors.append(f"съёмка: у {len(bad)} кадров курс вне [0, 360)")
-    directed = [p for p in items if p[3] >= 0]
-    if len(directed) < 0.8 * len(items):
-        errors.append("съёмка: слишком много кадров без курса — "
+    # Курс обязателен для УЛИЧНЫХ кадров: только по ним встают в точку съёмки.
+    # Виды Викисклада (kind=1) — метки места, у них курса нет и не должно быть.
+    street = [p for p in items if p[4] == 0]
+    blind = [p for p in street if p[3] < 0]
+    if blind:
+        errors.append(f"съёмка: {len(blind)} уличных кадров без курса — "
                       "по ним нельзя поверить геометрию")
-    # кадры должны попадать в рамку сцены: x/z в дециметрах от центра
-    bb = scene["head"]["bbox"]
-    p = scene["head"]["proj"]
-    half_x = abs(bb[3] - bb[1]) * p["kx"] * 10 * 0.55
-    half_z = abs(bb[2] - bb[0]) * p["kz"] * 10 * 0.55
-    out = [q for q in items if abs(q[0]) > half_x or abs(q[1]) > half_z]
+    if len(street) < 2000:
+        errors.append(f"съёмка: уличных кадров всего {len(street)} — "
+                      "для города мало")
+
+    # Рамка сцены НЕ симметрична: центр сцены задан отдельно от bbox и обычно
+    # не совпадает с его серединой. Считаем углы через ту же проекцию.
+    bb, p = scene["head"]["bbox"], scene["head"]["proj"]
+    xs = [(bb[1] - p["lon0"]) * p["kx"], (bb[3] - p["lon0"]) * p["kx"]]
+    zs = [(p["lat0"] - bb[0]) * p["kz"], (p["lat0"] - bb[2]) * p["kz"]]
+    x0, x1 = min(xs) * 10 - 200, max(xs) * 10 + 200      # запас 20 м
+    z0, z1 = min(zs) * 10 - 200, max(zs) * 10 + 200
+    out = [q for q in items if not (x0 <= q[0] <= x1 and z0 <= q[1] <= z1)]
     if out:
         errors.append(f"съёмка: {len(out)} кадров вне рамки сцены")
     no_url = [q for q in items if not q[6]]
