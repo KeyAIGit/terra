@@ -392,9 +392,22 @@ plausible reconstruction is the honest answer and tier R already says so.
 1. **Done (this PR):** `twin/` pipeline + SF scene demo (`twin_sf.html`):
    real terrain, ~150k real buildings, streets, water, parks, live weather,
    day-cycle, click-to-identify. Offline tests + doctor.
-2. **Precision pass:** switch scene buildings to DataSF lidar footprints
-   (real heights for *every* building, not just OSM's 140k), join assessor
-   years; USGS 1 m DEM for the city core; Overture for the other 8 counties.
+2. **Precision pass:** scene buildings now come from DataSF lidar footprints
+   (real heights for *every* building, not just OSM's 140k) with assessor years
+   joined. ~~USGS 1 m DEM for the city core~~ — **done, and keyless**: USGS
+   **3DEP Bare Earth** replaces Copernicus GLO-30 under the scene. This is a
+   correctness fix, not a resolution one. GLO-30 is a *surface* model — it
+   measures what the radar bounced off, which downtown is rooftops — so the
+   ground was lifted by the height of the buildings standing on it, and the
+   build had to shove it back down with a 3×3 minimum filter that also flattened
+   the hills. 3DEP hands over ground with the built environment already
+   subtracted, at 3.9 × 4.6 m, so the filter is gone. Two grids now exist for
+   two different jobs: objects are *placed* on the full-resolution lidar, and
+   the mesh we *draw* is resampled to ~24 m, because thirteen million vertices
+   bought a 96 MB scene file and no visible detail. Verified: the scene's
+   highest point is 287 m (Twin Peaks, 282 in life) and the financial district
+   sits at 4.8 m where the surface model claimed 7.2.
+   Still open: Overture for the other 8 counties.
 3. ~~**Textures**~~ — **done for the base layer.** `twin/sources/imagery.py`
    pulls USDA **NAIP at 0.6 m/pixel** (public domain, keyless) as Planetary
    Computer mosaic tiles — z16, ~1000 tiles, stitched and cropped to the scene
@@ -478,3 +491,16 @@ plausible reconstruction is the honest answer and tier R already says so.
 - Respect licenses: ODbL for OSM-derived, PDDL for DataSF, public domain for
   federal; Google tiles and Rumsey scans are *not* baked into artifacts.
 - Every user-visible surface is verified with Playwright screenshots.
+- **Secrets never enter the repository, and it is checked rather than
+  intended.** Ingest keys come from the environment or a gitignored
+  `twin/.keys.json`; browser keys stay in the viewer's `localStorage`; a key is
+  never sent through a conversation, because transcripts are written to disk and
+  a leaked key can only be revoked, not recalled. `twin.doctor` greps the
+  sources, the compiled scene and the built page for six shapes of secret and
+  fails the build on a hit. See [twin_keys.md](twin_keys.md).
+- **Keyless first.** A capability that needs a paid key is a capability we do
+  not have yet. Of the sixteen providers worth wanting, fourteen cost nothing
+  and need no payment card — and twice now the "paid" assumption turned out to
+  be wrong on inspection: street-level imagery (KartaView, not Mapillary's
+  token) and metre-scale bare-earth terrain (USGS 3DEP's open ImageServer, not
+  OpenTopography's key). Check before budgeting.

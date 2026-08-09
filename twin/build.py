@@ -831,7 +831,10 @@ def build_scene(key: str) -> str:
                  "counts": {"aircraft": len(air), "sats": len(sats),
                             "quakes": len(quakes), "cams": len(cams)}},
         "sources": [
-            {"name": "Copernicus DEM GLO-30", "license": "ESA, свободно с атрибуцией"},
+            ({"name": "USGS 3DEP (голая земля)", "license": "Public Domain"}
+             if dem_kind == "bare" else
+             {"name": "Copernicus DEM GLO-30", "license": "ESA, свободно с атрибуцией"}),
+            {"name": "KartaView (уличная съёмка)", "license": "CC BY-SA 4.0"},
             {"name": "OpenStreetMap", "license": "ODbL-1.0"},
             {"name": "DataSF (лидар + реестр оценщика)", "license": "PDDL/ODC"},
             {"name": "NOAA/NWS", "license": "Public Domain"},

@@ -63,7 +63,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#0b0e13;
   padding:5px 6px;font:inherit;font-size:11.5px;cursor:pointer}
 #photo button:hover{background:rgba(255,255,255,.13)}
 #photo button.on{background:#2f6f4f;border-color:#4aa070;color:#f0fff5}
-#gg{right:14px;top:428px;width:250px;display:none}
+#gg{right:14px;top:456px;width:250px;display:none}
 #gg .hd{font-weight:600;margin-bottom:5px}
 #gg input[type=text]{width:100%;box-sizing:border-box;background:#0c1119;
   color:#e8e6df;border:1px solid rgba(255,255,255,.15);border-radius:6px;
