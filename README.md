@@ -130,6 +130,22 @@ heading; *follow along* keeps the nearest frame facing your way (±55°, within
 250 m) beside you as you walk. A frame without a heading is useless for this,
 which is why `doctor` insists on one.
 
+![A real dashcam frame beside our geometry from the same point and bearing](docs/twin_photo_check.jpg)
+
+That picture is the point of the feature. The street canyon, the building line
+and the fall of the hill match a photograph taken from the same spot — the
+skeleton is right. The trees, the cars, the poles and every surface do not
+exist. Which is exactly the state of the model, now visible rather than
+asserted, and exactly why the remaining work is an appearance layer over a
+skeleton that already holds.
+
+Two things the data taught us here: the raw dashcam GPS is off by tens of metres
+(the records report 20 m accuracy themselves), so we prefer KartaView's
+road-snapped position and fall back to raw only when the snap wanders more than
+40 m; and some contributors mounted the camera upside down without recording it
+in EXIF, so the panel carries a flip button that remembers its answer for the
+whole sequence — one camera, one decision.
+
 **Google's imagery, if you bring a key.** Three Google Maps Platform products
 are wired in behind a key you enter in the browser — Street View Static (a
 photograph from the exact spot and bearing you are standing at), Map Tiles 2D

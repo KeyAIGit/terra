@@ -58,6 +58,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#0b0e13;
 #photo .cap{font-size:11px;color:#9aa3ad;margin-top:5px;line-height:1.35}
 #photo .cap a{color:#7ab0d6}
 #photo .row{display:flex;gap:6px;margin-top:7px}
+#photo #phFlip{flex:0 0 34px}
 #photo button{flex:1;background:rgba(255,255,255,.06);
   border:1px solid rgba(255,255,255,.11);color:#cfd6dd;border-radius:6px;
   padding:5px 6px;font:inherit;font-size:11.5px;cursor:pointer}
@@ -135,6 +136,8 @@ BODY = """
   <div class="row">
     <button id="phStand" onclick="photoStand()">встать сюда</button>
     <button id="phAuto" onclick="photoToggleAuto()">идти следом</button>
+    <button id="phFlip" onclick="photoFlip()" title="часть регистраторов
+      висела вверх ногами, и EXIF об этом молчит">↻</button>
   </div>
   <div class="row" id="phGRow" style="display:none">
     <button onclick="ggStreetHere()">снимок Google отсюда</button>
@@ -1424,6 +1427,36 @@ function buildPhotos(){
 
 function photoHide(){ $('photo').style.display = 'none'; photoCur = -1; }
 
+// Часть регистраторов висела вверх ногами, и EXIF об этом молчит — кадр
+// приезжает перевёрнутым. Определить это в браузере нельзя: у KartaView нет
+// CORS, значит холст с кадром «протухает» и пиксели не прочитать. Поэтому
+// переворот ручной, но запоминается на ВСЮ СЕРИЮ: у одного регистратора
+// камера висела одинаково весь заезд, так что чинится это один раз.
+function photoSeq(p){
+  var m = /details\/(\d+)/.exec(p && p[11] || '');
+  return m ? m[1] : '';
+}
+function photoFlipped(p){
+  var s = photoSeq(p);
+  if (!s) return false;
+  try { return localStorage.getItem('twin_flip_' + s) === '1'; }
+  catch (e) { return false; }
+}
+function photoFlip(){
+  var p = photoData[photoCur];
+  if (!p) return;
+  var s = photoSeq(p);
+  if (!s) return;
+  var now = !photoFlipped(p);
+  try { localStorage.setItem('twin_flip_' + s, now ? '1' : '0'); } catch (e) {}
+  photoApplyFlip(p);
+}
+function photoApplyFlip(p){
+  var on = photoFlipped(p);
+  $('phImg').style.transform = on ? 'rotate(180deg)' : '';
+  $('phFlip').classList.toggle('on', on);
+}
+
 function photoShow(i){
   var p = photoData[i];
   if (!p) return;
@@ -1446,6 +1479,8 @@ function photoShow(i){
     + (p[11] ? ' · <a href="' + p[11] + '" target="_blank" rel="noopener">'
                + 'первоисточник</a>' : '');
   $('phStand').style.display = p[3] >= 0 ? '' : 'none';
+  $('phFlip').style.display = photoSeq(p) ? '' : 'none';
+  photoApplyFlip(p);
   $('phGRow').style.display = GKEY ? '' : 'none';
   $('photo').style.display = 'block';
 }

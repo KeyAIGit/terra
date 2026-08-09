@@ -449,8 +449,9 @@ def pull_hf(token: str | None = None) -> tuple[int, str]:
         raise RuntimeError("нет HF_TOKEN в окружении — без него приватный "
                            "склад не открыть")
     from huggingface_hub import hf_hub_download
+    # склад заведён как датасет — с repo_type="model" файл не найдётся
     path = hf_hub_download(repo_id=HF_SECRETS_REPO, filename=HF_KEYS_PATH,
-                           repo_type="model", token=token)
+                           repo_type="dataset", token=token)
     with open(path, "r", encoding="utf-8") as f:
         remote = json.load(f)
     data = _load_file()
