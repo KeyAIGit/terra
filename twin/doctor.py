@@ -50,6 +50,49 @@ def _check_dem(errors: list, warns: list) -> None:
         warns.append(f"dem: центр города {dtwn:.0f} м подозрителен")
 
 
+def _check_bareearth(errors: list, warns: list, done: bool) -> None:
+    """Голая земля 3DEP: она заменяет собой поверхностную модель, и если
+    ошибётся — весь город встанет не на ту отметку."""
+    p = os.path.join(DATA_DIR, "bareearth", "bare_sf.npz")
+    if not os.path.exists(p):
+        (errors if done else warns).append(
+            "bareearth: нет bare_sf.npz — python3 -m twin.ingest --source bareearth")
+        return
+    z = np.load(p, allow_pickle=False)
+    elev = z["elev"]
+    meta = json.loads(str(z["meta"]))
+    lat_min, lon_min, lat_max, lon_max = meta["bbox"]
+
+    def at(la, lo):
+        r = int((lat_max - la) / (lat_max - lat_min) * (elev.shape[0] - 1))
+        c = int((lo - lon_min) / (lon_max - lon_min) * (elev.shape[1] - 1))
+        return float(elev[r, c])
+
+    step_m = (lat_max - lat_min) * 111_132.0 / elev.shape[0]
+    print(f"{OK} bareearth: сетка {elev.shape[0]}×{elev.shape[1]}, "
+          f"шаг ~{step_m:.1f} м, пропусков {meta.get('gaps', 0)}")
+    if step_m > 10:
+        errors.append(f"bareearth: шаг {step_m:.1f} м — не тоньше GLO-30, "
+                      "смысла в подмене нет")
+    peak = float(elev.max())
+    # Твин-Пикс — высшая точка сцены, 282 м; лидар обязан её увидеть
+    if not (250 <= peak <= 320):
+        errors.append(f"bareearth: высшая точка {peak:.0f} м, а Твин-Пикс 282 м")
+    else:
+        print(f"{OK} bareearth: высшая точка {peak:.0f} м (Твин-Пикс, в жизни 282)")
+    # главное отличие от модели поверхности: в деловом центре земля НИЗКАЯ,
+    # потому что небоскрёбы вычтены
+    fin = at(37.7935, -122.4010)
+    if fin > 25:
+        errors.append(f"bareearth: в деловом центре земля {fin:.0f} м — "
+                      "похоже, это всё-таки крыши, а не земля")
+    else:
+        print(f"{OK} bareearth: деловой центр {fin:.1f} м — застройка вычтена")
+    if meta.get("gaps", 0) > elev.size * 0.25:
+        warns.append(f"bareearth: пропусков {meta['gaps']} — четверть сцены "
+                     "не покрыта лидаром")
+
+
 def _read_kind(src: str, kind: str) -> list[dict]:
     import pyarrow.parquet as pq
     rows = []
@@ -462,6 +505,7 @@ def main() -> int:
     print("— физика —")
     st = {row["source"]: row["status"] for row in man.summary()}
     _check_dem(errors, warns)
+    _check_bareearth(errors, warns, st.get("bareearth") == "done")
     _check_osm(errors, warns, st.get("osm") == "done")
     _check_counties(errors, warns, st.get("counties") == "done")
     _check_weather(errors, warns, st.get("weather") == "done")

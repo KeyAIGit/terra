@@ -470,6 +470,44 @@ def test_addons():
     check("Draco подключается к GLTFLoader", got["linked"] is True)
 
 
+def test_render_grid():
+    section("сетка отрисовки против сетки посадки")
+    # Лидар 3DEP тоньше сетки, которую мы рисуем. Пересчёт обязан сохранять
+    # РАМКУ: сдвиг на строку — это десяток метров, на которые уедет весь город.
+    # склон с севера на юг: 10 м наверху, 90 м внизу. Одиночную строку-пик
+    # проверять нельзя — сглаживание её съест, и правильно сделает.
+    a = np.tile(np.linspace(10.0, 90.0, 100, dtype=np.float32)[:, None], (1, 120))
+    small = tb._resample_to(a, 25, 30)
+    check("размер стал целевым", small.shape == (25, 30), str(small.shape))
+    check("северный край остался северным", abs(small[0, 15] - 10.0) < 2.0,
+          f"{small[0, 15]:.2f}")
+    check("южный край остался южным", abs(small[-1, 15] - 90.0) < 2.0,
+          f"{small[-1, 15]:.2f}")
+    check("склон не перевернулся", small[0, 15] < small[-1, 15])
+    # запад-восток: рамка не должна ползти и по долготе
+    b = np.tile(np.linspace(0.0, 60.0, 120, dtype=np.float32), (100, 1))
+    wide = tb._resample_to(b, 25, 30)
+    check("западный край остался западным", abs(wide[12, 0] - 0.0) < 1.5,
+          f"{wide[12, 0]:.2f}")
+    check("восточный край остался восточным", abs(wide[12, -1] - 60.0) < 1.5,
+          f"{wide[12, -1]:.2f}")
+
+    # линейный склон обязан остаться тем же склоном, а не съехать
+    ramp = np.tile(np.linspace(0.0, 100.0, 200, dtype=np.float32), (50, 1))
+    r2 = tb._resample_to(ramp, 50, 50)
+    check("склон сохранил начало", abs(float(r2[25, 0]) - 0.0) < 1.5,
+          f"{float(r2[25, 0]):.2f}")
+    check("склон сохранил конец", abs(float(r2[25, -1]) - 100.0) < 1.5,
+          f"{float(r2[25, -1]):.2f}")
+    mid = float(r2[25, 24]) + float(r2[25, 25])
+    check("середина склона на месте", abs(mid / 2 - 50.0) < 2.0, f"{mid/2:.2f}")
+
+    check("шаг отрисовки задан", 10 <= tb.RENDER_STEP_M <= 40)
+    same = tb._resample_to(a, 100, 120)
+    check("совпадающий размер не трогается", same.shape == a.shape
+          and float(abs(same - a).max()) == 0.0)
+
+
 def test_keys():
     section("реестр ключей")
     from twin import keys as tk
@@ -597,6 +635,7 @@ def main():
     test_ecef()
     test_mercator_tiles()
     test_addons()
+    test_render_grid()
     test_keys()
     test_secret_scan()
     print("\n" + "=" * 64)

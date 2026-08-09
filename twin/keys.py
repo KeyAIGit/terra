@@ -417,6 +417,54 @@ def set_key(name: str, value: str) -> str:
     return env
 
 
+# Приватный склад секретов проекта — тот же, где уже лежат токены GitHub и HF.
+# Контейнер, в котором работает Фейбл, живёт недолго и умирает вместе с диском;
+# складывать ключи туда бессмысленно, а пересылать их в переписке — небезопасно
+# (переписка пишется в журнал). Поэтому ключи кладутся ОДИН раз в приватный
+# репозиторий, а сюда подтягиваются по требованию.
+HF_SECRETS_REPO = "Bekzod25/terra-secrets"
+HF_KEYS_PATH = "twin_keys.json"
+
+
+def template() -> str:
+    """Пустой бланк для приватного склада: заполнить и положить туда."""
+    blank = {}
+    for k in REGISTRY:
+        if k.where == "browser":
+            continue          # браузерные ключи вводятся на самой странице
+        blank[k.env] = ""
+        for e in k.extra_env:
+            blank[e] = ""
+    return json.dumps(blank, ensure_ascii=False, indent=1, sort_keys=True) + "\n"
+
+
+def pull_hf(token: str | None = None) -> tuple[int, str]:
+    """Забрать бланк с ключами из приватного репозитория в twin/.keys.json.
+
+    Токен HF берётся из HF_TOKEN/HUGGINGFACE_TOKEN. Пустые значения не
+    затирают уже имеющиеся: бланк можно заполнять по частям.
+    """
+    token = token or os.environ.get("HF_TOKEN") or os.environ.get("HUGGINGFACE_TOKEN")
+    if not token:
+        raise RuntimeError("нет HF_TOKEN в окружении — без него приватный "
+                           "склад не открыть")
+    from huggingface_hub import hf_hub_download
+    path = hf_hub_download(repo_id=HF_SECRETS_REPO, filename=HF_KEYS_PATH,
+                           repo_type="model", token=token)
+    with open(path, "r", encoding="utf-8") as f:
+        remote = json.load(f)
+    data = _load_file()
+    added = 0
+    for env, val in sorted(remote.items()):
+        if not isinstance(val, str) or not val.strip():
+            continue
+        if data.get(env) != val.strip():
+            data[env] = val.strip()
+            added += 1
+    _save_file(data)
+    return added, KEYS_FILE
+
+
 def status() -> list[dict]:
     out = []
     for k in _ordered():
@@ -470,8 +518,32 @@ def _markdown() -> str:
          "```bash",
          "python3 -m twin.keys                    # what is present, what is missing",
          "python3 -m twin.keys --set 511 <token>  # store one (never printed back)",
+         "python3 -m twin.keys --template         # blank form for the private store",
+         "python3 -m twin.keys --pull-hf          # fetch the filled form (needs HF_TOKEN)",
          "python3 -m twin.keys --md               # regenerate this document",
          "```",
+         "",
+         "## Handing keys to the agent",
+         "",
+         "Never in chat. A conversation is written to a session log on disk, and a",
+         "key that lands there cannot be taken back — it can only be revoked. Two",
+         "routes carry a key to a cloud session without passing through the",
+         "transcript:",
+         "",
+         "1. **Environment variables on the environment itself.** Set them where",
+         "   the remote environment is configured; every session starts with them",
+         "   already in `os.environ`, and nothing touches the repository. Best for",
+         "   keys you expect to keep.",
+         f"2. **The project's private store** — `{HF_SECRETS_REPO}`, the same",
+         f"   private repo that already holds the GitHub and Hugging Face tokens.",
+         f"   Run `python3 -m twin.keys --template`, fill the blanks, upload it as",
+         f"   `{HF_KEYS_PATH}`, and a session with `HF_TOKEN` in its environment",
+         "   pulls it with `--pull-hf`. Containers are ephemeral; the private repo",
+         "   is not, so this survives the session that created it.",
+         "",
+         "If a key does end up somewhere it should not — in a message, a commit, a",
+         "screenshot — treat it as burned: revoke it at the provider and issue a new",
+         "one. Every provider in this document lets you do that in one click.",
          ""]
     order = _ordered()
     seen = []
@@ -512,10 +584,27 @@ def main() -> int:
                     help="положить ключ в twin/.keys.json (в git не попадёт)")
     ap.add_argument("--md", action="store_true",
                     help="напечатать реестр как markdown (docs/twin_keys.md)")
+    ap.add_argument("--template", action="store_true",
+                    help="бланк для приватного склада: заполнить и положить "
+                         f"в {HF_SECRETS_REPO}/{HF_KEYS_PATH}")
+    ap.add_argument("--pull-hf", action="store_true",
+                    help="забрать заполненный бланк из приватного склада "
+                         "(нужен HF_TOKEN в окружении)")
     args = ap.parse_args()
 
     if args.md:
         sys.stdout.write(_markdown())
+        return 0
+    if args.template:
+        sys.stdout.write(template())
+        return 0
+    if args.pull_hf:
+        try:
+            n, path = pull_hf()
+        except Exception as e:
+            print(f"не вышло: {type(e).__name__}: {e}")
+            return 2
+        print(f"взято ключей: {n} -> {path}")
         return 0
     if args.set:
         name, value = args.set

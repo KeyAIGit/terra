@@ -142,6 +142,27 @@ resembling a key ever appears in the sources or the compiled scene. These three
 layers are written but **unverified** — we have no key to run them against; the
 keyless layers above are verified with Playwright.
 
+**Bare earth under the city.** Copernicus GLO-30 is a *surface* model — it
+measures whatever the radar bounced off, which downtown means rooftops, so the
+"ground" is lifted by however tall the buildings are. `twin/sources/bareearth.py`
+replaces it under each scene with **USGS 3DEP Bare Earth** (keyless), at a
+3.9 × 4.6 m step instead of 30 m, with the built environment already subtracted.
+The build prefers it automatically and then *stops* applying the 3×3 minimum
+filter, which existed only to undo the surface model and would otherwise shave
+the real ridges off the hills. `doctor` checks it where it matters: the scene's
+highest point comes out at 287 m (Twin Peaks, really 282), and the financial
+district sits at 4.8 m where the surface model claimed 7.2.
+
+**Keys, and where they are not.** Everything above runs on keyless data.
+[`docs/twin_keys.md`](docs/twin_keys.md) — generated from `twin/keys.py`, so the
+two cannot drift — lists sixteen providers that would each add something
+specific, of which **fourteen hand out a key against an email address**; only
+Google Maps Platform and Anthropic require a payment card, and both are
+optional. Ingest keys live in an environment variable or in a gitignored
+`twin/.keys.json`; browser keys stay in the viewer's `localStorage`. `doctor`
+greps the sources, the compiled scene and the built page for six shapes of
+secret and fails the build on a hit.
+
 Every record carries provenance (`source/license/tier/retrieved`) in the same K/T/R
 discipline as the atlas; per-parcel construction years from the assessor roll
 are the seed of the time machine (2026 → 1950 → 1906 → 1849 → 1776 →

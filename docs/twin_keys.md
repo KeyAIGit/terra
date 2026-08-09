@@ -31,8 +31,32 @@ asks the viewer for the key instead of shipping one.
 ```bash
 python3 -m twin.keys                    # what is present, what is missing
 python3 -m twin.keys --set 511 <token>  # store one (never printed back)
+python3 -m twin.keys --template         # blank form for the private store
+python3 -m twin.keys --pull-hf          # fetch the filled form (needs HF_TOKEN)
 python3 -m twin.keys --md               # regenerate this document
 ```
+
+## Handing keys to the agent
+
+Never in chat. A conversation is written to a session log on disk, and a
+key that lands there cannot be taken back — it can only be revoked. Two
+routes carry a key to a cloud session without passing through the
+transcript:
+
+1. **Environment variables on the environment itself.** Set them where
+   the remote environment is configured; every session starts with them
+   already in `os.environ`, and nothing touches the repository. Best for
+   keys you expect to keep.
+2. **The project's private store** — `Bekzod25/terra-secrets`, the same
+   private repo that already holds the GitHub and Hugging Face tokens.
+   Run `python3 -m twin.keys --template`, fill the blanks, upload it as
+   `twin_keys.json`, and a session with `HF_TOKEN` in its environment
+   pulls it with `--pull-hf`. Containers are ephemeral; the private repo
+   is not, so this survives the session that created it.
+
+If a key does end up somewhere it should not — in a message, a commit, a
+screenshot — treat it as burned: revoke it at the provider and issue a new
+one. Every provider in this document lets you do that in one click.
 
 ## Съёмка и рельеф
 

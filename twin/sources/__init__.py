@@ -4,6 +4,7 @@
 
 from twin.sources import (
     dem,
+    bareearth,
     osm,
     counties,
     weather,
@@ -15,7 +16,8 @@ from twin.sources import (
 )
 
 REGISTRY = [
-    dem,          # рельеф — фундамент всего
+    dem,          # рельеф региона — фундамент всего
+    bareearth,    # голая земля 3DEP под сценой: без крыш вместо земли
     counties,     # границы округов (лёгкие)
     weather,      # погода NOAA (мгновенно)
     live,         # живой слой: борта, спутники, толчки, прилив, камеры

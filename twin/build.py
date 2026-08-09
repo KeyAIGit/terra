@@ -59,6 +59,31 @@ _B_COLOR = {
 
 M_PER_DEG_LAT = 111132.0
 
+# Шаг сетки, которую страница рисует. Лидар 3DEP тоньше на порядок, но рельеф
+# на экране всё равно сглажен — вершины сверх этого шага только утяжеляют файл.
+RENDER_STEP_M = 24.0
+
+
+def _resample_to(a: np.ndarray, rows: int, cols: int) -> np.ndarray:
+    """Пересчитать сетку на заданный размер, НЕ сдвигая рамку.
+
+    Обрезать хвост по кратности нельзя: рамка рельефа задана по краям массива,
+    и отброшенные строки увели бы весь город на десяток метров. Поэтому сперва
+    сглаживаем по масштабу прореживания (иначе холмы пойдут ступенями от
+    попадания шага в шаг), затем растягиваем края в края.
+    """
+    from scipy.ndimage import gaussian_filter, zoom
+    if a.shape == (rows, cols):
+        return a.astype(np.float32)
+    ky, kx = a.shape[0] / rows, a.shape[1] / cols
+    if ky > 1.2 or kx > 1.2:
+        a = gaussian_filter(a, sigma=(max(0.6, ky * 0.5), max(0.6, kx * 0.5)))
+    # mode="nearest" обязателен: по умолчанию zoom считает всё за краем нулём,
+    # и от ошибки округления последний столбец выходит нулевым — по восточной
+    # и южной кромке сцены встаёт обрыв в море там, где берег.
+    return zoom(a, (rows / a.shape[0], cols / a.shape[1]),
+                order=1, mode="nearest").astype(np.float32)
+
 
 class Proj:
     """Локальная проекция сцены: метры от центра; x — восток, z — юг."""
@@ -93,12 +118,23 @@ class Ground:
 
 
 def _load_scene_dem(key: str):
+    """Рельеф сцены: голая земля 3DEP, если она собрана, иначе GLO-30.
+
+    Возвращает (высоты, bbox, вид), где вид — "bare" или "surface". Разница
+    не косметическая: GLO-30 меряет то, от чего отразился радар, то есть
+    крыши, и в центре города «земля» у неё поднята на высоту застройки.
+    """
+    bare = os.path.join(DATA_DIR, "bareearth", f"bare_{key}.npz")
+    if os.path.exists(bare):
+        z = np.load(bare, allow_pickle=False)
+        meta = json.loads(str(z["meta"]))
+        return z["elev"].astype(np.float32), tuple(meta["bbox"]), "bare"
     path = os.path.join(DATA_DIR, "dem", f"scene_{key}.npz")
     if not os.path.exists(path):
         raise FileNotFoundError(f"нет {path} — сначала python3 -m twin.ingest")
     z = np.load(path, allow_pickle=False)
     meta = json.loads(str(z["meta"]))
-    return z["elev"].astype(np.float32), tuple(meta["bbox"])
+    return z["elev"].astype(np.float32), tuple(meta["bbox"]), "surface"
 
 
 def _read_features(scene_key: str) -> list[dict]:
@@ -406,13 +442,33 @@ def _latest_weather(scene_key: str) -> dict:
 def build_scene(key: str) -> str:
     sc = regions.scene(key)
     proj = Proj(sc)
-    elev, dem_bbox = _load_scene_dem(key)
-    # GLO-30 — поверхностная модель (DSM): в плотной застройке она вздута
-    # крышами. Минимум-фильтр 3×3 (~90 м) прижимает к уровню улиц, лёгкое
-    # сглаживание убирает ступени. Правильное решение — USGS 1 м DTM (фаза 2).
+    elev, dem_bbox, dem_kind = _load_scene_dem(key)
     from scipy.ndimage import gaussian_filter, minimum_filter
-    elev = gaussian_filter(minimum_filter(elev, size=3), sigma=0.8)
+    if dem_kind == "bare":
+        # 3DEP уже отдал землю без застройки, да ещё в четыре метра шага.
+        # Минимум-фильтр тут ВРЕДЕН: он срезал бы настоящие гребни холмов —
+        # а холмы и есть лицо этого города. Только лёгкое сглаживание, чтобы
+        # снять шум лидара.
+        elev = gaussian_filter(elev, sigma=1.2)
+    else:
+        # GLO-30 — поверхностная модель (DSM): в плотной застройке она вздута
+        # крышами. Минимум-фильтр 3×3 (~90 м) прижимает к уровню улиц, лёгкое
+        # сглаживание убирает ступени.
+        elev = gaussian_filter(minimum_filter(elev, size=3), sigma=0.8)
+
+    # Земля, на которую САДЯТСЯ объекты, берётся в полном разрешении лидара:
+    # здание должно стоять на своей отметке, а не на средней по кварталу.
     ground = Ground(elev, dem_bbox)
+
+    # Сетка, которую мы РИСУЕМ, — отдельная и грубее. Лидар даёт 4 метра, это
+    # тринадцать миллионов вершин на сцену: страница на сто мегабайт ради
+    # рельефа, который на экране всё равно сглажен. Прореживаем до шага,
+    # который город переживал и раньше.
+    h_m = (dem_bbox[2] - dem_bbox[0]) * M_PER_DEG_LAT
+    w_m = (dem_bbox[3] - dem_bbox[1]) * math.cos(math.radians(proj.lat0)) * 111320.0
+    want_rows = max(2, min(elev.shape[0], int(round(h_m / RENDER_STEP_M))))
+    want_cols = max(2, min(elev.shape[1], int(round(w_m / RENDER_STEP_M))))
+    elev = _resample_to(elev, want_rows, want_cols)
     feats = _read_features(key)
 
     lat_min, lon_min, lat_max, lon_max = dem_bbox
@@ -758,6 +814,13 @@ def build_scene(key: str) -> str:
         "weather": wx,
         "time_machine": time_machine,
         "aerial": aerial,
+        "terrain_src": (
+            {"kind": "bare", "name": "USGS 3DEP — голая земля",
+             "note": "земля без застройки, шаг ~4 м"}
+            if dem_kind == "bare" else
+            {"kind": "surface", "name": "Copernicus GLO-30",
+             "note": "модель поверхности: в центре города земля вздута крышами"}
+        ),
         "people": {"n": len(residents),
                    "note": "синтетические жители: население квартала измерено "
                            "переписью, сам житель — реконструкция (ярус R); "
