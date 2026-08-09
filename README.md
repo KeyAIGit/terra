@@ -115,8 +115,34 @@ surface temperature per vertex from the material's albedo and thermal inertia,
 the sun's angle of incidence, the heat stored through the day and the
 building's own internal load by use — with air temperature from the live NOAA
 observation. Asphalt glows after dark, parks go cold, the bay stays flat. The
-scale is printed in °C. Every
-record carries provenance (`source/license/tier/retrieved`) in the same K/T/R
+scale is printed in °C.
+
+**Photographs of the same streets, as a check on the model.** The city here is
+built from measurements — footprints, lidar heights, assessor years — so the
+honest way to ask whether it resembles the real place is to stand where a
+camera stood, face the way it faced, and compare. `twin/sources/streetlevel.py`
+harvests real street-level frames from KartaView (dashcam imagery, CC BY-SA,
+each with a position **and a camera heading**) plus geotagged building views
+from Wikimedia Commons. No keys, and the frames stay at the source: only the
+address, the author and the licence travel into the scene. Click a marker and
+*stand here* puts the camera exactly at the shot and turns it to the shot's
+heading; *follow along* keeps the nearest frame facing your way (±55°, within
+250 m) beside you as you walk. A frame without a heading is useless for this,
+which is why `doctor` insists on one.
+
+**Google's imagery, if you bring a key.** Three Google Maps Platform products
+are wired in behind a key you enter in the browser — Street View Static (a
+photograph from the exact spot and bearing you are standing at), Map Tiles 2D
+satellite (a top-down mosaic stitched and laid on the terrain in place of
+NAIP), and Photorealistic 3D Tiles (a small 3D Tiles traverser of our own,
+placing Google's photogrammetry into the scene's local frame so the sensors and
+time-of-day still apply to it). The key lives only in that browser's
+localStorage and is sent only to Google; `doctor` fails the build if anything
+resembling a key ever appears in the sources or the compiled scene. These three
+layers are written but **unverified** — we have no key to run them against; the
+keyless layers above are verified with Playwright.
+
+Every record carries provenance (`source/license/tier/retrieved`) in the same K/T/R
 discipline as the atlas; per-parcel construction years from the assessor roll
 are the seed of the time machine (2026 → 1950 → 1906 → 1849 → 1776 →
 pre-colonial). Strategy: [docs/twin_strategy.md](docs/twin_strategy.md).

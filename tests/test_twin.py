@@ -6,6 +6,7 @@ TERRA-Твин — офлайн-проверки (без сети): схема, 
 """
 from __future__ import annotations
 
+import json
 import math
 import sys
 from pathlib import Path
@@ -257,6 +258,184 @@ def test_regions():
         check("чужая сцена отвергается", True)
 
 
+def test_streetlevel():
+    section("уличная съёмка")
+    from twin.sources import streetlevel as sl
+    sc = regions.scene("sf")
+
+    nodes = sl._grid(sc.bbox, sl.KV_STEP_M)
+    check("сетка накрывает сцену", len(nodes) > 100)
+    # угол ячейки не должен выпадать из круга запроса, иначе в съёмке дыры
+    corner = sl.KV_STEP_M * math.sqrt(2) / 2
+    check("круги запросов смыкаются", corner <= sl.KV_RADIUS_M,
+          f"угол {corner:.0f} м > радиуса {sl.KV_RADIUS_M} м")
+    check("узлы внутри рамки", all(
+        sc.bbox[0] - 0.01 <= la <= sc.bbox[2] + 0.01
+        and sc.bbox[1] - 0.01 <= lo <= sc.bbox[3] + 0.01
+        for _, _, la, lo in nodes))
+
+    # курс: строка, число, мусор и отсутствие
+    check("курс из строки", sl._kv_heading({"heading": "155"}) == 155.0)
+    check("курс -1 = нет курса", sl._kv_heading({"heading": "-1"}) is None)
+    check("курс из запасного поля",
+          sl._kv_heading({"heading": "", "headers": "42"}) == 42.0)
+    check("мусорный курс отброшен", sl._kv_heading({"heading": "север"}) is None)
+    check("курс приведён к кругу", sl._kv_heading({"heading": "375"}) == 15.0)
+
+    # место съёмки: сырой GPS регистратора врёт, посаженная на дорогу точка — нет
+    raw = {"lat": 37.7952, "lng": -122.4028}
+    near = dict(raw, match_lat="37.79525", match_lng="-122.40275")
+    check("берём точку на дороге", sl._kv_place(near)[2] == "road")
+    far = dict(raw, match_lat="37.7975", match_lng="-122.4028")
+    check("уехавшая посадка отвергнута", sl._kv_place(far)[2] == "gps")
+    check("нулевая посадка отвергнута",
+          sl._kv_place(dict(raw, match_lat="0", match_lng="0"))[2] == "gps")
+    check("кадр без координат отброшен", sl._kv_place({"heading": "1"}) is None)
+    d = math.hypot((sl._kv_place(far)[0] - 37.7952) * sl.M_PER_DEG_LAT, 0.0)
+    check("порог посадки в метрах", d > sl.MATCH_MAX_M or d == 0.0)
+
+    # прореживание: два кадра в метре друг от друга — остаётся свежий
+    la, lo = 37.7952, -122.4028
+    items = [
+        {"id": "1", "lat": la, "lng": lo, "heading": "10", "timestamp": "100",
+         "name": "a.jpg", "projection": "PLANE", "username": "u"},
+        {"id": "2", "lat": la + 1e-5, "lng": lo, "heading": "10",
+         "timestamp": "900", "name": "b.jpg", "projection": "PLANE",
+         "username": "u"},
+        {"id": "3", "lat": la + 0.002, "lng": lo, "heading": "10",
+         "timestamp": "300", "name": "c.jpg", "projection": "PLANE",
+         "username": "u"},
+    ]
+    recs = sl._kv_records(items, sc.bbox, "sf")
+    check("соседние кадры схлопнуты", len(recs) == 2, f"вышло {len(recs)}")
+    kept = {r["id"] for r in recs}
+    check("остался свежий кадр", "kv_2" in kept and "kv_1" not in kept)
+    check("кадр за рамкой отброшен",
+          not sl._kv_records([{"id": "9", "lat": 10.0, "lng": 10.0,
+                               "heading": "0", "timestamp": "1", "name": "z.jpg",
+                               "projection": "PLANE"}], sc.bbox, "sf"))
+    for r in recs:
+        check("запись съёмки проходит схему",
+              not schema.validate_record("feature", r))
+        break
+    check("адрес кадра абсолютный",
+          json.loads(recs[0]["tags_json"])["url"].startswith("https://"))
+    check("съёмка — ярус K", all(r["tier"] == "K" for r in recs))
+
+    # разметка HTML из Commons не должна протекать в подпись
+    check("разметка вычищена",
+          sl._strip_html('<a href="x">Иван</a> Петров') == "Иван Петров")
+
+
+def test_photo_geometry():
+    section("поверка фотографией")
+    # Курс по компасу -> рыскание камеры. В сцене x — восток, z — юг.
+    def dir_of(h):
+        y = math.pi - math.radians(h)
+        return (math.sin(y), math.cos(y))          # (x, z), как в stepCamera
+
+    x, z = dir_of(0)
+    check("курс 0° смотрит на север", abs(x) < 1e-9 and abs(z + 1) < 1e-9)
+    x, z = dir_of(90)
+    check("курс 90° смотрит на восток", abs(x - 1) < 1e-9 and abs(z) < 1e-9)
+    x, z = dir_of(180)
+    check("курс 180° смотрит на юг", abs(x) < 1e-9 and abs(z - 1) < 1e-9)
+    x, z = dir_of(270)
+    check("курс 270° смотрит на запад", abs(x + 1) < 1e-9 and abs(z) < 1e-9)
+
+    # обратный ход: из рыскания снова в курс
+    for h in (0, 37, 90, 180, 271, 359):
+        y = math.pi - math.radians(h)
+        back = (180 - math.degrees(y)) % 360
+        check(f"курс {h}° восстановлен", abs(((back - h + 180) % 360) - 180) < 1e-9)
+
+
+def test_ecef():
+    section("геоцентрические координаты плиток")
+    # ECEF по WGS84 — то же, что считает обозреватель для плиток Google
+    A, E2 = 6378137.0, 0.00669437999014
+
+    def ecef(lat, lon, h=0.0):
+        la, lo = math.radians(lat), math.radians(lon)
+        s, c = math.sin(la), math.cos(la)
+        N = A / math.sqrt(1 - E2 * s * s)
+        return ((N + h) * c * math.cos(lo), (N + h) * c * math.sin(lo),
+                (N * (1 - E2) + h) * s)
+
+    x, y, z = ecef(0.0, 0.0)
+    check("нулевая точка на экваторе", abs(x - A) < 1e-6 and abs(y) < 1e-6
+          and abs(z) < 1e-6)
+    x, y, z = ecef(90.0, 0.0)
+    b = A * math.sqrt(1 - E2)
+    check("полюс на малой полуоси", abs(z - b) < 1e-6 and abs(x) < 1e-6)
+    check("малая полуось ≈ 6356.75 км", abs(b - 6356752.314) < 1.0)
+
+    # два соседних узла: расстояние в геоцентре = расстояние по земле
+    sc = regions.scene("sf")
+    la0, lo0 = sc.center
+    p0 = ecef(la0, lo0)
+    p1 = ecef(la0 + 0.001, lo0)
+    d = math.dist(p0, p1)
+    check("тысячная доля градуса ≈ 111 м", 110.0 < d < 112.0, f"{d:.1f} м")
+
+    # местный базис ортонормирован — иначе плитки встанут криво
+    la, lo = math.radians(la0), math.radians(lo0)
+    sl_, cl = math.sin(la), math.cos(la)
+    so, co = math.sin(lo), math.cos(lo)
+    e = (-so, co, 0.0)
+    n = (-sl_ * co, -sl_ * so, cl)
+    u = (cl * co, cl * so, sl_)
+    def dot(a, b): return sum(i * j for i, j in zip(a, b))
+    check("базис ортогонален", abs(dot(e, n)) < 1e-12 and abs(dot(e, u)) < 1e-12
+          and abs(dot(n, u)) < 1e-12)
+    check("базис единичный", all(abs(dot(v, v) - 1) < 1e-12 for v in (e, n, u)))
+    # верх в точке города должен смотреть от центра Земли
+    check("верх наружу", dot(u, p0) > 0)
+
+
+def test_mercator_tiles():
+    section("плитки Web Mercator")
+    def mx(lon): return (lon + 180) / 360
+    def my(lat):
+        r = math.radians(lat)
+        return (1 - math.log(math.tan(r) + 1 / math.cos(r)) / math.pi) / 2
+
+    check("нулевой меридиан посередине", abs(mx(0) - 0.5) < 1e-12)
+    check("экватор посередине", abs(my(0) - 0.5) < 1e-12)
+    check("север выше юга", my(38.0) < my(37.0))
+    sc = regions.scene("sf")
+    n = 2 ** 15
+    x0, x1 = int(mx(sc.bbox[1]) * n), int(mx(sc.bbox[3]) * n)
+    y0, y1 = int(my(sc.bbox[2]) * n), int(my(sc.bbox[0]) * n)
+    tiles = (x1 - x0 + 1) * (y1 - y0 + 1)
+    check("сцена накрывается разумным числом плиток", 1 < tiles <= 420,
+          f"{tiles} плиток на z=15")
+
+
+def test_addons():
+    section("дополнения three для плиток Google")
+    from twin import view as tv
+    try:
+        src = tv._addons_source()
+    except FileNotFoundError as e:
+        check("node_modules/three на месте", False, str(e))
+        return
+    check("модули собраны", len(src) > 100_000)
+    check("нет висячих import", "\nimport {" not in src and not src.startswith("import"))
+    check("нет висячих export", "\nexport {" not in src)
+    # import.meta — синтаксическая ошибка в обычном скрипте: страница
+    # не соберёт ни одного загрузчика, а узнаем мы об этом только в браузере
+    check("import.meta вычищен", "import.meta" not in src)
+    check("GLTFLoader выставлен наружу", "THREE.GLTFLoader = __TA.GLTFLoader;" in src)
+    check("DRACOLoader выставлен наружу", "THREE.DRACOLoader = __TA.DRACOLoader;" in src)
+    check("каждый модуль в своём замке", src.count("(function(){") == 4)
+    check("тег script не разорвёт страницу", "</script" not in src)
+    d = tv._draco_assets()
+    check("декодер Draco вшит",
+          d["wasm"].startswith("data:application/wasm;base64,")
+          and len(d["wasm"]) > 100_000)
+
+
 def main():
     print("TERRA-Твин — проверки\n" + "=" * 64)
     test_schema()
@@ -272,6 +451,11 @@ def main():
     test_forecast()
     test_people()
     test_regions()
+    test_streetlevel()
+    test_photo_geometry()
+    test_ecef()
+    test_mercator_tiles()
+    test_addons()
     print("\n" + "=" * 64)
     if _FAILS:
         print(f"ПРОВАЛЕНО {len(_FAILS)} из {_RUN}:")

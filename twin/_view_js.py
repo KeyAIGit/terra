@@ -50,6 +50,32 @@ html,body{margin:0;height:100%;overflow:hidden;background:#0b0e13;
 .spin{width:38px;height:38px;border-radius:50%;border:3px solid #22303c;
   border-top-color:#7ab0d6;animation:sp 1s linear infinite}
 @keyframes sp{to{transform:rotate(360deg)}}
+#photo{left:14px;top:196px;width:326px;display:none;padding:8px 10px}
+#photo .hd{font-weight:600;font-size:12.5px;margin-bottom:5px;display:flex;
+  justify-content:space-between;align-items:baseline}
+#photo .x{cursor:pointer;color:#8c96a1;font-size:15px;line-height:1}
+#photo img{width:100%;border-radius:6px;display:block;background:#131922;min-height:60px}
+#photo .cap{font-size:11px;color:#9aa3ad;margin-top:5px;line-height:1.35}
+#photo .cap a{color:#7ab0d6}
+#photo .row{display:flex;gap:6px;margin-top:7px}
+#photo button{flex:1;background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.11);color:#cfd6dd;border-radius:6px;
+  padding:5px 6px;font:inherit;font-size:11.5px;cursor:pointer}
+#photo button:hover{background:rgba(255,255,255,.13)}
+#photo button.on{background:#2f6f4f;border-color:#4aa070;color:#f0fff5}
+#gg{right:14px;top:428px;width:250px;display:none}
+#gg .hd{font-weight:600;margin-bottom:5px}
+#gg input[type=text]{width:100%;box-sizing:border-box;background:#0c1119;
+  color:#e8e6df;border:1px solid rgba(255,255,255,.15);border-radius:6px;
+  padding:4px 6px;font:inherit;font-size:12px}
+#gg label{display:block;font-size:12.5px;margin:5px 0;cursor:pointer;user-select:none}
+#gg .dim{color:#8c96a1;font-size:11px;margin-top:5px;line-height:1.35}
+#gg a{color:#7ab0d6}
+#gg .st{font-size:11.5px;margin-top:5px;color:#b7c2cc}
+#gg .st.bad{color:#e59a9a}
+#attrib{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);
+  font-size:11px;color:#d3dae1;background:rgba(0,0,0,.55);padding:3px 10px;
+  border-radius:5px;z-index:5;display:none;max-width:74%;text-align:center}
 """
 
 BODY = """
@@ -81,6 +107,7 @@ BODY = """
   <label><input type="checkbox" id="lQ"> толчки за месяц <span class="n" id="nQ"></span></label>
   <label><input type="checkbox" id="lCam"> дорожные камеры <span class="n" id="nCam"></span></label>
   <label><input type="checkbox" id="lRes"> жители <span class="n" id="nRes"></span></label>
+  <label><input type="checkbox" id="lPh"> уличная съёмка <span class="n" id="nPh"></span></label>
   <div class="dim" id="tideTxt"></div>
   <label class="dim">время ×<span id="spdV">1</span>
     <input type="range" id="spd" min="0" max="3" step="1" value="0"></label>
@@ -95,11 +122,38 @@ BODY = """
   <button onclick="setMode(1)">ПНВ <span class="k">2</span></button>
   <button onclick="setMode(2)">тепловизор <span class="k">3</span></button>
   <button onclick="setMode(3)">ЭЛТ <span class="k">4</span></button>
+  <button id="ggBtn" onclick="ggPanel()">Google</button>
   <div class="dim" id="modeHint"></div>
 </div>
 <div id="help" class="panel">ЛКМ-тянуть — осмотреться · WASD — лететь · Q/E — вниз/вверх ·
  Shift — быстрее · колесо — скорость · клик по зданию — что это</div>
 <div id="info" class="panel"><b id="iName"></b><div class="dim" id="iMeta"></div></div>
+<div id="photo" class="panel">
+  <div class="hd"><span id="phT">снимок улицы</span><span class="x" onclick="photoHide()">✕</span></div>
+  <img id="phImg" alt="уличный снимок">
+  <div class="cap" id="phCap"></div>
+  <div class="row">
+    <button id="phStand" onclick="photoStand()">встать сюда</button>
+    <button id="phAuto" onclick="photoToggleAuto()">идти следом</button>
+  </div>
+  <div class="row" id="phGRow" style="display:none">
+    <button onclick="ggStreetHere()">снимок Google отсюда</button>
+  </div>
+</div>
+<div id="gg" class="panel">
+  <div class="hd">Google Maps Platform</div>
+  <input type="text" id="ggKey" placeholder="ключ API (остаётся в браузере)"
+         autocomplete="off" spellcheck="false">
+  <div class="st" id="ggSt"></div>
+  <label><input type="checkbox" id="ggSat"> вид сверху: спутник Google</label>
+  <label><input type="checkbox" id="gg3d"> фотореалистичные 3D-плитки</label>
+  <div class="dim">Ключ никуда не отправляется, кроме самого Google, и не
+    попадает в репозиторий. Нужны включёнными: Street View Static API,
+    Map Tiles API. Запросы платные по тарифу Google —
+    <a href="https://developers.google.com/maps/documentation/tile/usage-and-billing"
+       target="_blank" rel="noopener">тарифы</a>.</div>
+</div>
+<div id="attrib"></div>
 """
 
 APP_JS = r"""
@@ -257,6 +311,11 @@ var FACADE_GLSL = [
 // (там есть нормаль), фрагмент только красит. Инстансы и фильтр года
 // продолжают работать — мы не подменяем материал, а дополняем его.
 function sensorized(mat){
+  // Один материал может достаться нескольким мешам — так приходят плитки
+  // Google. Второй проход объявил бы attribute aMat дважды, и шейдер бы не
+  // собрался, поэтому помечаем уже обработанный материал.
+  if (mat.userData && mat.userData.__sens) return mat;
+  if (mat.userData) mat.userData.__sens = 1;
   var prev = mat.onBeforeCompile;
   mat.onBeforeCompile = function(shader){
     if (prev) prev(shader);
@@ -497,6 +556,8 @@ function buildTerrain(){
       tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
       tex.needsUpdate = true;
       matAerial = sensorized(new THREE.MeshLambertMaterial({ map: tex }));
+      // держим NAIP под рукой: слой Google подменяет карту, и надо уметь назад
+      matAerial.userData.naip = tex;
       if ($('yr')) applyAerial();
     };
     img.src = texSrc;
@@ -843,6 +904,17 @@ function setupControls(){
     if (camGroup) camGroup.visible = this.checked; });
   $('lRes').addEventListener('change', function(){
     if (resMesh) resMesh.visible = this.checked; });
+  $('lPh').addEventListener('change', function(){
+    if (photoCone) photoCone.visible = this.checked;
+    if (photoDot) photoDot.visible = this.checked;
+    if (!this.checked){ photoAuto = false; $('phAuto').classList.remove('on');
+                        photoHide(); }
+    else $('photo').style.display = photoCur >= 0 ? 'block' : $('photo').style.display;
+  });
+  $('ggKey').addEventListener('change', ggKeySet);
+  $('ggKey').addEventListener('blur', ggKeySet);
+  $('ggSat').addEventListener('change', function(){ ggApplySatellite(this.checked); });
+  $('gg3d').addEventListener('change', function(){ ggApply3D(this.checked); });
   $('aer').addEventListener('change', applyAerial);
   $('spd').addEventListener('input', function(){
     LIVE_SPEED = [1, 10, 60, 300][parseInt(this.value, 10)];
@@ -875,6 +947,8 @@ function onPick(e){
   if (resMesh && resMesh.visible) liveHit.push(resMesh);
   if (airMesh && airMesh.visible) liveHit.push(airMesh);
   if (camGroup && camGroup.visible) liveHit = liveHit.concat(camGroup.children);
+  if (photoCone && photoCone.visible) liveHit.push(photoCone);
+  if (photoDot && photoDot.visible) liveHit.push(photoDot);
   if (quakeGroup && quakeGroup.visible) liveHit = liveHit.concat(quakeGroup.children);
   var lh = ray.intersectObjects(liveHit, false);
   if (lh.length){
@@ -887,6 +961,11 @@ function onPick(e){
         $('info').style.display = 'block';
         return;
       }
+    }
+    if (h0.object === photoCone || h0.object === photoDot){
+      var map = h0.object === photoCone ? photoConeIdx : photoDotIdx;
+      var pi = map[h0.instanceId];
+      if (pi != null){ photoShow(pi); return; }
     }
     if (showLive(h0)) return;
   }
@@ -1253,6 +1332,570 @@ function applyTide(){
   waterMesh.position.y = 0.35 + (td.level_m - 1.0);
 }
 
+// ── уличная съёмка: поверка геометрии фотографией ───────────────────────────
+// Наш город собран из обмеров: контуров, высот, годов. Единственный честный
+// способ узнать, похож ли он на настоящий, — встать в ту же точку, повернуться
+// в ту же сторону и сравнить с кадром, снятым оттуда же. Поэтому у кадра
+// обязателен КУРС: без него сравнивать не с чем.
+//
+// Снимки KartaView сняты людьми с регистраторов (CC BY-SA), виды зданий —
+// с Викисклада. Кадры остаются у первоисточника; мы везём только адрес,
+// автора и лицензию и показываем их вместе с картинкой.
+var photoCone = null, photoDot = null, photoData = [], photoBase = '';
+var photoConeIdx = [], photoDotIdx = [], photoAuto = false;
+var photoCur = -1, photoTick = 0;
+var PH_EYE = 1.7;                   // рост наблюдателя, м
+
+function ll2xz(lat, lon){
+  var p = S.head.proj;
+  return [(lon - p.lon0) * p.kx, (p.lat0 - lat) * p.kz];
+}
+function xz2ll(x, z){
+  var p = S.head.proj;
+  return [p.lat0 - z / p.kz, p.lon0 + x / p.kx];
+}
+// Курс по компасу (0 — север, 90 — восток) в рыскание нашей камеры и обратно.
+// В сцене x — восток, z — юг, значит север это -z: yaw = π - курс.
+function hdg2yaw(h){ return Math.PI - h * Math.PI / 180; }
+function camHeading(){ return ((180 - yaw * 180 / Math.PI) % 360 + 360) % 360; }
+function angDiff(a, b){ var d = ((a - b) % 360 + 540) % 360 - 180; return Math.abs(d); }
+
+function photoUrl(u){
+  return (!u ? '' : (u.indexOf('http') === 0 ? u : photoBase + u));
+}
+
+function buildPhotos(){
+  var P = S.photos || {};
+  photoData = P.items || [];
+  photoBase = P.base || '';
+  $('nPh').textContent = photoData.length ? photoData.length : '';
+  if (!photoData.length) return;
+
+  var dir = [], undir = [];
+  for (var i = 0; i < photoData.length; i++)
+    (photoData[i][3] >= 0 ? dir : undir).push(i);
+
+  if (dir.length){
+    // клин, указывающий, КУДА смотрела камера: по нему видно направление
+    var g = new THREE.ConeGeometry(2.4, 8.5, 4);
+    g.rotateX(-Math.PI / 2);          // ось конуса: +y -> -z, то есть на север
+    g.setAttribute('aMat', new THREE.BufferAttribute(
+      new Float32Array(g.attributes.position.count).fill(M_ASPHALT), 1));
+    photoCone = new THREE.InstancedMesh(g, new THREE.MeshBasicMaterial(
+      { color: 0xffcf70 }), dir.length);
+    photoCone.frustumCulled = false;
+    var m = new THREE.Matrix4(), q = new THREE.Quaternion(),
+        v = new THREE.Vector3(), s = new THREE.Vector3(1, 1, 1),
+        Y = new THREE.Vector3(0, 1, 0);
+    for (var a = 0; a < dir.length; a++){
+      var p = photoData[dir[a]];
+      v.set(p[0] / 10, p[2] / 10 + 3.4, p[1] / 10);
+      q.setFromAxisAngle(Y, -p[3] * Math.PI / 180);
+      m.compose(v, q, s);
+      photoCone.setMatrixAt(a, m);
+    }
+    photoCone.instanceMatrix.needsUpdate = true;
+    photoCone.visible = false;
+    photoConeIdx = dir;
+    scene.add(photoCone);
+  }
+  if (undir.length){
+    // виды зданий без курса — просто метка места
+    var g2 = new THREE.OctahedronGeometry(3.4);
+    g2.setAttribute('aMat', new THREE.BufferAttribute(
+      new Float32Array(g2.attributes.position.count).fill(M_ASPHALT), 1));
+    photoDot = new THREE.InstancedMesh(g2, new THREE.MeshBasicMaterial(
+      { color: 0x7fd4ff }), undir.length);
+    photoDot.frustumCulled = false;
+    var m2 = new THREE.Matrix4(), q2 = new THREE.Quaternion(),
+        v2 = new THREE.Vector3(), s2 = new THREE.Vector3(1, 1, 1);
+    for (var b = 0; b < undir.length; b++){
+      var p2 = photoData[undir[b]];
+      v2.set(p2[0] / 10, p2[2] / 10 + 5.0, p2[1] / 10);
+      m2.compose(v2, q2, s2);
+      photoDot.setMatrixAt(b, m2);
+    }
+    photoDot.instanceMatrix.needsUpdate = true;
+    photoDot.visible = false;
+    photoDotIdx = undir;
+    scene.add(photoDot);
+  }
+}
+
+function photoHide(){ $('photo').style.display = 'none'; photoCur = -1; }
+
+function photoShow(i){
+  var p = photoData[i];
+  if (!p) return;
+  photoCur = i;
+  var kv = p[4] === 0;
+  var full = photoUrl(p[6]), thumb = photoUrl(p[5]) || full;
+  $('phT').textContent = kv ? ('снимок улицы · ' + (p[8] || 'дата неизвестна'))
+                            : (p[9] || 'вид места');
+  var img = $('phImg');
+  img.src = thumb;
+  img.onerror = function(){
+    $('phCap').innerHTML = '<span style="color:#e0a">кадр не загрузился: '
+      + 'страница открыта без сети или снимок убран с первоисточника</span>';
+  };
+  var who = p[7] ? ('снял ' + p[7]) : 'автор не указан';
+  var lic = p[10] || '';
+  $('phCap').innerHTML = who + (lic ? ' · ' + lic : '')
+    + (kv ? ' · KartaView' : ' · Wikimedia Commons')
+    + (p[3] >= 0 ? ' · курс ' + p[3] + '°' : '')
+    + (p[11] ? ' · <a href="' + p[11] + '" target="_blank" rel="noopener">'
+               + 'первоисточник</a>' : '');
+  $('phStand').style.display = p[3] >= 0 ? '' : 'none';
+  $('phGRow').style.display = GKEY ? '' : 'none';
+  $('photo').style.display = 'block';
+}
+
+// Встать ровно туда, откуда снят кадр, и посмотреть туда же. Дальше глаз
+// сравнивает сам: что стоит, чего не хватает, что не той высоты.
+function photoStand(){
+  var p = photoData[photoCur];
+  if (!p || p[3] < 0) return;
+  camera.position.set(p[0] / 10, p[2] / 10 + PH_EYE, p[1] / 10);
+  yaw = hdg2yaw(p[3]);
+  pitch = 0;
+  speed = Math.min(speed, 60);
+}
+
+function photoToggleAuto(){
+  photoAuto = !photoAuto;
+  $('phAuto').classList.toggle('on', photoAuto);
+  if (photoAuto){ photoTick = 99; }
+}
+
+// Ближайший кадр, снятый примерно в ту же сторону, куда смотрим мы.
+function photoNearest(){
+  var cx = camera.position.x, cz = camera.position.z, ch = camHeading();
+  var best = -1, bestD = 1e18;
+  for (var a = 0; a < photoConeIdx.length; a++){
+    var i = photoConeIdx[a], p = photoData[i];
+    var dx = p[0] / 10 - cx, dz = p[1] / 10 - cz;
+    var d = dx * dx + dz * dz;
+    if (d > bestD) continue;
+    if (angDiff(p[3], ch) > 55) continue;   // кадр смотрит не туда — не сравнить
+    bestD = d; best = i;
+  }
+  return bestD < 250 * 250 ? best : -1;
+}
+
+function updatePhotoAuto(dt){
+  if (!photoAuto) return;
+  photoTick += dt;
+  if (photoTick < 0.4) return;
+  photoTick = 0;
+  var i = photoNearest();
+  if (i >= 0 && i !== photoCur) photoShow(i);
+  else if (i < 0 && photoCur >= 0 && $('photo').style.display === 'block'){
+    $('phT').textContent = 'снимок улицы';
+    $('phCap').innerHTML = '<span style="color:#9aa3ad">рядом нет кадра, '
+      + 'снятого в эту сторону — пройдите к улице</span>';
+    $('phImg').removeAttribute('src');
+    photoCur = -1;
+  }
+}
+
+// ── Google Maps Platform: ключ пользователя ─────────────────────────────────
+// Ключ живёт ТОЛЬКО в этом браузере (localStorage) и уходит ровно одному
+// адресату — самому Google. В сцену, в файл и в репозиторий он не попадает.
+var GKEY = '', gSession = null, gSat = null, gAttribG = '';
+
+function ggPanel(){
+  var el = $('gg');
+  el.style.display = el.style.display === 'block' ? 'none' : 'block';
+  $('ggBtn').classList.toggle('on', el.style.display === 'block');
+}
+function ggSt(msg, bad){
+  var el = $('ggSt');
+  el.textContent = msg || '';
+  el.className = 'st' + (bad ? ' bad' : '');
+}
+function ggKeyLoad(){
+  try { GKEY = localStorage.getItem('twin_gmp_key') || ''; } catch (e) { GKEY = ''; }
+  $('ggKey').value = GKEY;
+  ggSt(GKEY ? 'ключ взят из этого браузера' : 'без ключа слои Google выключены');
+}
+function ggKeySet(){
+  GKEY = $('ggKey').value.trim();
+  try {
+    if (GKEY) localStorage.setItem('twin_gmp_key', GKEY);
+    else localStorage.removeItem('twin_gmp_key');
+  } catch (e) {}
+  ggSt(GKEY ? 'ключ сохранён в этом браузере' : 'ключ убран');
+  $('phGRow').style.display = GKEY ? '' : 'none';
+}
+function ggAttrib(txt){
+  gAttribG = txt || '';
+  var el = $('attrib');
+  el.innerHTML = gAttribG;
+  el.style.display = gAttribG ? 'block' : 'none';
+}
+
+// Street View Static: фотография ровно из той точки и в ту сторону, где стоим.
+function ggStreetHere(){
+  if (!GKEY){ ggSt('сначала ключ', true); ggPanel(); return; }
+  var ll = xz2ll(camera.position.x, camera.position.z);
+  var h = Math.round(camHeading());
+  var u = 'https://maps.googleapis.com/maps/api/streetview?size=640x400'
+        + '&location=' + ll[0].toFixed(6) + ',' + ll[1].toFixed(6)
+        + '&heading=' + h + '&pitch=0&fov=90&return_error_code=true'
+        + '&source=outdoor&key=' + encodeURIComponent(GKEY);
+  photoCur = -1;
+  $('phT').textContent = 'Google Street View · курс ' + h + '°';
+  var img = $('phImg');
+  img.onerror = function(){
+    $('phCap').innerHTML = '<span style="color:#e0a">Google не отдал кадр: '
+      + 'нет панорамы поблизости, либо ключ без Street View Static API, '
+      + 'либо не включён счёт</span>';
+  };
+  img.src = u;
+  $('phCap').innerHTML = '© Google · ' + ll[0].toFixed(5) + ', ' + ll[1].toFixed(5)
+    + ' · снимок берётся у Google по вашему ключу и нигде не сохраняется';
+  $('phStand').style.display = 'none';
+  $('photo').style.display = 'block';
+}
+
+// ── Google: вид сверху (Map Tiles API, 2D) ──────────────────────────────────
+// Плитки Web Mercator сшиваем в одно полотно и подкладываем вместо NAIP.
+// UV рельефа уже посчитаны с поправкой Меркатора, поэтому подложка ложится
+// на землю без сдвига — тем же путём, что и наш снимок.
+var GG_ZOOM = 15, GG_MAX_TILES = 420;
+
+function _merX(lon){ return (lon + 180) / 360; }
+function _merY(lat){
+  var r = lat * Math.PI / 180;
+  return (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2;
+}
+
+function ggSession(){
+  if (gSession && gSession.exp > Date.now() / 1000 + 60)
+    return Promise.resolve(gSession);
+  return fetch('https://tile.googleapis.com/v1/createSession?key='
+               + encodeURIComponent(GKEY), {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mapType: 'satellite', language: 'en-US', region: 'US' })
+  }).then(function(r){
+    if (!r.ok) return r.text().then(function(t){
+      throw new Error('createSession HTTP ' + r.status + ': ' + t.slice(0, 160)); });
+    return r.json();
+  }).then(function(j){
+    gSession = { s: j.session, exp: parseInt(j.expiry, 10) || 0 };
+    return gSession;
+  });
+}
+
+function ggLoadSatellite(){
+  var bb = S.head.bbox;                       // [lat_min, lon_min, lat_max, lon_max]
+  var n = Math.pow(2, GG_ZOOM);
+  var x0 = Math.floor(_merX(bb[1]) * n), x1 = Math.floor(_merX(bb[3]) * n);
+  var y0 = Math.floor(_merY(bb[2]) * n), y1 = Math.floor(_merY(bb[0]) * n);
+  var nx = x1 - x0 + 1, ny = y1 - y0 + 1;
+  if (nx * ny > GG_MAX_TILES)
+    return Promise.reject(new Error('плиток вышло ' + (nx * ny)
+      + ' — слишком много; уменьшите сцену'));
+  ggSt('спутник Google: качаю ' + (nx * ny) + ' плиток…');
+  return ggSession().then(function(ses){
+    var TS = 256, cv = document.createElement('canvas');
+    cv.width = nx * TS; cv.height = ny * TS;
+    var cx = cv.getContext('2d');
+    var jobs = [], done = 0;
+    for (var ty = y0; ty <= y1; ty++){
+      for (var tx = x0; tx <= x1; tx++){
+        jobs.push((function(tx, ty){
+          return function(){
+            return new Promise(function(res){
+              var im = new Image();
+              im.crossOrigin = 'anonymous';
+              im.onload = function(){
+                cx.drawImage(im, (tx - x0) * TS, (ty - y0) * TS, TS, TS);
+                ggSt('спутник Google: ' + (++done) + '/' + (nx * ny)); res();
+              };
+              im.onerror = function(){ ggSt('спутник Google: '
+                + (++done) + '/' + (nx * ny)); res(); };
+              im.src = 'https://tile.googleapis.com/v1/2dtiles/' + GG_ZOOM + '/'
+                     + tx + '/' + ty + '?session=' + encodeURIComponent(ses.s)
+                     + '&key=' + encodeURIComponent(GKEY);
+            });
+          };
+        })(tx, ty));
+      }
+    }
+    // по восемь за раз: и не душим сеть, и не ждём вечность
+    var q = jobs.slice();
+    function worker(){
+      var j = q.shift();
+      return j ? j().then(worker) : Promise.resolve();
+    }
+    var pool = [];
+    for (var w = 0; w < 8; w++) pool.push(worker());
+    return Promise.all(pool).then(function(){
+      // обрезаем мозаику ровно по рамке сцены — UV рельефа ждут именно её
+      var px0 = (_merX(bb[1]) * n - x0) * TS, px1 = (_merX(bb[3]) * n - x0) * TS;
+      var py0 = (_merY(bb[2]) * n - y0) * TS, py1 = (_merY(bb[0]) * n - y0) * TS;
+      var out = document.createElement('canvas');
+      out.width = Math.max(2, Math.round(px1 - px0));
+      out.height = Math.max(2, Math.round(py1 - py0));
+      out.getContext('2d').drawImage(cv, px0, py0, px1 - px0, py1 - py0,
+                                     0, 0, out.width, out.height);
+      var tex = new THREE.CanvasTexture(out);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      tex.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      gSat = tex;
+      ggSt('спутник Google готов');
+      return tex;
+    });
+  });
+}
+
+function ggApplySatellite(on){
+  if (on && !GKEY){ $('ggSat').checked = false; ggSt('сначала ключ', true); return; }
+  if (!on){
+    if (matAerial && matAerial.userData.naip)
+      matAerial.map = matAerial.userData.naip;
+    ggAttrib('');
+    applyAerial();
+    return;
+  }
+  var go = gSat ? Promise.resolve(gSat) : ggLoadSatellite();
+  go.then(function(tex){
+    if (!matAerial){ ggSt('в сцене нет слоя подложки', true); return; }
+    matAerial.map = tex;
+    matAerial.needsUpdate = true;
+    $('aer').checked = true;
+    applyAerial();
+    ggAttrib('Изображение © Google · Map Tiles API');
+  }).catch(function(e){
+    $('ggSat').checked = false;
+    ggSt(String(e.message || e), true);
+  });
+}
+
+// ── Google: фотореалистичные 3D-плитки ──────────────────────────────────────
+// Своё дерево 3D Tiles вместо готовой библиотеки — по той же причине, что и
+// свой композер: тащить Cesium ради одного слоя дороже, чем написать обход.
+// Плитки приходят в геоцентрических метрах (ECEF), мы переводим их в местную
+// систему сцены (восток / вверх / юг) одной матрицей, посчитанной по центру
+// сцены. Тогда фотограмметрия Google встаёт ровно на наш рельеф, а сенсоры,
+// время суток и остальной слой продолжают работать поверх неё.
+var G3 = {
+  root: null, group: null, on: false, loader: null, ecef2loc: null,
+  loading: 0, loaded: 0, cache: {}, err: '', sess: '', copy: {},
+};
+var G3_SSE = 24;          // допустимая экранная ошибка, пикселей
+var G3_MAX_TILES = 420;   // потолок одновременно живущих плиток
+var WGS_A = 6378137.0, WGS_E2 = 0.00669437999014;
+
+function ecef(lat, lon, h){
+  var la = lat * Math.PI / 180, lo = lon * Math.PI / 180;
+  var s = Math.sin(la), c = Math.cos(la);
+  var N = WGS_A / Math.sqrt(1 - WGS_E2 * s * s);
+  return [(N + h) * c * Math.cos(lo), (N + h) * c * Math.sin(lo),
+          (N * (1 - WGS_E2) + h) * s];
+}
+
+// Матрица «из геоцентра в сцену»: сдвиг в центр сцены и поворот на местные
+// восток/север/верх. Ось z сцены смотрит на ЮГ, поэтому север берём со знаком.
+function makeEcef2Loc(lat0, lon0){
+  var o = ecef(lat0, lon0, 0);
+  var la = lat0 * Math.PI / 180, lo = lon0 * Math.PI / 180;
+  var sl = Math.sin(la), cl = Math.cos(la), so = Math.sin(lo), co = Math.cos(lo);
+  var e = [-so, co, 0];
+  var n = [-sl * co, -sl * so, cl];
+  var u = [cl * co, cl * so, sl];
+  var m = new THREE.Matrix4();
+  m.set(e[0], e[1], e[2], -(e[0]*o[0] + e[1]*o[1] + e[2]*o[2]),
+        u[0], u[1], u[2], -(u[0]*o[0] + u[1]*o[1] + u[2]*o[2]),
+        -n[0], -n[1], -n[2], (n[0]*o[0] + n[1]*o[1] + n[2]*o[2]),
+        0, 0, 0, 1);
+  return m;
+}
+
+function g3Url(uri, base){
+  var u = uri;
+  if (u.indexOf('http') !== 0){
+    if (u.charAt(0) === '/') u = 'https://tile.googleapis.com' + u;
+    else u = base.replace(/\/[^\/]*$/, '/') + u;
+  }
+  if (u.indexOf('key=') < 0)
+    u += (u.indexOf('?') >= 0 ? '&' : '?') + 'key=' + encodeURIComponent(GKEY);
+  // сеанс Google раздаёт в дочерних адресах; тащим его дальше по дереву
+  if (G3.sess && u.indexOf('session=') < 0)
+    u += '&session=' + encodeURIComponent(G3.sess);
+  return u;
+}
+
+function g3Loader(){
+  if (G3.loader) return G3.loader;
+  var l = new THREE.GLTFLoader();
+  if (typeof THREE.DRACOLoader === 'function' && typeof TWIN_DRACO === 'object'
+      && TWIN_DRACO && TWIN_DRACO.wasm){
+    var d = new THREE.DRACOLoader();
+    // декодер вшит в страницу как data:URI — сеть для него не нужна
+    d.setDecoderPath({ js: TWIN_DRACO.wrapper, wasm: TWIN_DRACO.wasm });
+    l.setDRACOLoader(d);
+  }
+  G3.loader = l;
+  return l;
+}
+
+// Центр и радиус плитки в системе сцены. Google описывает объём областью
+// (широта/долгота/высота, радианы) либо коробкой в ECEF — понимаем оба.
+function g3Sphere(bv){
+  var c, r;
+  if (bv.region){
+    var w = bv.region[0], s = bv.region[1], e = bv.region[2],
+        n = bv.region[3], h0 = bv.region[4], h1 = bv.region[5];
+    var latC = (s + n) / 2 * 180 / Math.PI, lonC = (w + e) / 2 * 180 / Math.PI;
+    var pc = ecef(latC, lonC, (h0 + h1) / 2);
+    var pe = ecef(n * 180 / Math.PI, e * 180 / Math.PI, h1);
+    c = new THREE.Vector3(pc[0], pc[1], pc[2]);
+    r = c.distanceTo(new THREE.Vector3(pe[0], pe[1], pe[2]));
+  } else if (bv.box){
+    var b = bv.box;
+    c = new THREE.Vector3(b[0], b[1], b[2]);
+    r = Math.max(
+      Math.hypot(b[3], b[4], b[5]),
+      Math.hypot(b[6], b[7], b[8]),
+      Math.hypot(b[9], b[10], b[11])) * 1.7321;
+  } else if (bv.sphere){
+    c = new THREE.Vector3(bv.sphere[0], bv.sphere[1], bv.sphere[2]);
+    r = bv.sphere[3];
+  } else {
+    return null;
+  }
+  c.applyMatrix4(G3.ecef2loc);
+  return { c: c, r: r };
+}
+
+function g3Fetch(url){
+  if (G3.cache[url]) return G3.cache[url];
+  var p = fetch(url).then(function(r){
+    if (!r.ok) return r.text().then(function(t){
+      throw new Error('HTTP ' + r.status + ': ' + t.slice(0, 140)); });
+    return r.json();
+  });
+  G3.cache[url] = p;
+  return p;
+}
+
+function g3Copyright(js){
+  var c = (js.asset || {}).copyright || '';
+  if (c) G3.copy[c] = 1;
+  var all = Object.keys(G3.copy).join('; ');
+  ggAttrib(all ? ('© Google · ' + all) : '© Google');
+}
+
+// Один шаг обхода: решаем, хватает ли плитки на экране, и либо грузим её
+// содержимое, либо спускаемся к детям.
+function g3Visit(tile, baseUrl, out, depth){
+  if (!tile || out.length > G3_MAX_TILES || depth > 24) return;
+  var bv = tile.boundingVolume && g3Sphere(tile.boundingVolume);
+  if (!bv) return;
+  var d = Math.max(1, camera.position.distanceTo(bv.c) - bv.r);
+  if (d > 12000) return;
+  var ge = tile.geometricError != null ? tile.geometricError : 0;
+  var k = window.innerHeight / (2 * Math.tan(camera.fov * Math.PI / 360));
+  var sse = ge * k / d;
+  var kids = tile.children || [];
+  var content = tile.content && (tile.content.uri || tile.content.url);
+
+  if (sse > G3_SSE && kids.length){
+    for (var i = 0; i < kids.length; i++) g3Visit(kids[i], baseUrl, out, depth + 1);
+    return;
+  }
+  if (!content){
+    for (var j = 0; j < kids.length; j++) g3Visit(kids[j], baseUrl, out, depth + 1);
+    return;
+  }
+  var url = g3Url(content, baseUrl);
+  if (/\.json(\?|$)/.test(content)){
+    // поддерево: скачиваем и идём дальше уже по нему
+    g3Fetch(url).then(function(js){
+      if (js.root) { g3Copyright(js); g3Visit(js.root, url, out, depth + 1); }
+    }).catch(function(e){ G3.err = String(e.message || e); });
+    return;
+  }
+  out.push({ url: url, key: url });
+}
+
+function g3LoadTile(t){
+  if (G3.cache['m:' + t.key]) return;
+  G3.cache['m:' + t.key] = 1;
+  G3.loading++;
+  g3Loader().load(t.url, function(gltf){
+    G3.loading--; G3.loaded++;
+    var o = gltf.scene;
+    o.applyMatrix4(G3.ecef2loc);
+    o.traverse(function(n){
+      if (!n.isMesh) return;
+      n.castShadow = false; n.receiveShadow = false;
+      // материал плитки пропускаем через наш сенсорный слой: тепловизор и
+      // ПНВ должны работать и по фотограмметрии
+      var g = n.geometry;
+      if (g && !g.getAttribute('aMat'))
+        g.setAttribute('aMat', new THREE.BufferAttribute(
+          new Float32Array(g.attributes.position.count).fill(M_BLD), 1));
+      n.material = sensorized(n.material);
+      n.material.needsUpdate = true;
+    });
+    G3.group.add(o);
+    ggSt('плиток Google: ' + G3.loaded + (G3.loading ? ' (+' + G3.loading + ')' : ''));
+  }, undefined, function(e){
+    G3.loading--;
+    G3.err = 'плитка не разобралась: ' + (e && e.message ? e.message : e);
+    ggSt(G3.err, true);
+  });
+}
+
+var g3Tick = 0;
+function g3Update(dt){
+  if (!G3.on || !G3.root) return;
+  g3Tick += dt;
+  if (g3Tick < 1.0 || G3.loading > 6) return;
+  g3Tick = 0;
+  var want = [];
+  g3Visit(G3.root.json.root, G3.root.url, want, 0);
+  for (var i = 0; i < want.length && i < 12; i++) g3LoadTile(want[i]);
+}
+
+function ggApply3D(on){
+  if (on && !GKEY){ $('gg3d').checked = false; ggSt('сначала ключ', true); return; }
+  G3.on = on;
+  if (!on){
+    if (G3.group) G3.group.visible = false;
+    ggAttrib(gSat ? 'Изображение © Google · Map Tiles API' : '');
+    return;
+  }
+  if (!G3.group){
+    G3.group = new THREE.Group();
+    scene.add(G3.group);
+  }
+  G3.group.visible = true;
+  if (G3.root){ g3Tick = 99; return; }
+  var c = S.head.center;
+  G3.ecef2loc = makeEcef2Loc(c[0], c[1]);
+  ggSt('корень плиток Google…');
+  var url = 'https://tile.googleapis.com/v1/3dtiles/root.json?key='
+          + encodeURIComponent(GKEY);
+  g3Fetch(url).then(function(js){
+    if (!js.root) throw new Error('в ответе нет root');
+    // сеанс приезжает параметром в адресах детей — вынимаем его один раз
+    var s = JSON.stringify(js).match(/session=([A-Za-z0-9_\-]+)/);
+    G3.sess = s ? s[1] : '';
+    G3.root = { json: js, url: url };
+    g3Copyright(js);
+    ggSt('плитки Google: дерево получено');
+    g3Tick = 99;
+  }).catch(function(e){
+    $('gg3d').checked = false;
+    G3.on = false;
+    ggSt('3D-плитки не открылись: ' + (e.message || e), true);
+  });
+}
+
 // ── пост-обработка сенсоров ─────────────────────────────────────────────────
 // Свой мини-композер: сцена в буфер, затем полноэкранный треугольник с
 // шейдером режима. EffectComposer живёт в examples/jsm, а мы вшиваем только
@@ -1422,12 +2065,13 @@ function start(){
   chain = chain.then(function(){ return boot('живой слой: борта и спутники…'); })
     .then(function(){ buildAircraft(); buildSats(); buildQuakes(); buildCams();
                       applyTide(); buildResidents(); });
+  chain = chain.then(function(){ return boot('уличная съёмка…'); }).then(buildPhotos);
   chain = chain.then(function(){
     var tm = S.head.time_machine;
     if (tm){
       $('yr').min = tm.min; $('yr').max = tm.max; $('yr').value = tm.max;
     }
-    fillHud(); setupControls(); applyTime(); applyYear();
+    fillHud(); setupControls(); ggKeyLoad(); applyTime(); applyYear();
     $('boot').classList.add('gone');
     initPost();
     resizePost();
@@ -1441,6 +2085,8 @@ function start(){
       updateShadow();
       updateAircraft(dt);
       updateSats();
+      updatePhotoAuto(dt);
+      g3Update(dt);
       // солнце в системе камеры — для теплового расчёта в вершинах
       U_SUNV.value.copy(SUN_WORLD).transformDirection(camera.matrixWorldInverse);
       if (U_MODE.value === 0){

@@ -221,6 +221,87 @@ def _check_population(errors: list, warns: list, done: bool) -> None:
                       "живого человека")
 
 
+def _check_streetlevel(errors: list, warns: list, done: bool) -> None:
+    """Уличная съёмка: есть ли кадры, знают ли они свой курс и своего автора.
+
+    Курс — не украшение: кадр без него нельзя поставить рядом с нашей
+    геометрией, а ради этого съёмка и собиралась.
+    """
+    photos = _read_kind("streetlevel", "feature")
+    if not photos:
+        (errors if done else warns).append("streetlevel: нет уличных снимков")
+        return
+    kv = [p for p in photos if json.loads(p["tags_json"]).get("kind") == "kartaview"]
+    wc = [p for p in photos if json.loads(p["tags_json"]).get("kind") == "commons"]
+    with_h = [p for p in kv if json.loads(p["tags_json"]).get("heading") is not None]
+    print(f"{OK} streetlevel: {len(kv)} кадров KartaView "
+          f"({len(with_h)} с курсом), {len(wc)} видов Викисклада")
+
+    if done and len(kv) < 5000:
+        errors.append(f"streetlevel: {len(kv)} кадров — для города слишком мало")
+    share = len(with_h) / max(1, len(kv))
+    if share < 0.9:
+        errors.append(f"streetlevel: курс известен лишь у {share:.0%} кадров — "
+                      "сравнивать с геометрией будет нечем")
+    # в сыром слепке 360.0 — это север: первоисточник округляет курс сам.
+    # Строгая нормировка нужна там, где курс превращается в поворот камеры,
+    # то есть в собранной сцене — она проверяется ниже.
+    bad_h = [p for p in with_h
+             if not (0 <= json.loads(p["tags_json"])["heading"] <= 360)]
+    if bad_h:
+        errors.append(f"streetlevel: у {len(bad_h)} кадров курс вне круга")
+    no_url = [p for p in photos
+              if not str(json.loads(p["tags_json"]).get("url", "")).startswith("http")]
+    if no_url:
+        errors.append(f"streetlevel: у {len(no_url)} кадров нет адреса снимка")
+    # каждая фотография обязана нести автора и лицензию: это чужой труд
+    no_lic = [p for p in photos if not p.get("license")]
+    if no_lic:
+        errors.append(f"streetlevel: у {len(no_lic)} кадров нет лицензии")
+    # точка съёмки: сырой GPS регистратора ставит наблюдателя внутрь дома,
+    # посаженная на дорогу — на проезжую часть, где машина и ехала
+    on_road = [p for p in kv if json.loads(p["tags_json"]).get("place") == "road"]
+    if kv:
+        share_road = len(on_road) / len(kv)
+        print(f"{OK} streetlevel: {share_road:.0%} кадров посажено на линию дороги")
+        if share_road < 0.5:
+            errors.append(f"streetlevel: на дорогу посажено лишь {share_road:.0%} "
+                          "кадров — «встать сюда» будет заводить внутрь домов")
+    anon = [p for p in kv if not json.loads(p["tags_json"]).get("author")]
+    if anon:
+        warns.append(f"streetlevel: у {len(anon)} кадров KartaView автор не указан")
+
+    # съёмка — измерение, а не реконструкция
+    if any(p["tier"] != "K" for p in photos):
+        errors.append("streetlevel: снимок обязан быть яруса K")
+    # снимки лежат у первоисточника; себе мы их не перекладываем
+    kept = os.path.join(DATA_DIR, "streetlevel", "_raw")
+    if os.path.isdir(kept):
+        errors.append("streetlevel: кадры не должны храниться у нас — "
+                      "везём только адрес")
+
+
+def _check_google(errors: list, warns: list) -> None:
+    """Слои Google: ключа в репозитории быть не должно ни при каких условиях."""
+    import re
+    from twin import _view_js
+    blobs = {"_view_js.py": _view_js.APP_JS + _view_js.BODY}
+    scene = os.path.join(DATA_DIR, "build", "scene_sf.json.gz")
+    if os.path.exists(scene):
+        import gzip
+        with gzip.open(scene, "rb") as f:
+            blobs["scene_sf.json.gz"] = f.read().decode("utf-8", "replace")
+    # ключи Google Maps Platform начинаются с AIza и идут 39 знаков
+    pat = re.compile(r"AIza[0-9A-Za-z_\-]{35}")
+    for name, blob in blobs.items():
+        if pat.search(blob):
+            errors.append(f"google: в {name} лежит ключ API — убрать немедленно")
+    if "localStorage" not in _view_js.APP_JS:
+        warns.append("google: ключ больше не хранится в браузере — проверьте")
+    print(f"{OK} google: ключа в исходниках и сцене нет; "
+          f"слои включаются ключом пользователя из браузера")
+
+
 def _check_time_machine(errors: list, warns: list) -> None:
     """Собранная сцена: шкала лет и правдоподобие известных зданий."""
     import gzip
@@ -258,6 +339,38 @@ def _check_time_machine(errors: list, warns: list) -> None:
             errors.append(f"машина времени: {name} датирован {got}, а построен {real}")
         else:
             print(f"{OK} машина времени: {name} — {got} (в жизни {real})")
+
+    _check_scene_photos(scene, errors, warns)
+
+
+def _check_scene_photos(scene: dict, errors: list, warns: list) -> None:
+    """Съёмка в собранной сцене: курс становится поворотом камеры, значит
+    обязан лежать строго внутри круга, а кадр — стоять на своей земле."""
+    ph = scene.get("photos") or {}
+    items = ph.get("items") or []
+    if not items:
+        warns.append("в сцене нет уличных снимков — python3 -m twin.build sf")
+        return
+    print(f"{OK} съёмка в сцене: {ph.get('n_street', 0)} кадров улиц, "
+          f"{ph.get('n_land', 0)} видов мест")
+    bad = [p for p in items if not (p[3] == -1 or 0 <= p[3] < 360)]
+    if bad:
+        errors.append(f"съёмка: у {len(bad)} кадров курс вне [0, 360)")
+    directed = [p for p in items if p[3] >= 0]
+    if len(directed) < 0.8 * len(items):
+        errors.append("съёмка: слишком много кадров без курса — "
+                      "по ним нельзя поверить геометрию")
+    # кадры должны попадать в рамку сцены: x/z в дециметрах от центра
+    bb = scene["head"]["bbox"]
+    p = scene["head"]["proj"]
+    half_x = abs(bb[3] - bb[1]) * p["kx"] * 10 * 0.55
+    half_z = abs(bb[2] - bb[0]) * p["kz"] * 10 * 0.55
+    out = [q for q in items if abs(q[0]) > half_x or abs(q[1]) > half_z]
+    if out:
+        errors.append(f"съёмка: {len(out)} кадров вне рамки сцены")
+    no_url = [q for q in items if not q[6]]
+    if no_url:
+        errors.append(f"съёмка: у {len(no_url)} кадров в сцене нет адреса")
 
 
 def main() -> int:
@@ -300,6 +413,8 @@ def main() -> int:
     _check_sfbuildings(errors, warns, st.get("sfbuildings") == "done")
     _check_live(errors, warns, st.get("live") == "done")
     _check_population(errors, warns, st.get("population") == "done")
+    _check_streetlevel(errors, warns, st.get("streetlevel") == "done")
+    _check_google(errors, warns)
     _check_time_machine(errors, warns)
 
     for w in warns:

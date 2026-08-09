@@ -12,12 +12,84 @@ import base64
 import io
 import json
 import os
+import re
 import sys
 
 from terra.globe import _three_source
 from twin import regions
 from twin.build import BUILD_DIR, build_scene
 from twin._view_js import CSS, BODY, APP_JS
+
+
+# ── дополнения three.js для фотореалистичных плиток Google ──────────────────
+# Плитки приходят как glTF со сжатием Draco, а GLTFLoader и DRACOLoader живут
+# в examples/jsm и написаны модулями ESM. Ядро three мы вшиваем сборкой CJS,
+# поэтому четыре модуля переписываем в обычные функции: у каждого свой замок
+# (иначе `const { Loader } = THREE` объявится четырежды и сломает разбор), а
+# наружу торчит только то, что модуль экспортировал.
+_ADDON_FILES = (
+    "utils/BufferGeometryUtils.js",
+    "utils/SkeletonUtils.js",
+    "loaders/DRACOLoader.js",
+    "loaders/GLTFLoader.js",
+)
+_ADDON_EXPOSE = ("GLTFLoader", "DRACOLoader")
+
+
+def _addons_dir():
+    from pathlib import Path
+    here = Path(__file__).resolve().parent
+    for base in (here.parent, Path.cwd()):
+        d = base / "node_modules" / "three" / "examples" / "jsm"
+        if d.is_dir():
+            return d
+    raise FileNotFoundError(
+        "не найден node_modules/three/examples/jsm — установите three (npm i three)")
+
+
+def _addons_source() -> str:
+    """Модули examples/jsm одним классическим скриптом."""
+    d = _addons_dir()
+    # import.meta живёт только в модулях ESM, а мы собираем обычный скрипт.
+    # DRACOLoader берёт оттуда путь к декодеру по умолчанию — нам он не нужен,
+    # мы задаём декодер сами через setDecoderPath({js, wasm}).
+    out = ["var __TA = {};",
+           "var __TA_BASE = (typeof document !== 'undefined' && document.baseURI)"
+           " || 'https://localhost/';"]
+    for rel in _ADDON_FILES:
+        src = (d / rel).read_text(encoding="utf-8")
+        # импорт из ядра three -> разбор общего объекта THREE
+        src = re.sub(r"import\s*\{(.*?)\}\s*from\s*'three';",
+                     lambda m: "const {" + m.group(1) + "} = THREE;", src,
+                     count=1, flags=re.S)
+        # импорт соседнего модуля -> берём из общей витрины
+        src = re.sub(r"import\s*\{([^}]*)\}\s*from\s*'[^']*\.js';",
+                     lambda m: "const {" + m.group(1) + "} = __TA;", src)
+        names: list[str] = []
+        for block in re.findall(r"^export\s*\{([^}]*)\};", src, flags=re.M):
+            names += [n.strip() for n in block.split(",") if n.strip()]
+        src = re.sub(r"^export\s*\{[^}]*\};", "", src, flags=re.M)
+        src = src.replace("import.meta.url", "__TA_BASE")
+        if not names:
+            raise ValueError(f"не нашёл экспортов в {rel}")
+        assigns = "".join(f"__TA.{n} = {n};" for n in names)
+        out.append("(function(){\n" + src + "\n" + assigns + "\n})();")
+    out.append("".join(f"THREE.{n} = __TA.{n};" for n in _ADDON_EXPOSE))
+    body = "\n".join(out)
+    return body.replace("</script", "<\\/script").replace("<!--", "<\\!--")
+
+
+def _draco_assets() -> dict:
+    """Декодер Draco как data:URI — страница остаётся самодостаточной."""
+    d = _addons_dir() / "libs" / "draco"
+    wrapper = (d / "draco_wasm_wrapper.js").read_bytes()
+    wasm = (d / "draco_decoder.wasm").read_bytes()
+    return {
+        "wrapper": "data:application/javascript;base64,"
+                   + base64.b64encode(wrapper).decode("ascii"),
+        "wasm": "data:application/wasm;base64,"
+                + base64.b64encode(wasm).decode("ascii"),
+    }
 
 
 def _aerial_data_uri(key: str, max_px: int) -> str:
@@ -84,6 +156,19 @@ def build_split(key: str, out_dir: str, tex_max: int = 4096) -> list[str]:
                 + _three_source() + "\nvar THREE=module.exports;\n")
     written.append(os.path.join(out_dir, three_name))
 
+    # дополнения three (GLTFLoader/DRACOLoader) и декодер Draco — отдельными
+    # файлами: они нужны только тем, кто включит плитки Google, и не должны
+    # утяжелять первую загрузку страницы.
+    addons_name = f"twin_{key}.addons.js"
+    with open(os.path.join(out_dir, addons_name), "w", encoding="utf-8") as f:
+        f.write(_addons_source())
+    written.append(os.path.join(out_dir, addons_name))
+
+    draco_name = f"twin_{key}.draco.js"
+    with open(os.path.join(out_dir, draco_name), "w", encoding="utf-8") as f:
+        f.write("var TWIN_DRACO=" + json.dumps(_draco_assets()) + ";\n")
+    written.append(os.path.join(out_dir, draco_name))
+
     app_name = f"twin_{key}.app.js"
     with open(os.path.join(out_dir, app_name), "w", encoding="utf-8") as f:
         f.write(APP_JS)
@@ -102,6 +187,8 @@ def build_split(key: str, out_dir: str, tex_max: int = 4096) -> list[str]:
         "var TWIN_SCENE_URL=" + json.dumps(scene_name) + ";\n"
         "var TWIN_TEX_URL=" + json.dumps(tex_name) + ";</script>\n"
         "<script src=\"" + three_name + "\"></script>\n"
+        "<script src=\"" + draco_name + "\"></script>\n"
+        "<script src=\"" + addons_name + "\"></script>\n"
         "<script src=\"" + app_name + "\"></script>\n"
         "</body></html>\n"
     )
@@ -134,6 +221,8 @@ def build_view(key: str, out_path: str | None = None,
         "<script>var module={exports:{}},exports=module.exports;\n"
         + _three_source() +
         "\nvar THREE=module.exports;</script>\n"
+        "<script>var TWIN_DRACO=" + json.dumps(_draco_assets()) + ";</script>\n"
+        "<script>\n" + _addons_source() + "\n</script>\n"
         "<script>var TWIN=" + json.dumps(meta, ensure_ascii=False) + ";</script>\n"
         "<script>var TWIN_GZ=\"" + gz64 + "\";</script>\n"
         "<script>var TWIN_TEX=\"" + tex + "\";</script>\n"

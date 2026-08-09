@@ -298,6 +298,83 @@ def _sky_dir(lat0: float, lon0: float, lat: float, lon: float,
     return math.degrees(az), math.degrees(el)
 
 
+PHOTO_THIN_M = 45.0      # ближе этого второй уличный кадр не нужен
+PHOTO_CAP = 9000         # потолок числа кадров в сцене
+KV_BASE = "https://api.openstreetcam.org/"
+
+
+def _thin_photos(rows: list[tuple[float, float, tuple]]) -> list[tuple]:
+    """Один кадр на ячейку сетки; если кадров всё равно больше потолка —
+    РАСТЯГИВАЕМ ячейку и повторяем.
+
+    Обрезать отсортированный список нельзя: он отсортирован по месту, и
+    обрезка выкинула бы целиком восточную половину города.
+    """
+    step = PHOTO_THIN_M
+    for _ in range(12):
+        best: dict[tuple[int, int], tuple] = {}
+        for x, z, row in rows:
+            cell = (int(round(x / step)), int(round(z / step)))
+            prev = best.get(cell)
+            # свежий кадр вытесняет старый; при равной дате — по адресу, чтобы
+            # сборка оставалась детерминированной
+            if prev is None or (row[8], row[5]) > (prev[8], prev[5]):
+                best[cell] = row
+        if len(best) <= PHOTO_CAP:
+            return sorted(best.values(), key=lambda r: (r[0], r[1]))
+        step *= max(1.15, math.sqrt(len(best) / PHOTO_CAP))
+    return sorted(best.values(), key=lambda r: (r[0], r[1]))[:PHOTO_CAP]
+
+
+def _street_photos(key: str, proj: "Proj", ground: "Ground") -> dict:
+    """Уличные снимки сцены: место, курс камеры, адрес кадра, автор, лицензия.
+
+    Кадры остаются у первоисточника — мы везём только адрес. Прореживаем до
+    одного на PHOTO_THIN_M: пешеходу нужен ближайший кадр, а не все подряд.
+    Снимки Commons (виды зданий, курса нет) не прореживаем — их немного, и
+    каждый привязан к своему дому.
+    """
+    import pyarrow.parquet as pq
+    rows: list[tuple[float, float, tuple]] = []
+    landmarks: list[tuple] = []
+    for path in sorted(glob.glob(os.path.join(DATA_DIR, "streetlevel", "*.parquet"))):
+        if schema.table_kind(pq.ParquetFile(path).schema_arrow) != "feature":
+            continue
+        for rec in pq.read_table(path).to_pylist():
+            if rec.get("scene") != key or rec["fclass"] != "streetphoto":
+                continue
+            t = json.loads(rec["tags_json"])
+            lat, lon = rec["lat"], rec["lon"]
+            x, z = proj.xz(lat, lon)
+            hdg = t.get("heading")
+            row = (
+                int(round(x * 10)), int(round(z * 10)),
+                int(round(ground.at(lat, lon) * 10)),
+                -1 if hdg is None else int(round(float(hdg))) % 360,
+                0 if t.get("kind") == "kartaview" else 1,
+                str(t.get("thumb") or "").replace(KV_BASE, ""),
+                str(t.get("url") or "").replace(KV_BASE, ""),
+                str(t.get("author") or "")[:60],
+                str(t.get("shot_date") or "")[:10],
+                str(rec.get("name") or "")[:90],
+                str(t.get("license") or rec.get("license") or "")[:40],
+                str(t.get("page") or ""),
+            )
+            if t.get("kind") != "kartaview":
+                landmarks.append(row)
+                continue
+            rows.append((x, z, row))
+
+    street = _thin_photos(rows)
+    landmarks.sort(key=lambda r: (r[0], r[1], r[5]))
+    return {
+        "base": KV_BASE,
+        "items": [list(r) for r in street + landmarks],
+        "n_street": len(street), "n_land": len(landmarks),
+        "note": "кадры лежат у первоисточника; у каждого автор и лицензия",
+    }
+
+
 def _latest_weather(scene_key: str) -> dict:
     import pyarrow.parquet as pq
     out = {}
@@ -646,6 +723,8 @@ def build_scene(key: str) -> str:
                       "bbox": list(sc.bbox),
                       "source": "USDA NAIP · Microsoft Planetary Computer"}
 
+    photos = _street_photos(key, proj, ground)
+
     # ── синтетические жители: люди в городе, но ни один не настоящий ──
     residents = []
     import pyarrow.parquet as pq
@@ -669,6 +748,10 @@ def build_scene(key: str) -> str:
     head = {
         "key": key, "title": sc.title, "date": schema.today(),
         "center": list(sc.center), "bbox": list(sc.bbox),
+        # проекция сцены наружу: обозревателю нужно уметь и обратно, из метров
+        # в широту-долготу, — иначе не спросить Google про эту самую точку
+        "proj": {"lat0": proj.lat0, "lon0": proj.lon0,
+                 "kx": proj.kx, "kz": proj.kz},
         "utc_offset": sc.utc_offset,
         "counts": {"big": len(big), "small": len(small), "roads": len(roads),
                    "lakes": len(lakes), "pois": len(poi_out)},
@@ -679,6 +762,8 @@ def build_scene(key: str) -> str:
                    "note": "синтетические жители: население квартала измерено "
                            "переписью, сам житель — реконструкция (ярус R); "
                            "никто из них не соответствует живому человеку"},
+        "photos": {"street": photos["n_street"], "land": photos["n_land"],
+                   "note": photos["note"]},
         "live": {"stamp": live["stamp"], "tide": tide,
                  "counts": {"aircraft": len(air), "sats": len(sats),
                             "quakes": len(quakes), "cams": len(cams)}},
@@ -695,7 +780,7 @@ def build_scene(key: str) -> str:
                "big": big, "small": small, "roads": roads,
                "lakes": lakes, "pois": poi_out,
                "air": air, "sats": sats, "quakes": quakes, "cams": cams,
-               "res": residents}
+               "res": residents, "photos": photos}
     os.makedirs(BUILD_DIR, exist_ok=True)
     out = os.path.join(BUILD_DIR, f"scene_{key}.json.gz")
     raw = json.dumps(payload, ensure_ascii=False,
@@ -704,7 +789,8 @@ def build_scene(key: str) -> str:
         f.write(raw)
     print(f"сцена {key}: зданий {len(big)}+{len(small)}, дорог {len(roads)}, "
           f"озёр {len(lakes)}, POI {len(poi_out)}; живое: бортов {len(air)}, "
-          f"спутников {len(sats)}, толчков {len(quakes)}, камер {len(cams)}"
+          f"спутников {len(sats)}, толчков {len(quakes)}, камер {len(cams)}, "
+          f"снимков улиц {photos['n_street']}+{photos['n_land']}"
           + (f", прилив {tide['level_m']} м" if tide else "") + "; "
           f"json {len(raw)/1e6:.1f} МБ -> {os.path.getsize(out)/1e6:.1f} МБ gz")
     return out

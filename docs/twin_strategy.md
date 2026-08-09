@@ -125,13 +125,76 @@ for the *real* one. The two share the scene-compiler/viewer pattern
 | NHGIS (IPUMS) | historical census per decade (people counts per era) | free account |
 | Mapillary | street-level imagery API | free registration |
 
-### Paid / restricted — explicitly not needed
+Mapillary is now optional rather than needed: **KartaView** turned out to serve
+dashcam street imagery with position, heading and date over a keyless API
+(CC BY-SA), and **Wikimedia Commons** `geosearch` returns geotagged building
+views with author and licence, also keyless. Both are implemented in
+`twin/sources/streetlevel.py` — see §4a.
 
-Google Photorealistic 3D Tiles (streaming only, no baking, billing account),
-Planet, Hivemapper, Nexar, SatVu, Albedo, PeMS (manual approval, anti-scraping).
-One special case: **SFEI historical ecology GIS** (the pre-colonial Bay
-landscape) is free but its site 403-blocks our container's proxy — needs a
-one-time user-side download.
+### Billed key, user's account — implemented, awaiting a key
+
+Google Maps Platform is the one place where the best imagery is genuinely
+behind a paid key. All three products the user asked for are wired in and
+switch on the moment a key is pasted into the page:
+
+| Product | What it gives the twin | Endpoint |
+|---|---|---|
+| **Street View Static API** | photograph from the exact position and bearing the walker occupies — direct comparison against our geometry | `maps/api/streetview` |
+| **Map Tiles API, 2D satellite** | the top-down view: Mercator tiles stitched into one canvas and laid on the terrain in place of NAIP | `createSession` → `v1/2dtiles/{z}/{x}/{y}` |
+| **Map Tiles API, Photorealistic 3D Tiles** | the photorealistic walkthrough: Google's photogrammetry mesh streamed into our scene | `v1/3dtiles/root.json` |
+
+Design decisions worth keeping:
+
+- **Our own 3D Tiles traverser**, not Cesium. Pulling a second engine in for one
+  layer costs more than the traversal: bounding volume → screen-space error →
+  descend or load. Tiles arrive in ECEF and are moved into the scene by a single
+  matrix (geocentric → east/up/south) built at the scene centre, so Google's
+  mesh lands on our terrain and *our* sensors, sun and time-of-day still apply
+  to it. `GLTFLoader`/`DRACOLoader` live in `examples/jsm` as ES modules;
+  `twin/view.py` rewrites them into a classic script (each module in its own
+  closure, or `const { Loader } = THREE` would be declared four times), and the
+  Draco decoder is embedded as a `data:` URI.
+- **The key belongs to the user, not to us.** It is typed into the page, kept in
+  that browser's `localStorage`, and sent to exactly one host — Google.
+  `twin.doctor` greps the sources and the compiled scene for anything shaped
+  like `AIza…` and fails the build if it finds one.
+- **Terms**: tiles are streamed, never cached to our repo, and the attribution
+  string Google returns with the tileset is displayed on screen. Billing is the
+  user's, so the panel links to Google's pricing page rather than hiding it.
+- **Honest status**: written, syntax-checked and reasoned through, but **never
+  executed** — we have no key. Failures surface in the panel in words instead of
+  failing silently.
+
+### Paid / restricted — not pursued
+
+Planet, Hivemapper, Nexar, SatVu, Albedo, PeMS (manual approval,
+anti-scraping). One special case: **SFEI historical ecology GIS** (the
+pre-colonial Bay landscape) is free but its site 403-blocks our container's
+proxy — needs a one-time user-side download.
+
+## 4a. Photographs as ground truth (keyless, implemented)
+
+The city is assembled from measurements, so the only honest way to ask whether
+it resembles the real place is to stand where a camera stood, face the way it
+faced, and look. That makes the *heading* the load-bearing field of a street
+photograph — a frame without one cannot be compared to anything, and `doctor`
+therefore requires a heading on ≥90% of frames and, in the compiled scene,
+strictly inside [0, 360).
+
+- **KartaView** (`api.kartaview.org`, images at `api.openstreetcam.org`):
+  dashcam sequences, CC BY-SA 4.0, each frame carrying lat/lon, heading, date
+  and contributor. A 450 m radius around downtown returns ~4000 frames, so
+  thinning is mandatory: newest frame per 22 m cell at ingest, per 45 m in the
+  scene.
+- **Wikimedia Commons** `generator=geosearch` + `prop=imageinfo|coordinates`:
+  geotagged views of named buildings, with author and licence for each.
+
+Frames are never copied into our data — the scene carries the URL, the author
+and the licence, and the page fetches the picture from the source. Two traps
+found the hard way: KartaView serves images **without CORS** (fine in an
+`<img>` panel, impossible as a WebGL texture), and Commons attaches coordinates
+to only the first ten pages of a fifty-page generator result unless you ask for
+`colimit=max`.
 
 ## 5. The time machine (present → past)
 
@@ -390,6 +453,18 @@ plausible reconstruction is the honest answer and tier R already says so.
    Next: the 1906 burn polygon, then 1849/1776/pre-colonial layers.
 6. **People:** population per block (TIGER POP20) spawns agents; TERRA's
    agent/dialog machinery moves in — NPCs who *live in the real city*.
+6a. ~~**Photographic ground truth**~~ — **done, keyless**: real street frames
+   with camera headings (KartaView) and geotagged building views (Wikimedia
+   Commons). *Stand here* puts the camera at the shot and turns it to the
+   shot's bearing; *follow along* keeps the nearest same-facing frame beside
+   you as you walk. This is the twin's first way of being **wrong in public**:
+   any building we got too short, too tall or simply missing is now visible
+   next to a photograph of the same corner. Next: score the mismatch instead
+   of eyeballing it — silhouette overlap between the frame and our render.
+6b. **Google layers** — **written, awaiting a key** (§4): Street View Static,
+   2D satellite tiles, Photorealistic 3D Tiles. The skeleton stays ours;
+   Google's imagery is an appearance layer on top of it, exactly as §5d
+   concluded for generative models.
 7. **UE5:** the twin scene compiler feeds the existing `export_ue` pipeline
    (terrain.obj + masks + buildings.json are format-compatible by design).
 

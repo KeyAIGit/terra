@@ -11,6 +11,7 @@ from twin.sources import (
     live,
     imagery,
     population,
+    streetlevel,
 )
 
 REGISTRY = [
@@ -22,6 +23,7 @@ REGISTRY = [
     population,   # переписные кварталы с населением
     osm,          # здания/дороги/вода — самый долгий, чанками
     sfbuildings,  # городской лидар + годы постройки (машина времени)
+    streetlevel,  # уличная съёмка: чем поверять геометрию — фотографией
 ]
 
 BY_NAME = {m.NAME: m for m in REGISTRY}
