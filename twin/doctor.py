@@ -281,25 +281,80 @@ def _check_streetlevel(errors: list, warns: list, done: bool) -> None:
                       "везём только адрес")
 
 
-def _check_google(errors: list, warns: list) -> None:
-    """Слои Google: ключа в репозитории быть не должно ни при каких условиях."""
+SECRET_PATTERNS = (
+    ("Google Maps", r"AIza[0-9A-Za-z_\-]{35}"),
+    ("Anthropic", r"sk-ant-[A-Za-z0-9_\-]{24,}"),
+    ("Hugging Face", r"hf_[A-Za-z0-9]{30,}"),
+    ("GitHub", r"gh[pousr]_[A-Za-z0-9]{30,}"),
+    ("Mapillary", r"MLY\|[0-9]+\|[a-f0-9]{28,}"),
+    ("OpenAI", r"sk-[A-Za-z0-9]{40,}"),
+)
+
+
+def _check_secrets(errors: list, warns: list) -> None:
+    """Ни один ключ не должен попасть в код, в сцену или в собранную страницу.
+
+    Проверяем не только своё намерение, но и результат: обыскиваем исходники
+    твина, скомпилированную сцену и готовый HTML. Заодно убеждаемся, что файл
+    с ключами закрыт от git — забыть строчку в .gitignore легче лёгкого.
+    """
     import re
-    from twin import _view_js
-    blobs = {"_view_js.py": _view_js.APP_JS + _view_js.BODY}
+    import subprocess
+    from twin import keys as tkeys
+
+    blobs: dict[str, str] = {}
+    here = os.path.dirname(os.path.abspath(__file__))
+    for fn in sorted(os.listdir(here)):
+        if fn.endswith(".py"):
+            with open(os.path.join(here, fn), encoding="utf-8") as f:
+                blobs[f"twin/{fn}"] = f.read()
+    src_dir = os.path.join(here, "sources")
+    for fn in sorted(os.listdir(src_dir)):
+        if fn.endswith(".py"):
+            with open(os.path.join(src_dir, fn), encoding="utf-8") as f:
+                blobs[f"twin/sources/{fn}"] = f.read()
     scene = os.path.join(DATA_DIR, "build", "scene_sf.json.gz")
     if os.path.exists(scene):
         import gzip
         with gzip.open(scene, "rb") as f:
             blobs["scene_sf.json.gz"] = f.read().decode("utf-8", "replace")
-    # ключи Google Maps Platform начинаются с AIza и идут 39 знаков
-    pat = re.compile(r"AIza[0-9A-Za-z_\-]{35}")
-    for name, blob in blobs.items():
-        if pat.search(blob):
-            errors.append(f"google: в {name} лежит ключ API — убрать немедленно")
+    page = os.path.join(DATA_DIR, "build", "twin_sf.html")
+    if os.path.exists(page):
+        with open(page, encoding="utf-8", errors="replace") as f:
+            blobs["twin_sf.html"] = f.read()
+
+    found = 0
+    for who, pat in SECRET_PATTERNS:
+        rx = re.compile(pat)
+        for name, blob in blobs.items():
+            if rx.search(blob):
+                found += 1
+                errors.append(f"секреты: в {name} лежит ключ {who} — "
+                              "убрать немедленно и отозвать его у поставщика")
+    if not found:
+        print(f"{OK} секреты: в {len(blobs)} файлах твина ключей нет "
+              f"(искали {len(SECRET_PATTERNS)} видов)")
+
+    # файл с ключами не должен быть виден git ни при каких условиях
+    if os.path.exists(tkeys.KEYS_FILE):
+        try:
+            r = subprocess.run(["git", "check-ignore", "-q", tkeys.KEYS_FILE],
+                               cwd=os.path.dirname(here), timeout=20)
+            if r.returncode != 0:
+                errors.append("секреты: twin/.keys.json НЕ закрыт .gitignore")
+            else:
+                mode = oct(os.stat(tkeys.KEYS_FILE).st_mode & 0o777)
+                print(f"{OK} секреты: twin/.keys.json закрыт .gitignore, права {mode}")
+        except (OSError, subprocess.SubprocessError):
+            warns.append("секреты: не удалось спросить git про .keys.json")
+
+    from twin import _view_js
     if "localStorage" not in _view_js.APP_JS:
-        warns.append("google: ключ больше не хранится в браузере — проверьте")
-    print(f"{OK} google: ключа в исходниках и сцене нет; "
-          f"слои включаются ключом пользователя из браузера")
+        warns.append("секреты: браузерный ключ больше не хранится в localStorage "
+                     "— проверьте, куда он делся")
+    free, total = tkeys.free_count()
+    print(f"{OK} ключи: в реестре {total}, из них без платёжной карты {free} "
+          f"(python3 -m twin.keys)")
 
 
 def _check_time_machine(errors: list, warns: list) -> None:
@@ -414,7 +469,7 @@ def main() -> int:
     _check_live(errors, warns, st.get("live") == "done")
     _check_population(errors, warns, st.get("population") == "done")
     _check_streetlevel(errors, warns, st.get("streetlevel") == "done")
-    _check_google(errors, warns)
+    _check_secrets(errors, warns)
     _check_time_machine(errors, warns)
 
     for w in warns:

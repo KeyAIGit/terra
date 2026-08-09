@@ -435,6 +435,147 @@ def test_addons():
           d["wasm"].startswith("data:application/wasm;base64,")
           and len(d["wasm"]) > 100_000)
 
+    # Если рядом есть node — собираем связку и вправду создаём загрузчики.
+    # Проверка синтаксиса не поймала бы, скажем, потерянный экспорт, а
+    # в браузере это всплыло бы уже пустым слоем плиток.
+    import shutil, subprocess, tempfile
+    node = shutil.which("node")
+    if not node:
+        print("  · node не найден — живой запуск связки пропущен")
+        return
+    from terra.globe import _three_source
+    boot = (
+        "var module={exports:{}},exports=module.exports;\n" + _three_source()
+        + "\nvar THREE=module.exports;\n"
+        + "globalThis.document={baseURI:'https://example.invalid/'};\n"
+        + src
+        + "\nvar l=new THREE.GLTFLoader();"
+        + "\nvar dl=new THREE.DRACOLoader();"
+        + "\ndl.setDecoderPath({js:'data:js',wasm:'data:wasm'});"
+        + "\nl.setDRACOLoader(dl);"
+        + "\nconsole.log(JSON.stringify({g:l.constructor.name,"
+        + "d:dl.decoderPaths.wasm,linked:!!l.dracoLoader}));"
+    )
+    with tempfile.TemporaryDirectory() as td:
+        p = Path(td) / "bundle.js"
+        p.write_text(boot, encoding="utf-8")
+        r = subprocess.run([node, str(p)], capture_output=True, text=True,
+                           timeout=120)
+    if r.returncode != 0:
+        check("связка запускается", False, r.stderr.strip()[:200])
+        return
+    got = json.loads(r.stdout.strip().splitlines()[-1])
+    check("GLTFLoader создаётся", got["g"] == "GLTFLoader")
+    check("путь к декодеру принимает data:URI", got["d"] == "data:wasm")
+    check("Draco подключается к GLTFLoader", got["linked"] is True)
+
+
+def test_keys():
+    section("реестр ключей")
+    from twin import keys as tk
+
+    names = [k.name for k in tk.REGISTRY]
+    envs = [k.env for k in tk.REGISTRY]
+    check("имена ключей не повторяются", len(set(names)) == len(names))
+    check("переменные окружения не повторяются", len(set(envs)) == len(envs))
+    check("все разделы известны порядку показа",
+          all(k.group in tk.GROUP_ORDER for k in tk.REGISTRY),
+          str(sorted({k.group for k in tk.REGISTRY} - set(tk.GROUP_ORDER))))
+    check("у каждого ключа есть шаги", all(k.steps for k in tk.REGISTRY))
+    check("у каждого ключа есть адрес регистрации",
+          all("http" in k.signup for k in tk.REGISTRY))
+    check("переменные с общим префиксом",
+          all(k.env.startswith("TERRA_") or k.env == "ANTHROPIC_API_KEY"
+              for k in tk.REGISTRY))
+
+    # признак карты: он и есть главный ответ на вопрос «что взять бесплатно»
+    card = [k.name for k in tk.REGISTRY if k.card]
+    check("карту просят только Google и Anthropic",
+          sorted(card) == ["anthropic", "google_maps"], str(card))
+    free, total = tk.free_count()
+    check("большинство ключей без карты", free == total - 2 and free >= 12)
+    check("карточные ключи вынесены отдельно",
+          all(k.group == "Требует платёжную карту (можно не заводить)"
+              for k in tk.REGISTRY if k.card))
+    check("карточные ключи живут в браузере зрителя",
+          all(k.where == "browser" for k in tk.REGISTRY if k.card))
+
+    # вторые половинки пар логин/пароль должны быть объявлены
+    for k in tk.REGISTRY:
+        for e in k.extra_env:
+            check(f"{e} доступен через --set",
+                  e in tk.ALIASES.values(), f"нет псевдонима для {e}")
+
+    # чтение: окружение важнее файла
+    import os as _os
+    k0 = tk.REGISTRY[0]
+    old = _os.environ.get(k0.env)
+    _os.environ[k0.env] = "  из-окружения  "
+    try:
+        check("ключ берётся из окружения и обрезается",
+              tk.get(k0.name) == "из-окружения")
+    finally:
+        if old is None:
+            _os.environ.pop(k0.env, None)
+        else:
+            _os.environ[k0.env] = old
+    check("неизвестный ключ отвергается",
+          _raises(tk.env_of, "нет-такого", KeyError))
+    check("отсутствующий ключ объясняет, где взять",
+          _raises(tk.require, "opentopo", RuntimeError)
+          if tk.get("opentopo") is None else True)
+
+    # файл с ключами обязан быть закрыт от git
+    root = Path(__file__).resolve().parents[1]
+    gi = (root / ".gitignore").read_text(encoding="utf-8")
+    check("twin/.keys.json в .gitignore", "twin/.keys.json" in gi)
+    check("файл ключей не лежит в репозитории",
+          not (root / "twin" / ".keys.json").exists()
+          or "twin/.keys.json" in gi)
+
+    md = tk._markdown()
+    check("документ ключей собирается", len(md) > 3000)
+    check("документ называет карту прямо", "payment card" in md)
+    check("документ повторяет правило про git", "never" in md.lower())
+    doc = root / "docs" / "twin_keys.md"
+    if doc.exists():
+        check("docs/twin_keys.md не разошёлся с реестром",
+              doc.read_text(encoding="utf-8") == md,
+              "перегенерировать: python3 -m twin.keys --md > docs/twin_keys.md")
+
+
+def _raises(fn, arg, exc) -> bool:
+    try:
+        fn(arg)
+    except exc:
+        return True
+    except Exception:
+        return False
+    return False
+
+
+def test_secret_scan():
+    section("страж секретов")
+    from twin import doctor as td
+    import re
+    fakes = {
+        "Google Maps": "AIza" + "b" * 35,
+        "Anthropic": "sk-ant-" + "c" * 30,
+        "Hugging Face": "hf_" + "d" * 34,
+        "GitHub": "ghp_" + "e" * 36,
+        "Mapillary": "MLY|1234|" + "f" * 32,
+    }
+    pats = dict(td.SECRET_PATTERNS)
+    for who, sample in fakes.items():
+        check(f"ключ {who} был бы пойман",
+              bool(re.search(pats[who], "var k = '" + sample + "';")))
+    # обычный текст не должен объявляться секретом
+    harmless = ("AIza", "sk-ant", "hf_", "ghp_", "MLY|",
+                "https://developers.google.com/maps/documentation/tile")
+    for h in harmless:
+        hit = any(re.search(p, h) for _, p in td.SECRET_PATTERNS)
+        check(f"«{h[:28]}» не считается ключом", not hit)
+
 
 def main():
     print("TERRA-Твин — проверки\n" + "=" * 64)
@@ -456,6 +597,8 @@ def main():
     test_ecef()
     test_mercator_tiles()
     test_addons()
+    test_keys()
+    test_secret_scan()
     print("\n" + "=" * 64)
     if _FAILS:
         print(f"ПРОВАЛЕНО {len(_FAILS)} из {_RUN}:")
