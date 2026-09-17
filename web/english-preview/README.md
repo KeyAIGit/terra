@@ -1,27 +1,31 @@
-# Terra World 0.4: Places and records
+# Terra World 0.5
 
-A published English browser explorer at https://keyaigit.github.io/terra/ . The simulation history remains the original terra-1 archive; this release changes presentation and navigation only.
+Play: https://keyaigit.github.io/terra/ . The product title is **Terra World**, without a language suffix. The existing Hugging Face Space keeps its URL for compatibility and embeds this application.
 
-## Explore
+## The new market courtyard
 
-The atlas now draws gold settlement-cell markers and offers settlement search for the selected snapshot. Select a place to read its recorded population and people, then open that people's chronicle or biographies at an explicit cutoff year. Three destination links set both the place and the original walk's year. URLs preserve this context, for example `#atlas?year=-1500&city=Rik%C3%A3%CC%80%C5%BE%C3%A0val&polity=180`.
+Enter the courtyard from the home page, or open `#courtyard`. This is a newly authored, walkable interpretation of Níhmīwū's market district at 500 CE. It has a covered stone arcade, detailed doors and shutters, a fountain, market stalls, fabric canopies and vegetation. The scene uses six physically based surface sets, four model sets and one captured HDR lighting environment. Asset sources, processing and hashes are recorded in `courtyard/ASSETS.json`; about 36 MB of runtime assets load on the first visit.
 
-Only three places have walkable reconstructions. Other settlements are archive records, not newly generated game levels. A settlement absent from a requested snapshot is not backfilled from the future. Shared cells are drawn once and map clicks choose the most populous recorded settlement in the cell; the search can distinguish individual records.
+The surface maps control base color, normals, roughness and occlusion. Paving also uses sampled displacement. Selected models are packed GLBs with Meshopt compression; the tree was reduced before publication and its supplied leaf alpha was integrated into the material. Source textures are optimized WebP files, with lower texture resolution on touch devices. Poly Haven assets are CC0; applicable rendering-library license notices are included.
 
-In a walk, **Places** marks a landmark with a straight-line bearing and distance. **Jump** moves to a nearby landing position checked against existing collision and water constraints. The indicator is not a pathfinding route. **Guide** shows the settlement's recorded quantities, links it to the atlas, and lists recent events of its people, explicitly distinguished from town-specific events. The world pauses while a guide is open.
+This is a step toward the photorealistic visual target, not a claim that the district or entire planet has achieved photorealism. The courtyard is new scenery, not a reconstruction uniquely implied by the simulation's data. It has no new AI residents. The three earlier settlement walks and their scripted residents remain available separately.
 
-The scenery adds irregular feather-edged plazas and paths, window/door joinery, and a lightweight animated cloud layer. It remains stylized, not photorealistic. Existing buildings, street endpoints, terrain heights and historical data are preserved. Scene switching explicitly releases old scene resources. Touch controls and quality/pause settings from 0.3 remain available.
+Desktop: drag to look, WASD to walk, Shift to move faster, P to pause, H to hide or restore the interface. Viewpoint, lighting and quality controls are in the upper corner. Touch devices have a movement joystick and drag-to-look; the photo-mode control is desktop-only. The information panel links back to the capital's actual atlas record.
 
-## Boundaries
+## Preserved world
 
-There are 117 snapshots, 14,000 selected/truncated events and 5,060 notable-person records. Population is an aggregate simulation measure, not a count of autonomous AI agents. All eight featured portrait slots remain available in the full gallery. Historical filters hide the full featured gallery, exclude people born after the cutoff, and hide later deeds and death dates. Role, era and disposition fields are whole-life archive summaries, not a reconstruction of the person at the cutoff date.
+The terra-1 history and simulator were not changed or rerun. The archive still contains 117 snapshots, 14,000 selected/truncated events and 5,060 notable-person records. Aggregate population is not a count of autonomous AI agents. The original simulation grid and all historical identities remain unchanged. The earlier walks retain 34, 30 and 23 reconstructed residents.
 
-The walks retain 34 / 30 / 23 reconstructed residents. Their dialogue is scripted. No paid generation, model calls, API-key collection, analytics or visitor tracking were added. Terra Atlas and the old Hugging Face Space remain unchanged. Original third-party licenses and source attribution still apply; no blanket ownership claim is made over reference data or upstream code.
+All eight featured portrait slots remain; the previous illustrations remain interpretive. The home-page courtyard image is an actual in-engine screenshot, not an image-generation result. No paid generation, model calls, API keys, analytics or visitor tracking were added. The original reference dataset and legacy Hugging Face Space are unchanged.
 
-## Build and tests
+## Build and verification
 
-Run `node web/english-preview/build.mjs` with Node 24 or newer. The build checks original-archive and image SHA-256 hashes, JavaScript syntax, record counts and translation coverage. `dist/Terra_World_04.html` is the standalone offline edition. `site/` is the static self-hosted website including its data, images and download. Deploy the complete site directory, not just index.html.
+Use Node 24 or newer. In this directory, run `npm ci`, then `npm run build`. The courtyard uses bundled Three.js and local assets. The archived world exports are downloaded with pinned hashes, or supplied with `node build.mjs --cache=<original-export-cache>`. `site/` is the complete self-hosted website; deploy that whole directory. Runtime data do not depend on the original external CDN.
 
-Browser tests are in `tests/release04-desktop.mjs` and `tests/release04-mobile.mjs`. Install their Playwright dependency separately; set `TERRA_REPO` to the repository root and optionally `TERRA_QA` to a report directory. The tests use Chrome, including mobile touch emulation. QA_REPORT.json and release.json describe the exact verified build and tests. A physical iPhone/Safari, prolonged play, autonomous agents, multiplayer and changed simulation behavior are not claimed to be verified.
+`dist/Terra_World_05.html` is the complete offline edition, including the courtyard. `courtyard/dist/Terra_Courtyard.html` is a standalone courtyard edition. The asset-heavy offline files are larger than the earlier world archive alone.
 
-Previous published release: source 13c6f1bc59252149dd33fab1302518d32fe442d3 (0.3). Original English 0.2 source: 7fb112c6e33ed25e76a75f74ada9adf092f063d9. Keep these commits and the previous deployment for rollback. Feedback: https://github.com/KeyAIGit/terra/issues .
+Run `npm test` for the archive and courtyard suites. Tests use Chrome, including offline mode and mobile touch emulation; they are not evidence of performance on a physical iPhone. QA_REPORT.json identifies the exact tested artifact. Prolonged play, physical Safari/iPhone compatibility, multiplayer and autonomous residents are not claimed tested.
+
+Previous source release: f196f14677e0ff4614449745e88f896e5391aac8 (0.4), merged as f83305bcc0c93a7e7b1b72a4bb36983d9ed88e71. Keep the previous source and deployment commits for rollback.
+
+Feedback: https://huggingface.co/spaces/Bekzod25/terra-world-english/discussions or https://github.com/KeyAIGit/terra/issues .
