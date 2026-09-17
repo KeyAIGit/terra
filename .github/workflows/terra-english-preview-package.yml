@@ -19,6 +19,8 @@ jobs:
         run: node web/english-preview/build.mjs
       - name: Include reproducible source
         run: mkdir -p web/english-preview/dist/source && cp -r web/english-preview/assets web/english-preview/*.js web/english-preview/*.mjs web/english-preview/*.css web/english-preview/*.json web/english-preview/dist/source/ && cp web/english-preview/index.html web/english-preview/dist/source/index.html
+      - name: Include actual browser screenshots
+        run: cp -r web/english-preview/screenshots web/english-preview/dist/preview-images
       - uses: actions/upload-artifact@v4
         with:
           name: Terra-World-English-Preview

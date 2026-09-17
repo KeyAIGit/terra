@@ -134,16 +134,16 @@
       "archivedNPCs": 0,
       "grass": 2600,
       "colliders": 927,
-      "time": 0.41416361111110994,
+      "time": 0.41392583333333294,
       "errors": [],
       "render": {
-        "frame": 82,
-        "calls": 33,
-        "triangles": 471018,
+        "frame": 74,
+        "calls": 36,
+        "triangles": 471024,
         "points": 1040,
         "lines": 0
       },
-      "fps": 57
+      "fps": 55.7
     },
     {
       "player": {
@@ -157,16 +157,16 @@
       "archivedNPCs": 0,
       "grass": 2600,
       "colliders": 93,
-      "time": 0.4155669444444428,
+      "time": 0.41560527777777706,
       "errors": [],
       "render": {
-        "frame": 111,
-        "calls": 35,
-        "triangles": 392062,
+        "frame": 109,
+        "calls": 36,
+        "triangles": 392064,
         "points": 979,
         "lines": 0
       },
-      "fps": 55.6
+      "fps": 55.4
     },
     {
       "player": {
@@ -180,16 +180,16 @@
       "archivedNPCs": 0,
       "grass": 2600,
       "colliders": 45,
-      "time": 0.41563305555555435,
+      "time": 0.41565777777777707,
       "errors": [],
       "render": {
-        "frame": 111,
-        "calls": 31,
-        "triangles": 304498,
+        "frame": 110,
+        "calls": 32,
+        "triangles": 304500,
         "points": 952,
         "lines": 0
       },
-      "fps": 55.9
+      "fps": 55.6
     }
   ],
   "pageErrors": [],
@@ -213,7 +213,8 @@
     "portraits": 8
   },
   "pass": true,
-  "tested_html_sha256": "e045a5c3e9807189ae712796a2d57476f8348bf1773ffd51beb9672bdadb0511",
-  "browser": "Chrome, headless, Windows; offline mode",
-  "check_count": 28
+  "tested_html_sha256": "dbfd3d757a8c6bd12004db140f348e311bdc145841e8ae558c1fc70866827de3",
+  "browser": "Chrome, headless, Windows; network disabled",
+  "check_count": 28,
+  "packaging": "Exact GitHub Actions artifact was downloaded and retested after packaging"
 }
