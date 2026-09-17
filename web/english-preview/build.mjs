@@ -11,11 +11,11 @@ const sha=b=>createHash('sha256').update(b).digest('hex');
 const base='https://d2ol7oe51mr4n9.cloudfront.net/user_3G1EoKpPdtVgILUsyI2EdcfEGyE/';
 const originals={walk:['038b2f5a-79fd-4222-a148-e1ae1a1ebf46.html','29b4e734b064f5ea2b6dc3c6f7bdc5336247182d12c1a2e1fc6b6af37d171332'],planet:['f7e044a1-6fb4-41c3-8142-04490cbf3b54.html','3f816f25d4bd1eecb7f4b6ade9e4b04d57747673b293d1c4626b09b7da915bff'],people:['e51caab7-635aab7.html','']};
 originals.people=['e51caab7-635a-4fa1-9414-150ad5faade1.html','3cce30af2d2e8fb7f279815ce4a44755adadddb938cc2aa63ceb8b3991fbae2b'];
-const names=['localization.js','localization-extra.js','scene-upgrade.js','walk-patch.js','app.js'];
+const names=['localization.js','localization-extra.js','scene-upgrade.js','scene-04.js','journey.js','walk-patch.js','app.js'];
 const code=Object.fromEntries(await Promise.all(names.map(async n=>[n,await fs.readFile(path.join(here,n),'utf8')])));
 for(const[n,s]of Object.entries(code))new vm.Script(s,{filename:n});
 const template=await fs.readFile(path.join(here,'index.html'),'utf8'),css=await fs.readFile(path.join(here,'style.css'),'utf8');
-const manifest={version:'0.3.0',sourceFiles:{},assets:{},buildChecks:{}};
+const manifest={version:'0.4.0',sourceFiles:{},assets:{},buildChecks:{}};
 for(const n of [...names,'index.html','style.css'])manifest.sourceFiles[n]=sha(await fs.readFile(path.join(here,n)));
 async function bytes(url,local){
  if(cache&&local){try{return await fs.readFile(path.join(cache,local));}catch(e){if(e.code!=='ENOENT')throw e;}}
@@ -43,10 +43,10 @@ const adapter=`(()=>{const contents=${JSON.stringify(embedded)},cache=new Map(),
 const tag=s=>'<script>'+s.replace(/<\/script/gi,'<\\/script')+'</script>';
 function bundle(offline){let html=template.replace('<link rel="stylesheet" href="style.css">','<style>'+css+'</style>');for(const n of names)html=html.replace('<script src="'+n+'"></script>',()=>tag((offline&&n===names[0]?adapter+'\n':'')+(n==='app.js'?offlineApp:code[n])));if(offline)html=html.replace('The published edition serves the preserved world archive and artwork from this site. Its first visit loads world data on demand.','This standalone edition includes the original published assets and all seven generated artworks. No internet connection is required for exploration.');return html;}
 await fs.mkdir(out,{recursive:true});
-for(const[filename,offline]of [['Terra_World_03.html',true],['Terra_World_Online_Preview.html',false]]){const html=bundle(offline);await fs.writeFile(path.join(out,filename),html);manifest[filename]={bytes:Buffer.byteLength(html),sha256:sha(html)};}
+for(const[filename,offline]of [['Terra_World_04.html',true],['Terra_World_Online_Preview.html',false]]){const html=bundle(offline);await fs.writeFile(path.join(out,filename),html);manifest[filename]={bytes:Buffer.byteLength(html),sha256:sha(html)};}
 await fs.writeFile(path.join(out,'BUILD_MANIFEST.json'),JSON.stringify(manifest,null,2));
 for(const n of ['README.md','QA_REPORT.json']){try{await fs.copyFile(path.join(here,n),path.join(out,n));}catch(e){if(e.code!=='ENOENT')throw e;}}
-console.log(JSON.stringify(manifest.buildChecks));console.log('Built',out,manifest['Terra_World_03.html']);
+console.log(JSON.stringify(manifest.buildChecks));console.log('Built',out,manifest['Terra_World_04.html']);
 
 // Self-hosted static site: no legacy CDN dependency at runtime.
 const site=path.join(here,'site');await fs.mkdir(path.join(site,'data'),{recursive:true});
@@ -54,8 +54,9 @@ for(const [name,html]of Object.entries(raw))await fs.writeFile(path.join(site,'d
 for(const name of names)await fs.writeFile(path.join(site,name),code[name]);
 await fs.writeFile(path.join(site,'style.css'),css);
 await fs.writeFile(path.join(site,'index.html'),template.replace('<script src="localization.js">','<script>window.TERRA_SELF_HOSTED=true;</script><script src="localization.js">'));
+const publishedIndex=await fs.readFile(path.join(site,'index.html'),'utf8');await fs.writeFile(path.join(site,'index.html'),publishedIndex.replace(/(src|href)="([a-z][a-z0-9-]*\.(?:js|css))"/g,'$1="$2?v=0.4.0"'));
 await fs.cp(path.join(here,'assets'),path.join(site,'assets'),{recursive:true});
 await fs.mkdir(path.join(site,'downloads'),{recursive:true});
-await fs.copyFile(path.join(out,'Terra_World_03.html'),path.join(site,'downloads','Terra_World_03.html'));
-await fs.writeFile(path.join(site,'release.json'),JSON.stringify({version:'0.3.0',original_source_sha:Object.fromEntries(Object.entries(originals).map(([k,v])=>[k,v[1]])),built_from_source:manifest.sourceFiles,counts:manifest.buildChecks},null,2));
+await fs.copyFile(path.join(out,'Terra_World_04.html'),path.join(site,'downloads','Terra_World_04.html'));
+await fs.writeFile(path.join(site,'release.json'),JSON.stringify({version:'0.4.0',original_source_sha:Object.fromEntries(Object.entries(originals).map(([k,v])=>[k,v[1]])),built_from_source:manifest.sourceFiles,counts:manifest.buildChecks},null,2));
 await fs.writeFile(path.join(site,'.nojekyll'),'');

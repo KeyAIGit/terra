@@ -1,0 +1,11 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node tests/release04-desktop.mjs && node tests/release04-mobile.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}
