@@ -1,0 +1,42 @@
+{
+  "version": "0.5.0",
+  "space": "Bekzod25/terra-world-english",
+  "url": "https://huggingface.co/spaces/Bekzod25/terra-world-english",
+  "mode": "embedded-github-pages",
+  "independent_hf_copy": false,
+  "checks": [
+    {
+      "name": "space-running-with-neutral-title",
+      "pass": true,
+      "details": "5c56b37da457e8de012e66fbe07e04fdfb341438"
+    },
+    {
+      "name": "hf-interface-without-language-label",
+      "pass": true
+    },
+    {
+      "name": "hf-embedded-main-version05",
+      "pass": true
+    },
+    {
+      "name": "hf-embedded-courtyard-loads-all-assets",
+      "pass": true
+    },
+    {
+      "name": "hf-courtyard-exits-to-world",
+      "pass": true
+    },
+    {
+      "name": "hf-hub-app-tab-opens-new-courtyard",
+      "pass": true
+    },
+    {
+      "name": "no-hf-application-script-errors",
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "commit": "5c56b37da457e8de012e66fbe07e04fdfb341438",
+  "host": "https://bekzod25-terra-world-english.static.hf.space",
+  "pass": true
+}
