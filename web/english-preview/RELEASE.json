@@ -1,6 +1,7 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "qa_pass": true,
-  "checks": 28,
-  "tested_html_sha256": "dbfd3d757a8c6bd12004db140f348e311bdc145841e8ae558c1fc70866827de3"
+  "checks": 41,
+  "tested_html_sha256": "d3776dd47bd25dace5fccd01b39924132d684e78e1a9b4bb2c939703d7e5c99d",
+  "previous_release_commit": "7fb112c6e33ed25e76a75f74ada9adf092f063d9"
 }

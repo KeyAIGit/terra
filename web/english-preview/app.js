@@ -17,7 +17,7 @@ const unbase=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
 function status(text){$('status').textContent=text;$('status').classList.toggle('hidden',!text);}
 function fail(error){const text=error?.message||String(error);errors.push(text);$('error-message').textContent=text+' Your original world has not been modified.';$('error-box').classList.remove('hidden');status('');}
 async function source(name){
- if(!pending.has(name))pending.set(name,(async()=>{const cfg=SOURCE[name];const r=await fetch(BASE+cfg.file,{signal:AbortSignal.timeout(60000),credentials:'omit'});if(!r.ok)throw Error(`Original ${name} archive returned HTTP ${r.status}.`);const bytes=await r.arrayBuffer();if(!crypto.subtle)throw Error('This browser cannot verify the source. Open the preview in current Chrome, Edge or Firefox.');const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');if(hash!==cfg.sha)throw Error(`The original ${name} file has changed. Its code was not executed.`);verified.add(name);return new TextDecoder().decode(bytes);})().catch(e=>{pending.delete(name);throw e;}));
+ if(!pending.has(name))pending.set(name,(async()=>{const cfg=SOURCE[name];let r,bytes;if(window.TERRA_SELF_HOSTED){r=await fetch(new URL('data/'+name+'.html.gz',document.baseURI),{signal:AbortSignal.timeout(90000),credentials:'omit'});if(!r.ok)throw Error(`World archive ${name} returned HTTP ${r.status}.`);if(typeof DecompressionStream==='undefined')throw Error('This browser does not support archive decompression.');bytes=await new Response(r.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer();}else{r=await fetch(BASE+cfg.file,{signal:AbortSignal.timeout(90000),credentials:'omit'});if(!r.ok)throw Error(`Original ${name} archive returned HTTP ${r.status}.`);bytes=await r.arrayBuffer();}if(!crypto.subtle)throw Error('This browser cannot verify the source. Open the preview in current Chrome, Edge or Firefox.');const hash=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes)),b=>b.toString(16).padStart(2,'0')).join('');if(hash!==cfg.sha)throw Error(`The original ${name} file has changed. Its code was not executed.`);verified.add(name);return new TextDecoder().decode(bytes);})().catch(e=>{pending.delete(name);throw e;}));
  return pending.get(name);
 }
 async function loadWalk(){if(walkData)return walkData;const html=await source('walk');const ss=scripts(html);if(ss.length!==3)throw Error('Unexpected walk source format.');walkData={html,play:assigned(ss[1]),three:ss[0]};return walkData;}
@@ -63,7 +63,7 @@ async function createWorldView(){
  const natural=await image(dataImage(t.tex.nat)),normal=await image(dataImage(t.tex.nrm));
  const textureCanvas=document.createElement('canvas');textureCanvas.width=t.tex.tw;textureCanvas.height=t.tex.th;
  const ctx=textureCanvas.getContext('2d'),small=document.createElement('canvas');small.width=t.world.w;small.height=t.world.h;const sx=small.getContext('2d');
- const flat=$('flat-map'),flatCtx=flat.getContext('2d');let mode='sphere',ownership=[],pols=new Map(),sphere,renderer,scene,camera,planet,drag=null,moved=false,angleY=-2.65,angleX=.12,zoom=3.05,raf;
+ const flat=$('flat-map'),flatCtx=flat.getContext('2d');let mode='sphere',ownership=[],pols=new Map(),sphere,renderer,scene,camera,planet,drag=null,moved=false,angleY=-2.65,angleX=.12,zoom=3.2,raf;
  const texture=new THREE.CanvasTexture(textureCanvas);texture.colorSpace=THREE.SRGBColorSpace;
  function flatPaint(){const rect=$('planet-stage').getBoundingClientRect(),scale=Math.min(devicePixelRatio||1,1.6);flat.width=Math.max(1,Math.round(rect.width*scale));flat.height=Math.max(1,Math.round(rect.height*scale));flatCtx.fillStyle='#091923';flatCtx.fillRect(0,0,flat.width,flat.height);const f=Math.min(flat.width/textureCanvas.width,flat.height/textureCanvas.height);const w=textureCanvas.width*f,h=textureCanvas.height*f;flatCtx.drawImage(textureCanvas,(flat.width-w)/2,(flat.height-h)/2,w,h);}
  function resize(){const r=$('planet-stage').getBoundingClientRect();if(r.width<1||r.height<1)return;if(renderer){renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix();}flatPaint();}
@@ -73,7 +73,7 @@ async function createWorldView(){
   renderer=new THREE.WebGLRenderer({canvas:$('globe'),antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.6));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.2;
   scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(40,1,.05,100);camera.position.z=zoom;
   const normalMap=new THREE.Texture(normal);normalMap.needsUpdate=true;
-  sphere=new THREE.Mesh(new THREE.SphereGeometry(1,160,100),new THREE.MeshStandardMaterial({map:texture,normalMap,normalScale:new THREE.Vector2(.45,.45),roughness:.85}));
+  sphere=new THREE.Mesh(new THREE.SphereGeometry(1,160,100),new THREE.MeshStandardMaterial({map:texture,normalMap,normalScale:new THREE.Vector2(.22,.22),roughness:.85}));
   planet=new THREE.Group();planet.add(sphere);scene.add(planet);
   const atmosphere=new THREE.Mesh(new THREE.SphereGeometry(1.032,64,40),new THREE.ShaderMaterial({transparent:true,side:THREE.BackSide,depthWrite:false,uniforms:{},vertexShader:'varying vec3 n; varying vec3 v; void main(){vec4 p=modelViewMatrix*vec4(position,1.); n=normalize(normalMatrix*normal);v=normalize(-p.xyz);gl_Position=projectionMatrix*p;}',fragmentShader:'varying vec3 n; varying vec3 v; void main(){float a=pow(1.-abs(dot(normalize(n),normalize(v))),3.);gl_FragColor=vec4(.19,.54,.67,a*.44);}'}));planet.add(atmosphere);
   scene.add(new THREE.HemisphereLight('#dcecff','#233a43',2.1));const sun=new THREE.DirectionalLight('#ffe4b5',3.1);sun.position.set(-3,3,5);scene.add(sun);
@@ -110,7 +110,7 @@ function openPerson(index){const p=people.find(p=>p.index===Number(index));if(!p
  $('person-detail').innerHTML=`<div class="bio-layout"><div>${src?`<img class="bio-portrait" src="${esc(src)}" alt="Illustrated interpretation of ${esc(p.n)}">`:`<div class="bio-no-portrait">${esc(p.n[0])}</div>`}<p class="art-note">${src?'An artistic interpretation, not a photograph or a verified reconstruction of appearance.':'No portrait has been created for this record.'}</p></div><div class="bio-content"><div class="eyebrow">A LIFE IN THE ARCHIVE</div><h2>${esc(p.n)}</h2><p class="bio-meta">${esc(p.pn)} · ${esc(p.r==='chief'?'leader':p.r)} · ${esc(p.era)}</p><p>${E.year(p.b)} to ${E.year(p.d)} · Recorded age ${p.a}</p><h3>Recorded deeds</h3>${p.deeds.map(ds=>`<div class="deed"><span>${E.year(ds[0])}</span><p>${esc(ds[2])}</p></div>`).join('')||'<p>No individual deeds were included in this export.</p>'}<h3>Disposition in the model</h3><p>${(p.tr||[]).map(t=>esc(traitNames[t[0]]||t[0])+': '+Math.round(t[1]*100)+'%').join(' · ')}</p><h3>Recorded beliefs</h3><p>${(p.bl||[]).map(b=>esc(beliefNames[b[0]]||b[0])).join('<br>')}</p><p class="quiet-note">These are fictional simulation parameters, not psychological measurements. The archive may record a historical person outside the year of a walkable scene.</p></div></div>`;$('person-dialog').showModal();
 }
 async function startWalk(index,token){
- $('walk-loading').classList.remove('hidden');$('walk-progress').textContent='Loading the published world and checking its chronology.';$('walk-scene').value=index;
+ $('walk-loading').classList.remove('hidden');$('walk-progress').textContent='Loading the published world and checking its chronology.';$('walk-scene').value=index;$('walk-light').value='0.41';$('walk-quality').value='auto';
  const [w,play]=await Promise.all([loadWalk(),preparePlay()]);if(token!==routeToken)return;
  $('walk-progress').textContent='Building the settlement, materials and reconstructed residents.';
  const oldFrame=$('walk-frame'),frame=oldFrame.cloneNode(false);frame.removeAttribute('srcdoc');frame.srcdoc=buildTerraWalkHTML(w.html,play,index);oldFrame.replaceWith(frame);const start=performance.now();
@@ -119,7 +119,7 @@ async function startWalk(index,token){
 async function route(){
  const token=++routeToken,raw=location.hash.slice(1)||'home',parts=raw.split('/'),name=['home','atlas','chronicle','people','about','walk'].includes(parts[0])?parts[0]:'home';
  if(activeView==='walk'){try{$('walk-frame').contentWindow?.postMessage({type:'terra:stop'},'*');}catch{}$('walk-frame').srcdoc='';}
- activeView=name;worldView?.stop();clearInterval(timelineTimer);timelineTimer=null;$('time-play').textContent='▶';$('error-box').classList.add('hidden');
+ activeView=name;document.body.classList.toggle('is-walking',name==='walk');worldView?.stop();clearInterval(timelineTimer);timelineTimer=null;$('time-play').textContent='▶';$('error-box').classList.add('hidden');
  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('hidden',v.id!=='view-'+name));document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('active',a.dataset.nav===(name==='walk'?'home':name)));
  document.title='TERRA · '+({home:'A world with a past',atlas:'World atlas',chronicle:'The chronicle',people:'Faces in the archive',about:'About the world',walk:'Walk the world'}[name]);window.scrollTo(0,0);
  try{
@@ -132,7 +132,7 @@ async function route(){
  }catch(e){if(token===routeToken)fail(e);}
 }
 function sendWalk(data){$('walk-frame').contentWindow?.postMessage(data,'*');}
-window.TERRA_PREVIEW={version:'0.2.0',counts:null,chronology:null,inspect:()=>({view:activeView,sourceVerified:[...verified],errors:[...errors],untranslated:[...E.unresolved],world:worldView?.inspect()||null,portraits:Object.keys(portraits).length}),loadArchive,preparePlay,setFrame};
+window.TERRA_PREVIEW={version:'0.3.0',counts:null,chronology:null,inspect:()=>({view:activeView,sourceVerified:[...verified],errors:[...errors],untranslated:[...E.unresolved],world:worldView?.inspect()||null,portraits:Object.keys(portraits).length}),loadArchive,preparePlay,setFrame};
 document.addEventListener('click',e=>{const walk=e.target.closest('[data-walk]');if(walk){location.hash='walk/'+walk.dataset.walk;return;}const p=e.target.closest('[data-person]');if(p)openPerson(p.dataset.person);const site=e.target.closest('[data-site]');if(site)sendWalk({type:'terra:site',site:site.dataset.site});});
 window.addEventListener('hashchange',route);window.addEventListener('message',e=>{if(e.source===$('walk-frame').contentWindow&&e.data?.type==='terra-exit')location.hash='home';});
 $('retry').onclick=route;$('close-person').onclick=()=>$('person-dialog').close();$('person-dialog').addEventListener('click',e=>{if(e.target===$('person-dialog'))$('person-dialog').close();});
@@ -140,6 +140,6 @@ $('event-search').oninput=$('event-kind').onchange=$('event-time-filter').onchan
 $('people-search').oninput=()=>{peopleLimit=72;if(archive)renderPeople();};$('people-more').onclick=()=>{peopleLimit+=100;renderPeople();};
 $('world-time').oninput=e=>setFrame(Number(e.target.value));$('time-prev').onclick=()=>setFrame(frameIndex-1);$('time-next').onclick=()=>setFrame(frameIndex+1);$('time-play').onclick=()=>{if(!archive)return;if(timelineTimer){clearInterval(timelineTimer);timelineTimer=null;$('time-play').textContent='▶';}else{if(frameIndex===archive.d.frames.length-1)setFrame(0);$('time-play').textContent='Ⅱ';timelineTimer=setInterval(()=>{if(frameIndex>=archive.d.frames.length-1){clearInterval(timelineTimer);timelineTimer=null;$('time-play').textContent='▶';}else setFrame(frameIndex+1);},1000);}};
 $('sphere-mode').onclick=()=>worldView?.projection('sphere');$('flat-mode').onclick=()=>worldView?.projection('flat');$('political-toggle').onchange=()=>worldView?.update();
-$('walk-scene').onchange=e=>location.hash='walk/'+e.target.value;$('walk-light').onchange=e=>sendWalk({type:'terra:time',value:Number(e.target.value)});$('walk-fullscreen').onclick=()=>{$('walk-frame').requestFullscreen?.().catch(fail);};
+$('walk-scene').onchange=e=>location.hash='walk/'+e.target.value;$('walk-light').onchange=e=>sendWalk({type:'terra:time',value:Number(e.target.value)});$('walk-quality').onchange=e=>sendWalk({type:'terra:quality',value:e.target.value});$('walk-fullscreen').onclick=()=>{$('walk-frame').requestFullscreen?.().catch(fail);};
 home();route();
 })();
