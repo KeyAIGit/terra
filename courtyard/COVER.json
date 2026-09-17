@@ -1,0 +1,9 @@
+{
+  "kind": "actual in-engine screenshot",
+  "file": "cover.webp",
+  "bytes": 321276,
+  "sha256": "d1c1b7d8da1bfbec87447360c77e21ebc1d68fe822806f0ae0053e33b69bf279",
+  "viewpoint": "entrance",
+  "rendering": "Three.js WebGL; daylight; UI hidden using photo mode",
+  "processing": "bottom UI hint cropped; WebP encoded; no image generation"
+}

@@ -50,7 +50,7 @@ async function preparePlay(){
  });preparedPlay=result;window.TERRA_PREVIEW.chronology=report;return result;
 }
 function home(){
- $('hero-art').src=ART.capital;
+ $('hero-art').src='courtyard/cover.webp';
  $('destinations').innerHTML=SCENES.map((s,i)=>`<article class="destination"><button class="destination-image" data-walk="${i}" aria-label="Enter ${esc(s.name)}"><img src="${esc(ART[s.id]||ART.capital)}" alt="Illustrated interpretation of ${esc(s.name)}" loading="lazy"><span class="destination-index">0${i+1}</span><span class="destination-date">${E.year(s.year)}</span></button><div class="eyebrow">${esc(s.era)}</div><h3>${esc(s.name)}</h3><p class="description">${esc(s.description)}</p><button class="destination-link" data-walk="${i}">Walk this place <span>↗</span></button></article>`).join('');
  $('walk-scene').innerHTML=SCENES.map((s,i)=>`<option value="${i}">${esc(s.name)} · ${E.year(s.year)}</option>`).join('');
 }
@@ -120,13 +120,15 @@ async function startWalk(index,token){
  await new Promise((resolve,reject)=>{const timer=setInterval(()=>{if(token!==routeToken){clearInterval(timer);resolve();return;}try{const game=frame.contentWindow?.GAME;if(game?.ready){clearInterval(timer);if(game.errors?.length){reject(Error(game.errors.join('; ')));return;}$('walk-loading').classList.add('hidden');frame.contentWindow.focus();resolve();}else if(performance.now()-start>60000){clearInterval(timer);reject(Error('The settlement took too long to initialize. Reload or try another browser.'));}}catch(e){clearInterval(timer);reject(e);}},150);});
 }
 async function route(){
- const token=++routeToken,raw=location.hash.slice(1)||'home',parts=raw.split('?')[0].split('/'),params=new URLSearchParams(raw.includes('?')?raw.slice(raw.indexOf('?')+1):''),name=['home','atlas','chronicle','people','about','walk'].includes(parts[0])?parts[0]:'home';
+ const token=++routeToken,raw=location.hash.slice(1)||'home',parts=raw.split('?')[0].split('/'),params=new URLSearchParams(raw.includes('?')?raw.slice(raw.indexOf('?')+1):''),name=['home','atlas','chronicle','people','about','walk','courtyard'].includes(parts[0])?parts[0]:'home';
+ if(activeView==='courtyard'){const old=$('courtyard-frame');try{old.contentWindow?.COURTYARD?.dispose?.();}catch{}old.removeAttribute('src');old.removeAttribute('srcdoc');}
  if(activeView==='walk'){try{$('walk-frame').contentWindow?.GAME?.dispose?.();$('walk-frame').contentWindow?.postMessage({type:'terra:stop'},'*');}catch{}$('walk-frame').srcdoc='';}
- activeView=name;document.body.classList.toggle('is-walking',name==='walk');worldView?.stop();clearInterval(timelineTimer);timelineTimer=null;$('time-play').textContent='▶';$('error-box').classList.add('hidden');
- document.querySelectorAll('.view').forEach(v=>v.classList.toggle('hidden',v.id!=='view-'+name));document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('active',a.dataset.nav===(name==='walk'?'home':name)));
- journey?.beforeRoute(name,params);document.title='TERRA · '+({home:'A world with a past',atlas:'World atlas',chronicle:'The chronicle',people:'Faces in the archive',about:'About the world',walk:'Walk the world'}[name]);window.scrollTo(0,0);
+ activeView=name;document.body.classList.toggle('is-walking',name==='walk');document.body.classList.toggle('is-courtyard',name==='courtyard');worldView?.stop();clearInterval(timelineTimer);timelineTimer=null;$('time-play').textContent='▶';$('error-box').classList.add('hidden');
+ document.querySelectorAll('.view').forEach(v=>v.classList.toggle('hidden',v.id!=='view-'+name));document.querySelectorAll('[data-nav]').forEach(a=>a.classList.toggle('active',a.dataset.nav===(name==='walk'||name==='courtyard'?'home':name)));
+ journey?.beforeRoute(name,params);document.title='TERRA · '+({home:'A world with a past',atlas:'World atlas',chronicle:'The chronicle',people:'Faces in the archive',about:'About the world',walk:'Walk the world',courtyard:'The market courtyard'}[name]);window.scrollTo(0,0);
  try{
   if(name==='home'||name==='about'){status('');return;}status(name==='walk'?'Opening the settlement…':'Loading the original world archive…');
+  if(name==='courtyard'){const old=$('courtyard-frame'),next=old.cloneNode(false);next.removeAttribute('src');next.removeAttribute('srcdoc');if(window.TERRA_COURTYARD_HTML)next.srcdoc=window.TERRA_COURTYARD_HTML;else next.src=new URL('courtyard/index.html?v=0.5.0',document.baseURI).href;old.replaceWith(next);status('');return;}
   if(name==='walk'){await startWalk(Math.max(0,Math.min(2,Number(parts[1])||0)),token);}
   else if(name==='atlas'){await loadArchive();if(token!==routeToken)return;if(!worldView)worldView=await createWorldView();if(token!==routeToken){worldView.stop();return;}worldView.draw();}
   else if(name==='chronicle'){await loadArchive();if(token!==routeToken)return;if($('event-kind').options.length===1)$('event-kind').innerHTML+=[...new Set(translatedEvents.map(e=>e.k))].map(k=>`<option value="${esc(k)}">${esc(E.kinds[k]||k)}</option>`).join('');renderEvents();}
@@ -135,8 +137,9 @@ async function route(){
  }catch(e){if(token===routeToken)fail(e);}
 }
 function sendWalk(data){$('walk-frame').contentWindow?.postMessage(data,'*');}
-window.TERRA_PREVIEW={version:'0.4.0',counts:null,chronology:null,inspect:()=>({view:activeView,journey:journey?.inspect()||null,sourceVerified:[...verified],errors:[...errors],untranslated:[...E.unresolved],world:worldView?.inspect()||null,portraits:Object.keys(portraits).length}),loadArchive,preparePlay,setFrame};
+window.TERRA_PREVIEW={version:'0.5.0',counts:null,chronology:null,inspect:()=>({view:activeView,journey:journey?.inspect()||null,sourceVerified:[...verified],errors:[...errors],untranslated:[...E.unresolved],world:worldView?.inspect()||null,portraits:Object.keys(portraits).length}),loadArchive,preparePlay,setFrame};
 document.addEventListener('click',e=>{const walk=e.target.closest('[data-walk]');if(walk){location.hash='walk/'+walk.dataset.walk;return;}const p=e.target.closest('[data-person]');if(p)openPerson(p.dataset.person);const site=e.target.closest('[data-site]');if(site)sendWalk({type:'terra:site',site:site.dataset.site});});
+window.addEventListener('message',e=>{if(e.source!==$('courtyard-frame').contentWindow)return;if(e.data?.type==='courtyard-exit')location.hash='home';if(e.data?.type==='courtyard-archive')location.hash='atlas?year=500&city='+encodeURIComponent('Níhmīwū')+'&polity=294';});
 window.addEventListener('hashchange',route);window.addEventListener('message',e=>{if(e.source===$('walk-frame').contentWindow&&e.data?.type==='terra-exit')location.hash='home';});
 $('retry').onclick=route;$('close-person').onclick=()=>$('person-dialog').close();$('person-dialog').addEventListener('click',e=>{if(e.target===$('person-dialog'))$('person-dialog').close();});
 $('event-search').oninput=$('event-kind').onchange=$('event-time-filter').onchange=()=>{eventLimit=80;if(archive)renderEvents();};$('events-more').onclick=()=>{eventLimit+=100;renderEvents();};

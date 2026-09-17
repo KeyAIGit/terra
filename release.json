@@ -1,5 +1,5 @@
 {
-  "version": "0.4.0",
+  "version": "0.5.0",
   "original_source_sha": {
     "walk": "29b4e734b064f5ea2b6dc3c6f7bdc5336247182d12c1a2e1fc6b6af37d171332",
     "planet": "3f816f25d4bd1eecb7f4b6ade9e4b04d57747673b293d1c4626b09b7da915bff",
@@ -10,11 +10,11 @@
     "localization-extra.js": "1d0befbc939cf8508d9b3f1fc7e97419a98390131b8cc05dc871fa8a552837ff",
     "scene-upgrade.js": "5c4103beb0a1563c7b3b54557b442ffa495c4b495cd512b1db515f36e5478841",
     "scene-04.js": "2c018547d11b8ca2b6a5c0f6d6a20dc8577d24253efd5cee529500dbd2d199fc",
-    "journey.js": "2336c8f32594fb5a378698615eba6f9f1b6d91e64101f10c391a75e60c93ca1c",
+    "journey.js": "8ad8b8297243dae741aebac521bbe91f95109e6020e997cbe54c6c3e9e6cd99f",
     "walk-patch.js": "6fd60ec5a40e901e6251dd589e6b5d74d9fe908a5fcdd6ac428e41a6d0e87062",
-    "app.js": "9929b49e07a47942f0bb3dd9387fcd0170aaddf1f7718b373788dc1c01d119d0",
-    "index.html": "e595558c30effdf7aabad30926067f3425fd5323771d9d4ca293d0f5f0c54868",
-    "style.css": "6a7bd2ba3ab085a1ca28bbef6f8804760642362f905cef938088f23fcd4e1ec4"
+    "app.js": "f53f9d4685ee61eb0491c14e350a50d6bda135f8d9010871f4ee9c0970b0b307",
+    "index.html": "975fd98ed6675638002719ab50b26d88e0afd21e76de5c6511a06fb241be5999",
+    "style.css": "4dc68d98bb247a9aef5e1528f31ce695f0886e5efff8601dd5e9597a2bc08601"
   },
   "counts": {
     "javascriptSyntax": true,
@@ -24,12 +24,17 @@
     "eventTranslationMissing": 0,
     "deedTranslationMissing": 0
   },
-  "source_commit": "f196f14677e0ff4614449745e88f896e5391aac8",
-  "tested_html_sha256": "222aecddd9ad5bb0f6bae82d463466f9782698a63af5463840551ff59534221d",
-  "checks_passed": 45,
-  "previous_release_commit": "13c6f1bc59252149dd33fab1302518d32fe442d3",
-  "previous_deployment_commit": "814f432b35a56447d7f2832dbf18d06206ab1e41",
-  "pull_request": 4,
-  "public_checks_passed": 12,
-  "merge_commit": "f83305bcc0c93a7e7b1b72a4bb36983d9ed88e71"
+  "courtyard": {
+    "asset_count": 11,
+    "runtime_bytes": 35727183,
+    "playable": true,
+    "photorealism": "work-in-progress",
+    "simulation_changed": false
+  },
+  "tested_html_sha256": "c1424082f75028ddc3eb20ab50cfd3af4d4390b2c587a535cdaa4e17f6a230a4",
+  "checks_passed": 67,
+  "source_commit": "5c46e761969bcd93b69618fc9bb2250b1d743482",
+  "previous_release_commit": "f196f14677e0ff4614449745e88f896e5391aac8",
+  "previous_deployment_commit": "69d385f1c190c12ab06f34785a5dc2beb3e1c823",
+  "pull_request": 5
 }
