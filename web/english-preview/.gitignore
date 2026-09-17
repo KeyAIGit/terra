@@ -2,3 +2,5 @@ dist/
 site/
 node_modules/
 qa-results/
+
+courtyard/dist/

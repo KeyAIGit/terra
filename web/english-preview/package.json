@@ -3,9 +3,15 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node tests/release04-desktop.mjs && node tests/release04-mobile.mjs"
+    "test": "node tests/release05-archive-desktop.mjs && node tests/release05-archive-mobile.mjs && node tests/release05-courtyard.mjs && node tests/release05-courtyard-touch.mjs"
   },
   "devDependencies": {
-    "playwright": "1.63.0"
+    "@gltf-transform/core": "4.2.1",
+    "@gltf-transform/extensions": "4.2.1",
+    "@gltf-transform/functions": "4.2.1",
+    "esbuild": "0.25.10",
+    "meshoptimizer": "0.23.0",
+    "playwright": "1.63.0",
+    "three": "0.180.0"
   }
 }
