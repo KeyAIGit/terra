@@ -1,137 +1,166 @@
 {
-  "version": "0.3.0",
+  "version": "0.4.0",
   "pass": true,
-  "tested_html_sha256": "d3776dd47bd25dace5fccd01b39924132d684e78e1a9b4bb2c939703d7e5c99d",
-  "checks_total": 41,
-  "environment": "Chrome on Windows; desktop and mobile touch emulation; offline and self-hosted localhost editions",
+  "checks_total": 45,
+  "tested_html_sha256": "222aecddd9ad5bb0f6bae82d463466f9782698a63af5463840551ff59534221d",
+  "environment": "Windows Chrome headless; desktop offline and self-hosted mobile touch emulation",
   "not_verified": [
     "Physical iPhone/Safari",
     "long-duration stability",
-    "engine behavior (unchanged)"
+    "simulation engine (unchanged)"
   ],
   "desktop": {
-    "edition": "offline",
+    "version": "0.4.0",
     "checks": [
       {
-        "name": "offline-home",
+        "name": "offline-home-04",
         "pass": true
       },
       {
-        "name": "globe-renderer",
+        "name": "dated-settlement-deep-link",
+        "pass": true
+      },
+      {
+        "name": "flat-map-city-layer",
+        "pass": true
+      },
+      {
+        "name": "flat-map-click-matches-recorded-cell",
+        "pass": true
+      },
+      {
+        "name": "globe-click-matches-recorded-cell",
+        "pass": true
+      },
+      {
+        "name": "settlement-search-and-population",
+        "pass": true
+      },
+      {
+        "name": "chronicle-filter-no-future-records",
+        "pass": true,
+        "details": 94
+      },
+      {
+        "name": "clear-chronicle-context",
+        "pass": true
+      },
+      {
+        "name": "historical-biography-hides-future-deeds",
+        "pass": true
+      },
+      {
+        "name": "all-eight-portraits-preserved",
+        "pass": true
+      },
+      {
+        "name": "walk-0-scenery04",
         "pass": true,
         "details": {
-          "mode": "sphere",
-          "ownership": 16200,
-          "polities": 260,
-          "renderer": true,
-          "frame": 116
+          "pathVertices": 9250,
+          "facadeParts": 8628
         }
-      },
-      {
-        "name": "polity-inspector",
-        "pass": true
-      },
-      {
-        "name": "timeline-first-and-last",
-        "pass": true
-      },
-      {
-        "name": "flat-map",
-        "pass": true
-      },
-      {
-        "name": "chronicle-search-and-filter",
-        "pass": true
-      },
-      {
-        "name": "all-eight-portraits",
-        "pass": true
-      },
-      {
-        "name": "biography-identity-and-dates",
-        "pass": true
-      },
-      {
-        "name": "people-search",
-        "pass": true
       },
       {
         "name": "walk-0-movement",
         "pass": true
       },
       {
-        "name": "walk-0-lighting",
+        "name": "walk-0-waypoint-bearing",
         "pass": true
       },
       {
-        "name": "walk-0-landmark",
+        "name": "walk-0-checked-landmark-jump",
         "pass": true
       },
       {
-        "name": "walk-0-dialogue",
+        "name": "walk-0-guide-and-pause",
         "pass": true
       },
       {
-        "name": "walk-0-render",
+        "name": "walk-0-english-dialogue",
         "pass": true
+      },
+      {
+        "name": "walk-1-scenery04",
+        "pass": true,
+        "details": {
+          "pathVertices": 2360,
+          "facadeParts": 2324
+        }
       },
       {
         "name": "walk-1-movement",
         "pass": true
       },
       {
-        "name": "walk-1-lighting",
+        "name": "walk-1-waypoint-bearing",
         "pass": true
       },
       {
-        "name": "walk-1-landmark",
+        "name": "walk-1-checked-landmark-jump",
         "pass": true
       },
       {
-        "name": "walk-1-dialogue",
+        "name": "walk-1-guide-and-pause",
         "pass": true
       },
       {
-        "name": "walk-1-render",
+        "name": "walk-1-english-dialogue",
         "pass": true
+      },
+      {
+        "name": "walk-2-scenery04",
+        "pass": true,
+        "details": {
+          "pathVertices": 1800,
+          "facadeParts": 0
+        }
       },
       {
         "name": "walk-2-movement",
         "pass": true
       },
       {
-        "name": "walk-2-lighting",
+        "name": "walk-2-waypoint-bearing",
         "pass": true
       },
       {
-        "name": "walk-2-landmark",
+        "name": "walk-2-checked-landmark-jump",
         "pass": true
       },
       {
-        "name": "walk-2-dialogue",
+        "name": "walk-2-guide-and-pause",
         "pass": true
       },
       {
-        "name": "walk-2-render",
+        "name": "walk-2-english-dialogue",
         "pass": true
       },
       {
-        "name": "mobile-home-no-overflow",
+        "name": "selection-cleared-before-city-existed",
         "pass": true
       },
       {
-        "name": "mobile-gallery-no-overflow",
+        "name": "no-invented-city-in-earlier-snapshot",
         "pass": true
       },
       {
-        "name": "no-browser-errors-or-untranslated-records",
+        "name": "phone-home-layout",
         "pass": true
       },
       {
-        "name": "zero-network-requests-in-offline-edition",
+        "name": "phone-atlas-layout",
+        "pass": true
+      },
+      {
+        "name": "zero-network-javascript-shader-translation-errors",
         "pass": true
       }
     ],
+    "errors": [],
+    "shaderErrors": [],
+    "network": [],
     "scenes": [
       {
         "player": {
@@ -145,16 +174,16 @@
         "archivedNPCs": 0,
         "grass": 2600,
         "colliders": 927,
-        "time": 0.4136244444444434,
+        "time": 0.4133688888888885,
         "errors": [],
         "render": {
-          "frame": 71,
-          "calls": 52,
-          "triangles": 1045102,
+          "frame": 64,
+          "calls": 54,
+          "triangles": 1262952,
           "points": 1040,
           "lines": 0
         },
-        "version": "0.3.0",
+        "version": "0.4.0",
         "mobile": false,
         "paused": false,
         "quality": "auto",
@@ -163,7 +192,17 @@
         "articulatedResidents": 34,
         "yaw": 0.4993467216801301,
         "pitch": -0.055,
-        "fps": 55.7
+        "paths04": {
+          "streetSegments": 11,
+          "vertices": 9250,
+          "featheredEdges": true,
+          "plazaShape": "irregular radial"
+        },
+        "facadeDetails": 8628,
+        "clouds04": true,
+        "waypoint": null,
+        "disposed": false,
+        "fps": 56.3
       },
       {
         "player": {
@@ -177,16 +216,16 @@
         "archivedNPCs": 0,
         "grass": 2600,
         "colliders": 93,
-        "time": 0.4155655555555539,
+        "time": 0.4134119444444437,
         "errors": [],
         "render": {
-          "frame": 111,
-          "calls": 48,
-          "triangles": 1059772,
+          "frame": 66,
+          "calls": 54,
+          "triangles": 1119290,
           "points": 979,
           "lines": 0
         },
-        "version": "0.3.0",
+        "version": "0.4.0",
         "mobile": false,
         "paused": false,
         "quality": "auto",
@@ -195,7 +234,17 @@
         "articulatedResidents": 30,
         "yaw": 0.4993467216801301,
         "pitch": -0.055,
-        "fps": 56.3
+        "paths04": {
+          "streetSegments": 4,
+          "vertices": 2360,
+          "featheredEdges": true,
+          "plazaShape": "irregular radial"
+        },
+        "facadeDetails": 2324,
+        "clouds04": true,
+        "waypoint": null,
+        "disposed": false,
+        "fps": 55.8
       },
       {
         "player": {
@@ -209,16 +258,16 @@
         "archivedNPCs": 0,
         "grass": 2600,
         "colliders": 45,
-        "time": 0.4155769444444429,
+        "time": 0.4133374999999991,
         "errors": [],
         "render": {
-          "frame": 111,
-          "calls": 38,
-          "triangles": 645948,
+          "frame": 65,
+          "calls": 44,
+          "triangles": 648802,
           "points": 952,
           "lines": 0
         },
-        "version": "0.3.0",
+        "version": "0.4.0",
         "mobile": false,
         "paused": false,
         "quality": "auto",
@@ -227,13 +276,35 @@
         "articulatedResidents": 23,
         "yaw": 0.4993467216801301,
         "pitch": -0.055,
-        "fps": 56.3
+        "paths04": {
+          "streetSegments": 3,
+          "vertices": 1800,
+          "featheredEdges": true,
+          "plazaShape": "irregular radial"
+        },
+        "facadeDetails": 0,
+        "clouds04": true,
+        "waypoint": null,
+        "disposed": false,
+        "fps": 55.9
       }
     ],
-    "pageErrors": [],
-    "network": [],
     "final": {
-      "view": "people",
+      "view": "atlas",
+      "journey": {
+        "selectedCity": {
+          "name": "Níhmīwū",
+          "polity": 294,
+          "x": 134,
+          "y": 26,
+          "year": 500
+        },
+        "scope": {
+          "year": 500,
+          "polity": null
+        },
+        "settlements": 1020
+      },
       "sourceVerified": [
         "planet",
         "people",
@@ -250,192 +321,85 @@
       },
       "portraits": 8
     },
-    "pass": true
+    "pass": true,
+    "tested_html_sha256": "222aecddd9ad5bb0f6bae82d463466f9782698a63af5463840551ff59534221d"
   },
   "mobile": {
     "checks": [
       {
-        "name": "touch-controls-visible",
+        "name": "mobile-controls-detected",
         "pass": true
       },
       {
-        "name": "real-touch-joystick-movement",
+        "name": "touch-joystick-movement",
         "pass": true
       },
       {
-        "name": "touch-look",
+        "name": "touch-camera",
         "pass": true
       },
       {
-        "name": "pause-freezes-time",
+        "name": "touch-landmark-marker",
         "pass": true
       },
       {
-        "name": "quality-setting",
+        "name": "touch-checked-jump",
         "pass": true
       },
       {
-        "name": "touch-meet-and-dialogue",
+        "name": "touch-field-guide-pauses",
         "pass": true
       },
       {
-        "name": "mobile-no-horizontal-overflow",
+        "name": "touch-guide-to-dated-atlas",
         "pass": true
       },
       {
-        "name": "mobile-scene-0",
+        "name": "touch-resident-dialogue",
+        "pass": true
+      },
+      {
+        "name": "five-scene-switches-release-old-scene",
         "pass": true,
-        "detail": {
-          "canopy": 135,
-          "props": 823,
-          "residents": 34
-        }
+        "details": 5
       },
       {
-        "name": "mobile-scene-1",
-        "pass": true,
-        "detail": {
-          "canopy": 210,
-          "props": 318,
-          "residents": 30
-        }
-      },
-      {
-        "name": "mobile-scene-2",
-        "pass": true,
-        "detail": {
-          "canopy": 65,
-          "props": 306,
-          "residents": 23
-        }
-      },
-      {
-        "name": "mobile-landscape-layout",
+        "name": "landscape-controls-and-waypoint-fit",
         "pass": true
       },
       {
-        "name": "self-hosted-no-external-runtime-dependencies",
+        "name": "quality-and-paused-time",
         "pass": true
       },
       {
-        "name": "no-javascript-or-shader-errors",
+        "name": "no-browser-errors-or-third-party-runtime",
         "pass": true
       }
     ],
     "errors": [],
     "externalRequests": [],
-    "mobileScenes": [
+    "sceneDisposals": [
       {
-        "player": {
-          "x": -6.6,
-          "y": 2.4669074527255574,
-          "z": 78.7,
-          "vy": 0,
-          "grounded": true
-        },
-        "npcCount": 34,
-        "archivedNPCs": 0,
-        "grass": 2600,
-        "colliders": 927,
-        "time": 0.4165641666666659,
-        "errors": [],
-        "render": {
-          "frame": 128,
-          "calls": 30,
-          "triangles": 579958,
-          "points": 1040,
-          "lines": 0
-        },
-        "version": "0.3.0",
-        "mobile": true,
-        "paused": false,
-        "quality": "balanced",
-        "canopyTrees": 135,
-        "streetProps": 823,
-        "articulatedResidents": 34,
-        "yaw": 0.2393467216801301,
-        "pitch": -0.075
+        "scene": 1,
+        "disposed": true
       },
       {
-        "player": {
-          "x": 12,
-          "y": 2.608978221236682,
-          "z": 30,
-          "vy": 0,
-          "grounded": true
-        },
-        "npcCount": 30,
-        "archivedNPCs": 0,
-        "grass": 2600,
-        "colliders": 93,
-        "time": 0.410954722222222,
-        "errors": [],
-        "render": {
-          "frame": 16,
-          "calls": 25,
-          "triangles": 583284,
-          "points": 979,
-          "lines": 0
-        },
-        "version": "0.3.0",
-        "mobile": true,
-        "paused": false,
-        "quality": "auto",
-        "canopyTrees": 210,
-        "streetProps": 318,
-        "articulatedResidents": 30,
-        "yaw": 0.4993467216801301,
-        "pitch": -0.055
+        "scene": 2,
+        "disposed": true
       },
       {
-        "player": {
-          "x": 12,
-          "y": 2.5987771064788125,
-          "z": 30,
-          "vy": 0,
-          "grounded": true
-        },
-        "npcCount": 23,
-        "archivedNPCs": 0,
-        "grass": 2600,
-        "colliders": 45,
-        "time": 0.4110544444444442,
-        "errors": [],
-        "render": {
-          "frame": 18,
-          "calls": 25,
-          "triangles": 382840,
-          "points": 952,
-          "lines": 0
-        },
-        "version": "0.3.0",
-        "mobile": true,
-        "paused": false,
-        "quality": "auto",
-        "canopyTrees": 65,
-        "streetProps": 306,
-        "articulatedResidents": 23,
-        "yaw": 0.4993467216801301,
-        "pitch": -0.055
+        "scene": 0,
+        "disposed": true
+      },
+      {
+        "scene": 1,
+        "disposed": true
+      },
+      {
+        "scene": 2,
+        "disposed": true
       }
     ],
-    "host": {
-      "view": "atlas",
-      "sourceVerified": [
-        "walk",
-        "planet"
-      ],
-      "errors": [],
-      "untranslated": [],
-      "world": {
-        "mode": "sphere",
-        "ownership": 16200,
-        "polities": 260,
-        "renderer": true,
-        "frame": 116
-      },
-      "portraits": 0
-    },
     "pass": true
   }
 }
