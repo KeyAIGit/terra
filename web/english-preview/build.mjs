@@ -35,16 +35,15 @@ const deeds=archive.people.flatMap(p=>p.ds).filter(ds=>box.E.tr(ds[2]).includes(
 for(const p of archive.people)box.E.tr(p.e);
 if(events.length||deeds.length||box.E.unresolved.size)throw Error('Untranslated archive records remain.');
 manifest.buildChecks={javascriptSyntax:true,frames:archive.frames.length,events:archive.events.length,people:archive.people.length,eventTranslationMissing:events.length,deedTranslationMissing:deeds.length};
-const artBase=code['app.js'].match(/const ARTBASE='([^']+)'/)[1];
-const artEntries=[...code['app.js'].matchAll(/([A-Za-z]+):ARTBASE\+'([^']+)'/g)];
 let offlineApp=code['app.js'];
-for(const[,name,file]of artEntries){const url=artBase+file,b=await bytes(url,'art/'+name+'.png');if(b.length<1000||b.subarray(0,8).toString('hex')!=='89504e470d0a1a0a')throw Error('Invalid artwork: '+name);manifest.assets[url]={bytes:b.length,sha256:sha(b)};offlineApp=offlineApp.replace("ARTBASE+'"+file+"'",JSON.stringify('data:image/png;base64,'+b.toString('base64')));console.log('Embedded artwork',name,b.length);}
-if(artEntries.length!==7)throw Error('Expected seven generated artworks.');
+const artManifest=JSON.parse(await fs.readFile(path.join(here,'ASSETS_MANIFEST.json'),'utf8'));
+for(const [name,entry] of Object.entries(artManifest.assets)){const b=await fs.readFile(path.join(here,entry.file));if(sha(b)!==entry.sha256)throw Error('Artwork hash mismatch: '+name);manifest.assets[entry.file]=entry;offlineApp=offlineApp.replace(JSON.stringify(entry.file),JSON.stringify('data:image/webp;base64,'+b.toString('base64')));console.log('Embedded optimized artwork',name,b.length);}
+if(Object.keys(artManifest.assets).length!==7)throw Error('Expected seven artworks.');
 const adapter=`(()=>{const contents=${JSON.stringify(embedded)},cache=new Map(),originalFetch=window.fetch.bind(window);window.fetch=async function(input,options){const url=typeof input==='string'?input:input.url;if(!Object.prototype.hasOwnProperty.call(contents,url))return originalFetch(input,options);if(!cache.has(url)){const bytes=Uint8Array.from(atob(contents[url]),c=>c.charCodeAt(0));cache.set(url,new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer());}return new Response(await cache.get(url),{status:200,headers:{'Content-Type':'text/html; charset=utf-8'}});};window.TERRA_OFFLINE=true;})();`;
 const tag=s=>'<script>'+s.replace(/<\/script/gi,'<\\/script')+'</script>';
-function bundle(offline){let html=template.replace('<link rel="stylesheet" href="style.css">','<style>'+css+'</style>');for(const n of names)html=html.replace('<script src="'+n+'"></script>',()=>tag((offline&&n===names[0]?adapter+'\n':'')+(offline&&n==='app.js'?offlineApp:code[n])));if(offline)html=html.replace('The first visit retrieves the original published assets over the internet.','This standalone edition includes the original published assets and all seven generated artworks. No internet connection is required for exploration.');return html;}
+function bundle(offline){let html=template.replace('<link rel="stylesheet" href="style.css">','<style>'+css+'</style>');for(const n of names)html=html.replace('<script src="'+n+'"></script>',()=>tag((offline&&n===names[0]?adapter+'\n':'')+(n==='app.js'?offlineApp:code[n])));if(offline)html=html.replace('The first visit retrieves the original published assets over the internet.','This standalone edition includes the original published assets and all seven generated artworks. No internet connection is required for exploration.');return html;}
 await fs.mkdir(out,{recursive:true});
 for(const[filename,offline]of [['Terra_World_English_Preview.html',true],['Terra_World_Online_Preview.html',false]]){const html=bundle(offline);await fs.writeFile(path.join(out,filename),html);manifest[filename]={bytes:Buffer.byteLength(html),sha256:sha(html)};}
 await fs.writeFile(path.join(out,'BUILD_MANIFEST.json'),JSON.stringify(manifest,null,2));
 for(const n of ['README.md','QA_REPORT.json']){try{await fs.copyFile(path.join(here,n),path.join(out,n));}catch(e){if(e.code!=='ENOENT')throw e;}}
-console.log(JSON.stringify(manifest.buildChecks));console.log('Built',out,manifest.Terra_World_English_Preview);
+console.log(JSON.stringify(manifest.buildChecks));console.log('Built',out,manifest['Terra_World_English_Preview.html']);

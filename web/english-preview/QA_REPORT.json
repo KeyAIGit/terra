@@ -1,0 +1,219 @@
+{
+  "edition": "offline",
+  "checks": [
+    {
+      "name": "offline-home",
+      "pass": true
+    },
+    {
+      "name": "globe-renderer",
+      "pass": true,
+      "details": {
+        "mode": "sphere",
+        "ownership": 16200,
+        "polities": 260,
+        "renderer": true,
+        "frame": 116
+      }
+    },
+    {
+      "name": "polity-inspector",
+      "pass": true
+    },
+    {
+      "name": "timeline-first-and-last",
+      "pass": true
+    },
+    {
+      "name": "flat-map",
+      "pass": true
+    },
+    {
+      "name": "chronicle-search-and-filter",
+      "pass": true
+    },
+    {
+      "name": "all-eight-portraits",
+      "pass": true
+    },
+    {
+      "name": "biography-identity-and-dates",
+      "pass": true
+    },
+    {
+      "name": "people-search",
+      "pass": true
+    },
+    {
+      "name": "walk-0-movement",
+      "pass": true
+    },
+    {
+      "name": "walk-0-lighting",
+      "pass": true
+    },
+    {
+      "name": "walk-0-landmark",
+      "pass": true
+    },
+    {
+      "name": "walk-0-dialogue",
+      "pass": true
+    },
+    {
+      "name": "walk-0-render",
+      "pass": true
+    },
+    {
+      "name": "walk-1-movement",
+      "pass": true
+    },
+    {
+      "name": "walk-1-lighting",
+      "pass": true
+    },
+    {
+      "name": "walk-1-landmark",
+      "pass": true
+    },
+    {
+      "name": "walk-1-dialogue",
+      "pass": true
+    },
+    {
+      "name": "walk-1-render",
+      "pass": true
+    },
+    {
+      "name": "walk-2-movement",
+      "pass": true
+    },
+    {
+      "name": "walk-2-lighting",
+      "pass": true
+    },
+    {
+      "name": "walk-2-landmark",
+      "pass": true
+    },
+    {
+      "name": "walk-2-dialogue",
+      "pass": true
+    },
+    {
+      "name": "walk-2-render",
+      "pass": true
+    },
+    {
+      "name": "mobile-home-no-overflow",
+      "pass": true
+    },
+    {
+      "name": "mobile-gallery-no-overflow",
+      "pass": true
+    },
+    {
+      "name": "no-browser-errors-or-untranslated-records",
+      "pass": true
+    },
+    {
+      "name": "zero-network-requests-in-offline-edition",
+      "pass": true
+    }
+  ],
+  "scenes": [
+    {
+      "player": {
+        "x": 0,
+        "y": 2.605110424532119,
+        "z": 208,
+        "vy": 0,
+        "grounded": true
+      },
+      "npcCount": 34,
+      "archivedNPCs": 0,
+      "grass": 2600,
+      "colliders": 927,
+      "time": 0.41416361111110994,
+      "errors": [],
+      "render": {
+        "frame": 82,
+        "calls": 33,
+        "triangles": 471018,
+        "points": 1040,
+        "lines": 0
+      },
+      "fps": 57
+    },
+    {
+      "player": {
+        "x": 0,
+        "y": 2.4493495363027193,
+        "z": 152,
+        "vy": 0,
+        "grounded": true
+      },
+      "npcCount": 30,
+      "archivedNPCs": 0,
+      "grass": 2600,
+      "colliders": 93,
+      "time": 0.4155669444444428,
+      "errors": [],
+      "render": {
+        "frame": 111,
+        "calls": 35,
+        "triangles": 392062,
+        "points": 979,
+        "lines": 0
+      },
+      "fps": 55.6
+    },
+    {
+      "player": {
+        "x": 0,
+        "y": 2.617256699321913,
+        "z": 132,
+        "vy": 0,
+        "grounded": true
+      },
+      "npcCount": 23,
+      "archivedNPCs": 0,
+      "grass": 2600,
+      "colliders": 45,
+      "time": 0.41563305555555435,
+      "errors": [],
+      "render": {
+        "frame": 111,
+        "calls": 31,
+        "triangles": 304498,
+        "points": 952,
+        "lines": 0
+      },
+      "fps": 55.9
+    }
+  ],
+  "pageErrors": [],
+  "network": [],
+  "final": {
+    "view": "people",
+    "sourceVerified": [
+      "planet",
+      "people",
+      "walk"
+    ],
+    "errors": [],
+    "untranslated": [],
+    "world": {
+      "mode": "sphere",
+      "ownership": 16200,
+      "polities": 260,
+      "renderer": true,
+      "frame": 116
+    },
+    "portraits": 8
+  },
+  "pass": true,
+  "tested_html_sha256": "e045a5c3e9807189ae712796a2d57476f8348bf1773ffd51beb9672bdadb0511",
+  "browser": "Chrome, headless, Windows; offline mode",
+  "check_count": 28
+}

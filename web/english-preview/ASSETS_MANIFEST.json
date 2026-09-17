@@ -1,0 +1,55 @@
+{
+  "generator": "Higgsfield z_image",
+  "kind": "Artistic interpretations, not game screenshots",
+  "assets": {
+    "capital": {
+      "source": "https://d8j0ntlcm91z4.cloudfront.net/user_3G1EoKpPdtVgILUsyI2EdcfEGyE/hf_20260917_101154_e0ba14c9-8980-4ce9-a43c-b768bc7d9cb9.png",
+      "source_sha256": "bb3ada51cd2cfb5cd10bda936126a11a764a3ed0f7af21440ebac010e70146d1",
+      "file": "assets/capital.webp",
+      "bytes": 390994,
+      "sha256": "0c2f443f8a8e216254b7fb2efad1b38538bf1ec65800e7f496d44937c31c4cf2"
+    },
+    "Ta": {
+      "source": "https://d8j0ntlcm91z4.cloudfront.net/user_3G1EoKpPdtVgILUsyI2EdcfEGyE/hf_20260917_101610_e104c084-3f7f-4f4f-89fe-2d9c45ee7822.png",
+      "source_sha256": "80e743e5bd9cbcc22cb084657330b5f1ba83e1ee53653343cb725b21dafd2a05",
+      "file": "assets/Ta.webp",
+      "bytes": 85790,
+      "sha256": "472bd2a99e57f243c3d71336066ca2843cce449e1015946f5dfc95ceed66230e"
+    },
+    "Imif": {
+      "source": "https://d8j0ntlcm91z4.cloudfront.net/user_3G1EoKpPdtVgILUsyI2EdcfEGyE/hf_20260917_101716_3e5a1e14-1a95-4a23-a429-49369e7e08d2.png",
+      "source_sha256": "74b191bd3f078b0dfc8008061b7f219e6597fb9306b1bab91bab13293e86cf48",
+      "file": "assets/Imif.webp",
+      "bytes": 109414,
+      "sha256": "da536b584348d2f6c4e2e966f85fcf71874dc922abf99e3c79214a5db962b4cf"
+    },
+    "Sithriru": {
+      "source": "https://d8j0ntlcm91z4.cloudfront.net/user_3G1EoKpPdtVgILUsyI2EdcfEGyE/hf_20260917_101002_dca1b8aa-b56c-4457-9196-398697dd2bea.png",
+      "source_sha256": "7dac91085e81ccb891e0c149345bff7b2e4c96ede002ef89b0d88542da4323ff",
+      "file": "assets/Sithriru.webp",
+      "bytes": 138550,
+      "sha256": "62a8cbcd16c75069e6ad503340586055d8d8ebb68afcee5ec1e9b18e99f6699c"
+    },
+    "Ana": {
+      "source": "https://d8j0ntlcm91z4.cloudfront.net/user_3G1EoKpPdtVgILUsyI2EdcfEGyE/hf_20260917_102519_bfc80db8-e418-4a28-af56-13290a20e23c.png",
+      "source_sha256": "8996b02c3215d78d8cda2d8367367f9b82e95f0b1ef529bcb4062159ee7b0c3c",
+      "file": "assets/Ana.webp",
+      "bytes": 76856,
+      "sha256": "3954bcc347b07917a82aedf378c595a7bf77cf19993e132bde0779e8fd7d2971"
+    },
+    "bronze": {
+      "source": "https://d8j0ntlcm91z4.cloudfront.net/user_3G1EoKpPdtVgILUsyI2EdcfEGyE/hf_20260917_103256_38abd2d8-a564-46ef-aa15-214177877894.png",
+      "source_sha256": "ebab6237ddfd2a74017308d34431e5a485a85fec8b87fa15293c45865518b4cb",
+      "file": "assets/bronze.webp",
+      "bytes": 401204,
+      "sha256": "e5b7ab63ad7a4b52e6aa030b26f27a2a3f6ffc1b6397f873c014ce87d694d7d6"
+    },
+    "neolithic": {
+      "source": "https://d8j0ntlcm91z4.cloudfront.net/user_3G1EoKpPdtVgILUsyI2EdcfEGyE/hf_20260917_103540_8e97070d-2146-42f6-a4b3-2f3732bea596.png",
+      "source_sha256": "3c661ec6bc8a7050ae18d7353fa2d4a449fc5d6d645b89ffd8a418acad5b3cd2",
+      "file": "assets/neolithic.webp",
+      "bytes": 421502,
+      "sha256": "ee8d15169f7e800bb2bd40c57ed74b52201c988829400cb8f5b033a43fd925ae"
+    }
+  }
+}

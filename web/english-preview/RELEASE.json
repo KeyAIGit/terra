@@ -1,0 +1,6 @@
+{
+  "version": "0.2.0",
+  "qa_pass": true,
+  "checks": 28,
+  "tested_html_sha256": "e045a5c3e9807189ae712796a2d57476f8348bf1773ffd51beb9672bdadb0511"
+}
