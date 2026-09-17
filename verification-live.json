@@ -1,5 +1,92 @@
 {
   "version": "0.4.0",
-  "status": "pending-public-verification",
-  "local_checks_passed": 45
+  "url": "https://keyaigit.github.io/terra/",
+  "checks": [
+    {
+      "name": "published-release-identity",
+      "pass": true,
+      "details": "f196f14677e0ff4614449745e88f896e5391aac8"
+    },
+    {
+      "name": "published-home-04",
+      "pass": true
+    },
+    {
+      "name": "versioned-script-cache-keys",
+      "pass": true
+    },
+    {
+      "name": "published-settlement-year-and-population",
+      "pass": true
+    },
+    {
+      "name": "published-chronicle-cutoff",
+      "pass": true
+    },
+    {
+      "name": "published-eight-portraits",
+      "pass": true
+    },
+    {
+      "name": "published-walk-0",
+      "pass": true
+    },
+    {
+      "name": "published-walk-1",
+      "pass": true
+    },
+    {
+      "name": "published-walk-2",
+      "pass": true
+    },
+    {
+      "name": "published-guide-to-atlas",
+      "pass": true
+    },
+    {
+      "name": "public-download-matches-tested-artifact",
+      "pass": true,
+      "details": "222aecddd9ad5bb0f6bae82d463466f9782698a63af5463840551ff59534221d"
+    },
+    {
+      "name": "published-no-errors-or-external-runtime",
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "release": {
+    "version": "0.4.0",
+    "original_source_sha": {
+      "walk": "29b4e734b064f5ea2b6dc3c6f7bdc5336247182d12c1a2e1fc6b6af37d171332",
+      "planet": "3f816f25d4bd1eecb7f4b6ade9e4b04d57747673b293d1c4626b09b7da915bff",
+      "people": "3cce30af2d2e8fb7f279815ce4a44755adadddb938cc2aa63ceb8b3991fbae2b"
+    },
+    "built_from_source": {
+      "localization.js": "f8ef43e14a03ee6474707ae4deb998858159632463d13a3024cdbc6a3ceec3fa",
+      "localization-extra.js": "1d0befbc939cf8508d9b3f1fc7e97419a98390131b8cc05dc871fa8a552837ff",
+      "scene-upgrade.js": "5c4103beb0a1563c7b3b54557b442ffa495c4b495cd512b1db515f36e5478841",
+      "scene-04.js": "2c018547d11b8ca2b6a5c0f6d6a20dc8577d24253efd5cee529500dbd2d199fc",
+      "journey.js": "2336c8f32594fb5a378698615eba6f9f1b6d91e64101f10c391a75e60c93ca1c",
+      "walk-patch.js": "6fd60ec5a40e901e6251dd589e6b5d74d9fe908a5fcdd6ac428e41a6d0e87062",
+      "app.js": "9929b49e07a47942f0bb3dd9387fcd0170aaddf1f7718b373788dc1c01d119d0",
+      "index.html": "e595558c30effdf7aabad30926067f3425fd5323771d9d4ca293d0f5f0c54868",
+      "style.css": "6a7bd2ba3ab085a1ca28bbef6f8804760642362f905cef938088f23fcd4e1ec4"
+    },
+    "counts": {
+      "javascriptSyntax": true,
+      "frames": 117,
+      "events": 14000,
+      "people": 5060,
+      "eventTranslationMissing": 0,
+      "deedTranslationMissing": 0
+    },
+    "source_commit": "f196f14677e0ff4614449745e88f896e5391aac8",
+    "tested_html_sha256": "222aecddd9ad5bb0f6bae82d463466f9782698a63af5463840551ff59534221d",
+    "checks_passed": 45,
+    "previous_release_commit": "13c6f1bc59252149dd33fab1302518d32fe442d3",
+    "previous_deployment_commit": "814f432b35a56447d7f2832dbf18d06206ab1e41",
+    "pull_request": 4
+  },
+  "pass": true
 }

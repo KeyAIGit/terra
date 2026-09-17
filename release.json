@@ -29,5 +29,7 @@
   "checks_passed": 45,
   "previous_release_commit": "13c6f1bc59252149dd33fab1302518d32fe442d3",
   "previous_deployment_commit": "814f432b35a56447d7f2832dbf18d06206ab1e41",
-  "pull_request": 4
+  "pull_request": 4,
+  "public_checks_passed": 12,
+  "merge_commit": "f83305bcc0c93a7e7b1b72a4bb36983d9ed88e71"
 }
