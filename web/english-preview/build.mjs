@@ -17,7 +17,7 @@ const names=['localization.js','localization-extra.js','scene-upgrade.js','scene
 const code=Object.fromEntries(await Promise.all(names.map(async n=>[n,await fs.readFile(path.join(here,n),'utf8')])));
 for(const[n,s]of Object.entries(code))new vm.Script(s,{filename:n});
 const template=await fs.readFile(path.join(here,'index.html'),'utf8'),css=await fs.readFile(path.join(here,'style.css'),'utf8');
-const manifest={version:'0.5.0',sourceFiles:{},assets:{},buildChecks:{}};
+const manifest={version:'0.6.0',sourceFiles:{},assets:{},buildChecks:{}};
 for(const n of [...names,'index.html','style.css'])manifest.sourceFiles[n]=sha(await fs.readFile(path.join(here,n)));
 async function bytes(url,local){
  if(cache&&local){try{return await fs.readFile(path.join(cache,local));}catch(e){if(e.code!=='ENOENT')throw e;}}
@@ -37,7 +37,7 @@ const deeds=archive.people.flatMap(p=>p.ds).filter(ds=>box.E.tr(ds[2]).includes(
 for(const p of archive.people)box.E.tr(p.e);
 if(events.length||deeds.length||box.E.unresolved.size)throw Error('Untranslated archive records remain.');
 manifest.buildChecks={javascriptSyntax:true,frames:archive.frames.length,events:archive.events.length,people:archive.people.length,eventTranslationMissing:events.length,deedTranslationMissing:deeds.length};
-let offlineApp=code['app.js'];const courtyardCover=await fs.readFile(path.join(here,'courtyard/cover.webp'));offlineApp=offlineApp.replace("'courtyard/cover.webp'",JSON.stringify('data:image/webp;base64,'+courtyardCover.toString('base64')));
+let offlineApp=code['app.js'];for(const id of ['capital','bronze','neolithic']){const file='courtyard/cover-'+id+'.webp',bytes=await fs.readFile(path.join(here,file));offlineApp=offlineApp.replace("'"+file+"'",JSON.stringify('data:image/webp;base64,'+bytes.toString('base64')));}const courtyardCover=await fs.readFile(path.join(here,'courtyard/cover.webp'));offlineApp=offlineApp.replace("'courtyard/cover.webp'",JSON.stringify('data:image/webp;base64,'+courtyardCover.toString('base64')));
 const artManifest=JSON.parse(await fs.readFile(path.join(here,'ASSETS_MANIFEST.json'),'utf8'));
 for(const [name,entry] of Object.entries(artManifest.assets)){const b=await fs.readFile(path.join(here,entry.file));if(sha(b)!==entry.sha256)throw Error('Artwork hash mismatch: '+name);manifest.assets[entry.file]=entry;offlineApp=offlineApp.replace(JSON.stringify(entry.file),JSON.stringify('data:image/webp;base64,'+b.toString('base64')));console.log('Embedded optimized artwork',name,b.length);}
 if(Object.keys(artManifest.assets).length!==7)throw Error('Expected seven artworks.');
@@ -45,10 +45,10 @@ const adapter=`(()=>{const contents=${JSON.stringify(embedded)},cache=new Map(),
 const tag=s=>'<script>'+s.replace(/<\/script/gi,'<\\/script')+'</script>';
 function bundle(offline){let html=template.replace('<link rel="stylesheet" href="style.css">','<style>'+css+'</style>');for(const n of names)html=html.replace('<script src="'+n+'"></script>',()=>tag((offline&&n===names[0]?adapter+'\n':'')+(n==='app.js'?(offline?'window.TERRA_COURTYARD_HTML='+JSON.stringify(courtyardHTML)+';\n':'')+offlineApp:code[n])));if(offline)html=html.replace('The published edition serves the preserved world archive and artwork from this site. Its first visit loads world data on demand.','This standalone edition includes the original published assets and all seven generated artworks. No internet connection is required for exploration.');return html;}
 await fs.mkdir(out,{recursive:true});
-for(const[filename,offline]of [['Terra_World_05.html',true],['Terra_World_Online_Preview.html',false]]){const html=bundle(offline);await fs.writeFile(path.join(out,filename),html);manifest[filename]={bytes:Buffer.byteLength(html),sha256:sha(html)};}
+for(const[filename,offline]of [['Terra_World_06.html',true],['Terra_World_Online_Preview.html',false]]){const html=bundle(offline);await fs.writeFile(path.join(out,filename),html);manifest[filename]={bytes:Buffer.byteLength(html),sha256:sha(html)};}
 await fs.writeFile(path.join(out,'BUILD_MANIFEST.json'),JSON.stringify(manifest,null,2));
 for(const n of ['README.md','QA_REPORT.json']){try{await fs.copyFile(path.join(here,n),path.join(out,n));}catch(e){if(e.code!=='ENOENT')throw e;}}
-console.log(JSON.stringify(manifest.buildChecks));console.log('Built',out,manifest['Terra_World_05.html']);
+console.log(JSON.stringify(manifest.buildChecks));console.log('Built',out,manifest['Terra_World_06.html']);
 
 // Self-hosted static site: no legacy CDN dependency at runtime.
 const site=path.join(here,'site');await fs.mkdir(path.join(site,'data'),{recursive:true});
@@ -56,16 +56,16 @@ for(const [name,html]of Object.entries(raw))await fs.writeFile(path.join(site,'d
 for(const name of names)await fs.writeFile(path.join(site,name),code[name]);
 await fs.writeFile(path.join(site,'style.css'),css);
 await fs.writeFile(path.join(site,'index.html'),template.replace('<script src="localization.js">','<script>window.TERRA_SELF_HOSTED=true;</script><script src="localization.js">'));
-const publishedIndex=await fs.readFile(path.join(site,'index.html'),'utf8');await fs.writeFile(path.join(site,'index.html'),publishedIndex.replace(/(src|href)="([a-z][a-z0-9-]*\.(?:js|css))"/g,'$1="$2?v=0.5.0"'));
+const publishedIndex=await fs.readFile(path.join(site,'index.html'),'utf8');await fs.writeFile(path.join(site,'index.html'),publishedIndex.replace(/(src|href)="([a-z][a-z0-9-]*\.(?:js|css))"/g,'$1="$2?v=0.6.0"'));
 await fs.cp(path.join(here,'assets'),path.join(site,'assets'),{recursive:true});
 await fs.mkdir(path.join(site,'downloads'),{recursive:true});
-await fs.copyFile(path.join(out,'Terra_World_05.html'),path.join(site,'downloads','Terra_World_05.html'));
-await fs.writeFile(path.join(site,'release.json'),JSON.stringify({version:'0.5.0',original_source_sha:Object.fromEntries(Object.entries(originals).map(([k,v])=>[k,v[1]])),built_from_source:manifest.sourceFiles,counts:manifest.buildChecks},null,2));
+await fs.copyFile(path.join(out,'Terra_World_06.html'),path.join(site,'downloads','Terra_World_06.html'));
+await fs.writeFile(path.join(site,'release.json'),JSON.stringify({version:'0.6.0',original_source_sha:Object.fromEntries(Object.entries(originals).map(([k,v])=>[k,v[1]])),built_from_source:manifest.sourceFiles,counts:manifest.buildChecks},null,2));
 await fs.writeFile(path.join(site,'.nojekyll'),'');
 
 // Publish only runtime courtyard files, not source model intermediates.
 const district=path.join(here,'courtyard'),districtSite=path.join(site,'courtyard');await fs.mkdir(districtSite,{recursive:true});
-for(const f of ['index.html','courtyard.css','courtyard.js','ASSETS.json','cover.webp','THIRD_PARTY.md','THIRD_PARTY_LICENSES.txt'])await fs.copyFile(path.join(district,f),path.join(districtSite,f));
+for(const f of ['index.html','courtyard.css','courtyard.js','ASSETS.json','cover.webp','cover-capital.webp','cover-bronze.webp','cover-neolithic.webp','COVERS.json','THIRD_PARTY.md','THIRD_PARTY_LICENSES.txt'])await fs.copyFile(path.join(district,f),path.join(districtSite,f));
 const districtManifest=JSON.parse(await fs.readFile(path.join(district,'ASSETS.json'),'utf8'));
 for(const f of districtManifest.runtimeFiles){const target=path.join(districtSite,f.path);await fs.mkdir(path.dirname(target),{recursive:true});await fs.copyFile(path.join(district,f.path),target);}
 await fs.copyFile(path.join(district,'dist/Terra_Courtyard.html'),path.join(site,'downloads/Terra_Courtyard.html'));

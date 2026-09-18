@@ -3,7 +3,7 @@
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node tests/release05-archive-desktop.mjs && node tests/release05-archive-mobile.mjs && node tests/release05-courtyard.mjs && node tests/release05-courtyard-touch.mjs"
+    "test": "node tests/run-unit06.mjs && node tests/release06-traffic.mjs && node tests/release06-archive-desktop.mjs && node tests/release06-archive-mobile.mjs && node tests/release06-neighborhoods.mjs && node tests/release06-district-ui.mjs"
   },
   "devDependencies": {
     "@gltf-transform/core": "4.2.1",

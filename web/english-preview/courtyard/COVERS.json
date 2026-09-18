@@ -1,0 +1,26 @@
+[
+  {
+    "file": "cover-capital.webp",
+    "kind": "actual in-engine screenshot",
+    "era": "capital",
+    "bytes": 258712,
+    "sha256": "afaa58711814ef4575a39625297762dabe9d6605c343a8f57e3a9c95025e23fd",
+    "processing": "UI hidden in app; lower hint cropped; WebP encoding; no image generation"
+  },
+  {
+    "file": "cover-bronze.webp",
+    "kind": "actual in-engine screenshot",
+    "era": "bronze",
+    "bytes": 289960,
+    "sha256": "754a5a9b15007e55e0663677aa066d12ffe9824ee19c8c3e41f7a2a4e9a64eb1",
+    "processing": "UI hidden in app; lower hint cropped; WebP encoding; no image generation"
+  },
+  {
+    "file": "cover-neolithic.webp",
+    "kind": "actual in-engine screenshot",
+    "era": "neolithic",
+    "bytes": 191472,
+    "sha256": "c3d72e4a532f91dfa6036ba2203398e2125aea6913377abf4a092812700af297",
+    "processing": "UI hidden in app; lower hint cropped; WebP encoding; no image generation"
+  }
+]

@@ -5,3 +5,21 @@
 @media(prefers-reduced-motion:reduce){.spinner{animation:none}}
 
 .touch #photo{display:none}
+
+/* Local interactions and conversations. */
+#interact{position:fixed;bottom:65px;left:50%;transform:translateX(-50%);z-index:8;background:#173038f0;max-width:84%;font-size:12px}
+#interact[hidden]{display:none}
+#room-label{position:fixed;left:28px;bottom:24px;color:#e4d4b3;font-size:11px;background:#12262cd4;padding:7px 11px;z-index:5}
+#interaction-notice{position:fixed;left:50%;top:24%;transform:translateX(-50%);z-index:25;background:#132e37;padding:12px 20px;color:#eadabd;max-width:84%;text-align:center}
+#resident-dialog{width:min(520px,90vw);max-height:85vh;background:#112b33;color:#ede4d0;border:1px solid #bda57b;padding:30px;overflow:auto}
+#resident-dialog::backdrop{background:#06151bc9;backdrop-filter:blur(5px)}
+#resident-dialog h2{font:32px Georgia}#resident-dialog p{font-size:13px;line-height:1.8}
+#resident-close{position:absolute;right:8px;top:8px;border:0;background:transparent;font-size:24px}
+.resident-topics{display:flex;gap:8px;flex-wrap:wrap}.resident-topics button{font-size:11px}
+.resident-note{font-size:10px!important;color:#9eb6b0}
+.resident-speech{position:fixed;transform:translate(-50%,-100%);z-index:7;max-width:260px;pointer-events:none;font-size:11px;line-height:1.5;padding:8px 12px;background:#132a33df;border:1px solid #d4bd8680;color:#f2e6ce;border-radius:7px}
+#controls{max-width:59%}#district-select{max-width:175px}
+.photo #interact,.photo #room-label,.photo .resident-speech{display:none}
+.touch #interact{bottom:154px}.touch #room-label{bottom:12px;left:12px;font-size:9px}
+@media(max-width:600px){#controls{max-width:none}#district-select{max-width:180px}#interact{font-size:11px}#room-label{max-width:85%}}
+@media(pointer:coarse) and (orientation:landscape){#controls{max-width:57%}.touch #interact{bottom:30px;max-width:45%}#room-label{left:130px;bottom:5px}}
