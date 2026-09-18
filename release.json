@@ -44,5 +44,8 @@
   "source_commit": "ff301c061acd09845860821e8d8a0f55e2dd55e2",
   "previous_release_commit": "5c46e761969bcd93b69618fc9bb2250b1d743482",
   "previous_deployment_commit": "24e64849c8ac23acf31b41876f9fd4cb11552375",
-  "pull_request": 6
+  "pull_request": 6,
+  "public_checks_passed": 15,
+  "hf_checks_passed": 8,
+  "merge_commit": "bc7570e8c2d0f01a25e75ad474e994c835201018"
 }

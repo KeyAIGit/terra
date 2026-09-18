@@ -1,5 +1,134 @@
 {
   "version": "0.6.0",
-  "status": "pending-public-verification",
-  "local_checks_passed": 109
+  "url": "https://keyaigit.github.io/terra/",
+  "checks": [
+    {
+      "name": "published-release-matches-source",
+      "pass": true,
+      "detail": "ff301c061acd09845860821e8d8a0f55e2dd55e2"
+    },
+    {
+      "name": "published-home-has-three-district-entries",
+      "pass": true
+    },
+    {
+      "name": "published-capital-inhabited-district",
+      "pass": true,
+      "detail": {
+        "year": 500,
+        "rooms": 5,
+        "residents": 6
+      }
+    },
+    {
+      "name": "published-capital-correct-historical-record",
+      "pass": true
+    },
+    {
+      "name": "published-bronze-inhabited-district",
+      "pass": true,
+      "detail": {
+        "year": -1500,
+        "rooms": 5,
+        "residents": 6
+      }
+    },
+    {
+      "name": "published-bronze-correct-historical-record",
+      "pass": true
+    },
+    {
+      "name": "published-neolithic-inhabited-district",
+      "pass": true,
+      "detail": {
+        "year": -6000,
+        "rooms": 5,
+        "residents": 6
+      }
+    },
+    {
+      "name": "published-neolithic-correct-historical-record",
+      "pass": true
+    },
+    {
+      "name": "published-original-walk-0-preserved",
+      "pass": true
+    },
+    {
+      "name": "published-original-walk-1-preserved",
+      "pass": true
+    },
+    {
+      "name": "published-original-walk-2-preserved",
+      "pass": true
+    },
+    {
+      "name": "published-chronicle-cutoff-preserved",
+      "pass": true
+    },
+    {
+      "name": "published-offline-file-exact-hash",
+      "pass": true,
+      "detail": "591346e8fec87395f5e395b35d83f27fd06bd5714865c713de25a8775b7c4385"
+    },
+    {
+      "name": "published-shared-assets-and-provenance",
+      "pass": true
+    },
+    {
+      "name": "published-no-script-errors-or-third-party-runtime",
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "externalRequests": [],
+  "release": {
+    "version": "0.6.0",
+    "original_source_sha": {
+      "walk": "29b4e734b064f5ea2b6dc3c6f7bdc5336247182d12c1a2e1fc6b6af37d171332",
+      "planet": "3f816f25d4bd1eecb7f4b6ade9e4b04d57747673b293d1c4626b09b7da915bff",
+      "people": "3cce30af2d2e8fb7f279815ce4a44755adadddb938cc2aa63ceb8b3991fbae2b"
+    },
+    "built_from_source": {
+      "localization.js": "f8ef43e14a03ee6474707ae4deb998858159632463d13a3024cdbc6a3ceec3fa",
+      "localization-extra.js": "1d0befbc939cf8508d9b3f1fc7e97419a98390131b8cc05dc871fa8a552837ff",
+      "scene-upgrade.js": "5c4103beb0a1563c7b3b54557b442ffa495c4b495cd512b1db515f36e5478841",
+      "scene-04.js": "2c018547d11b8ca2b6a5c0f6d6a20dc8577d24253efd5cee529500dbd2d199fc",
+      "journey.js": "8ad8b8297243dae741aebac521bbe91f95109e6020e997cbe54c6c3e9e6cd99f",
+      "walk-patch.js": "6fd60ec5a40e901e6251dd589e6b5d74d9fe908a5fcdd6ac428e41a6d0e87062",
+      "app.js": "6df9cf7133a08bc2a6ca230a32015ca36109665443c3b9686cff12b033dcd8b2",
+      "index.html": "82daefbc13e4094e48185b0d8b424feb6ba3d1c431cabfbb75f3db7a384bc13d",
+      "style.css": "8d712ac087016d0fc9f981d223a069536b33b08ec02e773d179139b85edbebc7"
+    },
+    "counts": {
+      "javascriptSyntax": true,
+      "frames": 117,
+      "events": 14000,
+      "people": 5060,
+      "eventTranslationMissing": 0,
+      "deedTranslationMissing": 0
+    },
+    "courtyard": {
+      "asset_count": 21,
+      "runtime_bytes": 40695903,
+      "playable": true,
+      "photorealism": "work-in-progress",
+      "simulation_changed": false
+    },
+    "tested_html_sha256": "591346e8fec87395f5e395b35d83f27fd06bd5714865c713de25a8775b7c4385",
+    "checks_passed": 109,
+    "districts": {
+      "districts": 3,
+      "interiors_each": 5,
+      "residents_each": 6,
+      "rule_based": true,
+      "geometric_perception": true,
+      "history_changed": false
+    },
+    "source_commit": "ff301c061acd09845860821e8d8a0f55e2dd55e2",
+    "previous_release_commit": "5c46e761969bcd93b69618fc9bb2250b1d743482",
+    "previous_deployment_commit": "24e64849c8ac23acf31b41876f9fd4cb11552375",
+    "pull_request": 6
+  },
+  "pass": true
 }

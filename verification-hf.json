@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "space": "Bekzod25/terra-world-english",
   "url": "https://huggingface.co/spaces/Bekzod25/terra-world-english",
   "mode": "embedded-github-pages",
@@ -8,26 +8,30 @@
     {
       "name": "space-running-with-neutral-title",
       "pass": true,
-      "details": "5c56b37da457e8de012e66fbe07e04fdfb341438"
+      "detail": "660e1a519a624869d4dc0ef002e03b2e813f6d16"
     },
     {
-      "name": "hf-interface-without-language-label",
+      "name": "hf-embedded-world-version06",
       "pass": true
     },
     {
-      "name": "hf-embedded-main-version05",
+      "name": "hf-capital-inhabited-district",
       "pass": true
     },
     {
-      "name": "hf-embedded-courtyard-loads-all-assets",
+      "name": "hf-bronze-inhabited-district",
       "pass": true
     },
     {
-      "name": "hf-courtyard-exits-to-world",
+      "name": "hf-neolithic-inhabited-district",
       "pass": true
     },
     {
-      "name": "hf-hub-app-tab-opens-new-courtyard",
+      "name": "hf-district-returns-to-world",
+      "pass": true
+    },
+    {
+      "name": "hf-hub-app-tab-opens-inhabited-district",
       "pass": true
     },
     {
@@ -36,7 +40,7 @@
     }
   ],
   "errors": [],
-  "commit": "5c56b37da457e8de012e66fbe07e04fdfb341438",
+  "commit": "660e1a519a624869d4dc0ef002e03b2e813f6d16",
   "host": "https://bekzod25-terra-world-english.static.hf.space",
   "pass": true
 }
