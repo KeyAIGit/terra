@@ -1,7 +1,7 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "license": "CC0-1.0",
-  "provider": "Poly Haven",
+  "provider": "Poly Haven and MakeHuman core assets",
   "license_url": "https://polyhaven.com/license",
   "api_url": "https://polyhaven.com/our-api",
   "files": [
@@ -605,6 +605,102 @@
       "bytes": 228588,
       "sha256": "31f64db1598586c27ea2aa92ee067ea9b2529321eb965fa661f9c06e1660bc69",
       "processing": "WebP; original resolution retained up to 2048 color/normal or 1024 scalar maps"
+    },
+    {
+      "file": "assets/clay/color.webp",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/clay_plaster/clay_plaster_diff_1k.jpg",
+      "source_sha256": "82e43c68bddebb55a18577ae3cb0d01c02c23f086d342a854ff8a174d9f4fd73",
+      "bytes": 25598,
+      "sha256": "46dda68166972accb9cd3a497afb47967c223cd954575e7e44255e31f9612b2c",
+      "processing": "1K WebP for physically based material"
+    },
+    {
+      "file": "assets/clay/normal.webp",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/clay_plaster/clay_plaster_nor_gl_1k.jpg",
+      "source_sha256": "359f814292005ab16be86807678a4a51e8256a87c282ebf5f5333ce18c428fba",
+      "bytes": 391810,
+      "sha256": "af3f5a0f6681777aaeb8bc15dd852f90d4a0d86e8daccde09b713a9d785bf795",
+      "processing": "1K WebP for physically based material"
+    },
+    {
+      "file": "assets/clay/rough.webp",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/clay_plaster/clay_plaster_rough_1k.jpg",
+      "source_sha256": "e91a6238456b54a82dbf2c025e0b046851c90e7e772fe2affd26a46b243ce7b7",
+      "bytes": 42404,
+      "sha256": "bdf82cd8f568cff64bffaf8d239c866bf879699b4cac64b1af75802ccfcc6aff",
+      "processing": "1K WebP for physically based material"
+    },
+    {
+      "file": "assets/clay/ao.webp",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/clay_plaster/clay_plaster_ao_1k.jpg",
+      "source_sha256": "68abd3834d30e8bdaa4b12b67f463f79e39514b5a21b0347b63cd5a520352fb2",
+      "bytes": 47060,
+      "sha256": "80b70aec8341a3dcbeba7060fabdc477cce74cc46927ef51c701f7fcf274846a",
+      "processing": "1K WebP for physically based material"
+    },
+    {
+      "file": "assets/earth/color.webp",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/dirt_floor/dirt_floor_diff_1k.jpg",
+      "source_sha256": "6c2e7f1c5eab8239fec561f255c607d0e3a86046925ba3a8b9340805efc1ab62",
+      "bytes": 391948,
+      "sha256": "dcb2c452c95d3d751ef1d1c62ed03636879138c1fdb85ed48119e6874f472889",
+      "processing": "1K WebP for physically based material"
+    },
+    {
+      "file": "assets/earth/normal.webp",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/dirt_floor/dirt_floor_nor_gl_1k.jpg",
+      "source_sha256": "9481dc2cee97b240ca10dc1cd60fec834a85e455aaa7d2a584396ea10210c2c0",
+      "bytes": 636938,
+      "sha256": "4fef196a6f43b11d3a5389592f90a5d14e2cf5ec4411af979696226a5cb5d2ca",
+      "processing": "1K WebP for physically based material"
+    },
+    {
+      "file": "assets/earth/rough.webp",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/dirt_floor/dirt_floor_rough_1k.jpg",
+      "source_sha256": "093166ffda063b8fcf04ec645e1e12c24811f614468ba378437a3535c3c53f57",
+      "bytes": 49384,
+      "sha256": "4f7a9cd7b6d8c0271db9faaa7897270fafa68c4d8e7db9aa89da81e1190968a6",
+      "processing": "1K WebP for physically based material"
+    },
+    {
+      "file": "assets/earth/ao.webp",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/dirt_floor/dirt_floor_ao_1k.jpg",
+      "source_sha256": "a3e1d6c64c7b85ce19e32fa4026464bf404de4d845840e4c64f403d2fbc4aeec",
+      "bytes": 322474,
+      "sha256": "22d6363fc53e45d9aca7f64c013648151324506e081219ee9a0bbe25d2caf356",
+      "processing": "1K WebP for physically based material"
+    },
+    {
+      "file": "assets/thatch/color.webp",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/reed_roof_03/reed_roof_03_diff_1k.jpg",
+      "source_sha256": "be5e3d941b4c46215a2198f8b641df820b198afc6790149394299ec3c5e8d98d",
+      "bytes": 452366,
+      "sha256": "771967ea8c0b0bfab80c8814d6adacf88ec746cbac6c94f7fcd2f5fd94ebfba8",
+      "processing": "1K WebP for physically based material"
+    },
+    {
+      "file": "assets/thatch/normal.webp",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/reed_roof_03/reed_roof_03_nor_gl_1k.jpg",
+      "source_sha256": "802cf73fbff64f2f974dff7aee850430fc4a3fc547fdb111052e4a69748dadaf",
+      "bytes": 653692,
+      "sha256": "0c0cc1025f0ce7c271a52c9ceae2e601f50f1cb96c95ecfdb4ffcf3d2984d6e4",
+      "processing": "1K WebP for physically based material"
+    },
+    {
+      "file": "assets/thatch/rough.webp",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/reed_roof_03/reed_roof_03_rough_1k.jpg",
+      "source_sha256": "a0b7d4ab71d5c2c881dd0821a392ec3c52cc15ad68112a9bbe107f952628dac6",
+      "bytes": 302120,
+      "sha256": "9fe266a1cd9c98e07ce80c4df4fc592086dcc0b95fbc7ae1a73960a8c855bb9a",
+      "processing": "1K WebP for physically based material"
+    },
+    {
+      "file": "assets/thatch/ao.webp",
+      "url": "https://dl.polyhaven.org/file/ph-assets/Textures/jpg/1k/reed_roof_03/reed_roof_03_ao_1k.jpg",
+      "source_sha256": "5facf135d6b488e13b63e4cc075d6f5551c1419dcb953aa5c7bf65ae309f59c4",
+      "bytes": 474682,
+      "sha256": "db43ab42ddf71565d9fd1ca871b559bda8cfcc77d5c6810595ae3ef3b183ab08",
+      "processing": "1K WebP for physically based material"
     }
   ],
   "assets": [
@@ -736,6 +832,134 @@
       "type": "hdri",
       "source": "https://polyhaven.com/a/kloofendal_48d_partly_cloudy_puresky",
       "file": "assets/sky.hdr"
+    },
+    {
+      "name": "clay",
+      "id": "clay_plaster",
+      "type": "texture",
+      "source": "https://polyhaven.com/a/clay_plaster",
+      "maps": {
+        "color": "assets/clay/color.webp",
+        "normal": "assets/clay/normal.webp",
+        "rough": "assets/clay/rough.webp",
+        "ao": "assets/clay/ao.webp"
+      }
+    },
+    {
+      "name": "earth",
+      "id": "dirt_floor",
+      "type": "texture",
+      "source": "https://polyhaven.com/a/dirt_floor",
+      "maps": {
+        "color": "assets/earth/color.webp",
+        "normal": "assets/earth/normal.webp",
+        "rough": "assets/earth/rough.webp",
+        "ao": "assets/earth/ao.webp"
+      }
+    },
+    {
+      "name": "thatch",
+      "id": "reed_roof_03",
+      "type": "texture",
+      "source": "https://polyhaven.com/a/reed_roof_03",
+      "maps": {
+        "color": "assets/thatch/color.webp",
+        "normal": "assets/thatch/normal.webp",
+        "rough": "assets/thatch/rough.webp",
+        "ao": "assets/thatch/ao.webp"
+      }
+    },
+    {
+      "name": "anatomy",
+      "id": "makehuman-hm08-head",
+      "type": "anatomy",
+      "file": "assets/resident-head.json",
+      "bytes": 410696,
+      "sha256": "dffc759ee262dcdd7f5596cf3ede6d3c3e6acfd18e4ca18f4c7c9266b5cf186e",
+      "source": "https://github.com/makehumancommunity/makehuman/blob/a8bc2d54ff0ac92e78ff71431b1023eda42bf482/makehuman/data/3dobjs/base.obj",
+      "source_revision": "a8bc2d54ff0ac92e78ff71431b1023eda42bf482",
+      "source_sha256": "8e761e6624b8f54536409135d1636da63b32486a90d4897f84e121d144f6fb4c",
+      "license": "CC0-1.0",
+      "license_url": "https://static.makehumancommunity.org/about/license.html",
+      "processing": "Head/neck only with original UVs, cropped texture coordinates and metric scale"
+    },
+    {
+      "name": "head-young",
+      "id": "makehuman-system-young-head",
+      "type": "anatomy-texture",
+      "file": "assets/head-young.webp",
+      "sha256": "7a5fedafb024e4534834c8c4fb38bd4e27224ee0681f4472b4bc6b066edcb5f8",
+      "bytes": 72392,
+      "source": "https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+      "source_path": "skins/young_caucasian_male/young_lightskinned_male_diffuse.png",
+      "source_sha256": "862a26e335e958b70534cb5f0d7c47ef30ab148a56c42b3e9da969cf76f12963",
+      "license": "CC0-1.0",
+      "processing": "Head UV-region texture masked to neutral outside the selected head triangles; WebP; no unused body regions displayed"
+    },
+    {
+      "name": "head-mature",
+      "id": "makehuman-system-mature-head",
+      "type": "anatomy-texture",
+      "file": "assets/head-mature.webp",
+      "sha256": "5f677bcc0f1fd5cfabf9f6bb2b6c5b6a7ca204ad6786714d3f949be9da4ca619",
+      "bytes": 81624,
+      "source": "https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+      "source_path": "skins/middleage_asian_male/middleage_lightskinned_male_diffuse2.png",
+      "source_sha256": "e897c4cc1b6ad5d10a7d2b2be92402feda4e772e6582dfaf0a1e8fc4621d8097",
+      "license": "CC0-1.0",
+      "processing": "Head UV-region texture masked to neutral outside the selected head triangles; WebP; no unused body regions displayed"
+    },
+    {
+      "name": "hair-short02-anatomy",
+      "id": "makehuman-core-short02",
+      "type": "anatomy",
+      "file": "assets/hair-short02.json",
+      "bytes": 128212,
+      "sha256": "e63738d52ab12ba842e42e08d12a13fa95e4f280d84a59daf9f305f743b417c3",
+      "source_path": "hair/short02",
+      "source": "https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+      "source_sha256": "48f979114adfa712165a69cc55c45a70831af1fb3cba8e2a89120f0c87407b64",
+      "license": "CC0-1.0",
+      "processing": "Original hair geometry/alpha texture, metric head alignment and WebP encoding"
+    },
+    {
+      "name": "hair-short02-anatomy-texture",
+      "id": "makehuman-core-short02",
+      "type": "anatomy-texture",
+      "file": "assets/hair-short02.webp",
+      "bytes": 190700,
+      "sha256": "57d9daf06ff3bcebb0fa5112d80c7f64132345e670f72d8509ac2eb38f7d94c1",
+      "source_path": "hair/short02",
+      "source": "https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+      "source_sha256": "47fe33831a3929567c733356dd66243116e05df2ace1f884ddca0080b728229f",
+      "license": "CC0-1.0",
+      "processing": "Original hair geometry/alpha texture, metric head alignment and WebP encoding"
+    },
+    {
+      "name": "hair-short04-anatomy",
+      "id": "makehuman-core-short04",
+      "type": "anatomy",
+      "file": "assets/hair-short04.json",
+      "bytes": 52256,
+      "sha256": "7fcaa0f3c79de2c3abffd9ed7476a88139eada9426a639f36bd70947e30dd6cb",
+      "source_path": "hair/short04",
+      "source": "https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+      "source_sha256": "676964a133ee35ffcea1195382bf75542da7a298931e4001bc7b0d7b707225de",
+      "license": "CC0-1.0",
+      "processing": "Original hair geometry/alpha texture, metric head alignment and WebP encoding"
+    },
+    {
+      "name": "hair-short04-anatomy-texture",
+      "id": "makehuman-core-short04",
+      "type": "anatomy-texture",
+      "file": "assets/hair-short04.webp",
+      "bytes": 242364,
+      "sha256": "90600e0ef578978c40b19a8efdbf9c6aa9c78d0ca310931003b72375cceba822",
+      "source_path": "hair/short04",
+      "source": "https://files2.makehumancommunity.org/asset_packs/makehuman_system_assets/makehuman_system_assets_cc0.zip",
+      "source_sha256": "0bef7fc0e403db5a40fabb2111ebfa6f7e8158e204c6e56b8da98e9ef527846e",
+      "license": "CC0-1.0",
+      "processing": "Original hair geometry/alpha texture, metric head alignment and WebP encoding"
     }
   ],
   "runtimeFiles": [
@@ -888,7 +1112,114 @@
       "path": "assets/sky.hdr",
       "bytes": 1435119,
       "sha256": "fd94c84997b8a3c353b62c2125a9b44e19509956986a126e472684432a02d798"
+    },
+    {
+      "path": "assets/clay/color.webp",
+      "bytes": 25598,
+      "sha256": "46dda68166972accb9cd3a497afb47967c223cd954575e7e44255e31f9612b2c"
+    },
+    {
+      "path": "assets/clay/normal.webp",
+      "bytes": 391810,
+      "sha256": "af3f5a0f6681777aaeb8bc15dd852f90d4a0d86e8daccde09b713a9d785bf795"
+    },
+    {
+      "path": "assets/clay/rough.webp",
+      "bytes": 42404,
+      "sha256": "bdf82cd8f568cff64bffaf8d239c866bf879699b4cac64b1af75802ccfcc6aff"
+    },
+    {
+      "path": "assets/clay/ao.webp",
+      "bytes": 47060,
+      "sha256": "80b70aec8341a3dcbeba7060fabdc477cce74cc46927ef51c701f7fcf274846a"
+    },
+    {
+      "path": "assets/earth/color.webp",
+      "bytes": 391948,
+      "sha256": "dcb2c452c95d3d751ef1d1c62ed03636879138c1fdb85ed48119e6874f472889"
+    },
+    {
+      "path": "assets/earth/normal.webp",
+      "bytes": 636938,
+      "sha256": "4fef196a6f43b11d3a5389592f90a5d14e2cf5ec4411af979696226a5cb5d2ca"
+    },
+    {
+      "path": "assets/earth/rough.webp",
+      "bytes": 49384,
+      "sha256": "4f7a9cd7b6d8c0271db9faaa7897270fafa68c4d8e7db9aa89da81e1190968a6"
+    },
+    {
+      "path": "assets/earth/ao.webp",
+      "bytes": 322474,
+      "sha256": "22d6363fc53e45d9aca7f64c013648151324506e081219ee9a0bbe25d2caf356"
+    },
+    {
+      "path": "assets/thatch/color.webp",
+      "bytes": 452366,
+      "sha256": "771967ea8c0b0bfab80c8814d6adacf88ec746cbac6c94f7fcd2f5fd94ebfba8"
+    },
+    {
+      "path": "assets/thatch/normal.webp",
+      "bytes": 653692,
+      "sha256": "0c0cc1025f0ce7c271a52c9ceae2e601f50f1cb96c95ecfdb4ffcf3d2984d6e4"
+    },
+    {
+      "path": "assets/thatch/rough.webp",
+      "bytes": 302120,
+      "sha256": "9fe266a1cd9c98e07ce80c4df4fc592086dcc0b95fbc7ae1a73960a8c855bb9a"
+    },
+    {
+      "path": "assets/thatch/ao.webp",
+      "bytes": 474682,
+      "sha256": "db43ab42ddf71565d9fd1ca871b559bda8cfcc77d5c6810595ae3ef3b183ab08"
+    },
+    {
+      "path": "assets/resident-head.json",
+      "bytes": 410696,
+      "sha256": "dffc759ee262dcdd7f5596cf3ede6d3c3e6acfd18e4ca18f4c7c9266b5cf186e"
+    },
+    {
+      "path": "assets/head-young.webp",
+      "bytes": 72392,
+      "sha256": "7a5fedafb024e4534834c8c4fb38bd4e27224ee0681f4472b4bc6b066edcb5f8"
+    },
+    {
+      "path": "assets/head-mature.webp",
+      "bytes": 81624,
+      "sha256": "5f677bcc0f1fd5cfabf9f6bb2b6c5b6a7ca204ad6786714d3f949be9da4ca619"
+    },
+    {
+      "path": "assets/hair-short02.json",
+      "bytes": 128212,
+      "sha256": "e63738d52ab12ba842e42e08d12a13fa95e4f280d84a59daf9f305f743b417c3"
+    },
+    {
+      "path": "assets/hair-short02.webp",
+      "bytes": 190700,
+      "sha256": "57d9daf06ff3bcebb0fa5112d80c7f64132345e670f72d8509ac2eb38f7d94c1"
+    },
+    {
+      "path": "assets/hair-short04.json",
+      "bytes": 52256,
+      "sha256": "7fcaa0f3c79de2c3abffd9ed7476a88139eada9426a639f36bd70947e30dd6cb"
+    },
+    {
+      "path": "assets/hair-short04.webp",
+      "bytes": 242364,
+      "sha256": "90600e0ef578978c40b19a8efdbf9c6aa9c78d0ca310931003b72375cceba822"
     }
   ],
-  "runtimeBytes": 35727183
+  "runtimeBytes": 40695903,
+  "providers": [
+    {
+      "name": "Poly Haven",
+      "license": "CC0-1.0",
+      "url": "https://polyhaven.com/license"
+    },
+    {
+      "name": "MakeHuman core assets",
+      "license": "CC0-1.0",
+      "url": "https://static.makehumancommunity.org/about/license.html"
+    }
+  ]
 }

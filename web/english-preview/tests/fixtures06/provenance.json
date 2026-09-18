@@ -1,0 +1,13 @@
+{
+  "kind": "collision geometry captured from the three rendered districts",
+  "files": {
+    "capital": "469dda13e98470c4e7e446586d78873762b1b2fc9ae53b7c2b11bf205f6b163a",
+    "bronze": "f60abd43d46dd3840641cedc30550b2204aadb3e4519b24ff02bc0c66d3b4387",
+    "neolithic": "665150acfe5a37f4e191387448ab8e98b7e76ab52d0e498d499df47e705150fb"
+  },
+  "sources": {
+    "neighborhoods.js": "dbf4eea088c6d3f50f796783cab8aca4c277f225016b328ff5006364759130fc",
+    "district-config.js": "9d1e3ed80957394764a4254f45897e552c5a37ca5de39d0677a0dc1610b5128c",
+    "main.js": "c39a25eec70909d9bf5aa64b5957d38786faee76429164fa6e278243f4972e5b"
+  }
+}

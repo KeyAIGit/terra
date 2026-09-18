@@ -10,5 +10,5 @@ const script=s=>'<script>'+s.replace(/<\/script/gi,'<\\/script')+'</script>';
 const inline=script('window.COURTYARD_MANIFEST='+JSON.stringify(manifest)+';window.COURTYARD_ASSETS='+JSON.stringify(packed)+';')+script(js);
 let html=template.replace(/<link rel="stylesheet" href="courtyard.css[^\"]*">/,'<style>'+css+'</style>').replace(/<script src="courtyard.js[^\"]*"><\/script>/,()=>inline);
 if(html.includes('src="courtyard.js'))throw Error('Standalone script was not inlined');
-await fs.mkdir(root+'/dist',{recursive:true});await fs.writeFile(root+'/dist/Terra_Courtyard.html',html);await fs.writeFile(root+'/dist/BUILD.json',JSON.stringify({version:'0.5.0',runtimeFiles:runtime,standalone:{bytes:Buffer.byteLength(html),sha256:sha(html)},rendererSha256:sha(js)},null,2));
+await fs.mkdir(root+'/dist',{recursive:true});await fs.writeFile(root+'/dist/Terra_Courtyard.html',html);await fs.writeFile(root+'/dist/BUILD.json',JSON.stringify({version:'0.6.0',runtimeFiles:runtime,standalone:{bytes:Buffer.byteLength(html),sha256:sha(html)},rendererSha256:sha(js)},null,2));
 console.log('Courtyard packaged',manifest.runtimeFiles.length,'files',manifest.runtimeBytes,'asset bytes;',Buffer.byteLength(html),'standalone bytes');

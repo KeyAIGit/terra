@@ -1,8 +1,7 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "qa_pass": true,
-  "checks": 67,
-  "tested_html_sha256": "c1424082f75028ddc3eb20ab50cfd3af4d4390b2c587a535cdaa4e17f6a230a4",
-  "previous_release_commit": "f196f14677e0ff4614449745e88f896e5391aac8",
-  "courtyard": "new visual interpretation; no simulation changes"
+  "checks": 109,
+  "tested_html_sha256": "591346e8fec87395f5e395b35d83f27fd06bd5714865c713de25a8775b7c4385",
+  "previous_release_commit": "5c46e761969bcd93b69618fc9bb2250b1d743482"
 }
