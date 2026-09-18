@@ -1,24 +1,2020 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "pass": true,
-  "checks_total": 67,
-  "tested_html_sha256": "c1424082f75028ddc3eb20ab50cfd3af4d4390b2c587a535cdaa4e17f6a230a4",
-  "environment": "Windows Chrome, desktop and mobile touch emulation; self-hosted and completely offline editions",
-  "visual_review": "Actual in-engine screenshots reviewed. The district is a material/geometry study; photorealism remains a work in progress.",
-  "courtyard": {
-    "asset_sets": 11,
-    "runtime_files": 30,
-    "runtime_bytes": 35727183,
-    "new_residents": 0
+  "checks_total": 109,
+  "tested_html_sha256": "591346e8fec87395f5e395b35d83f27fd06bd5714865c713de25a8775b7c4385",
+  "environment": "Windows Chrome; desktop, mobile touch emulation, fully offline package and deterministic traffic simulation",
+  "scope": {
+    "districts": 3,
+    "interiors_each": 5,
+    "residents_each": 6,
+    "rule_based": true,
+    "geometric_perception": true,
+    "history_changed": false
   },
   "not_verified": [
     "Physical iPhone/Safari",
-    "prolonged play or multiplayer",
-    "photorealism achieved across the world"
+    "indefinite-duration stability",
+    "camera-image understanding or language-model agents",
+    "cinematic photorealism"
   ],
   "suites": {
+    "unit": {
+      "version": "0.6.0",
+      "pass": true,
+      "checks": [
+        {
+          "name": "navigation-and-perception-unit-1",
+          "pass": true
+        },
+        {
+          "name": "navigation-and-perception-unit-2",
+          "pass": true
+        },
+        {
+          "name": "navigation-and-perception-unit-3",
+          "pass": true
+        },
+        {
+          "name": "navigation-and-perception-unit-4",
+          "pass": true
+        },
+        {
+          "name": "navigation-and-perception-unit-5",
+          "pass": true
+        },
+        {
+          "name": "navigation-and-perception-unit-6",
+          "pass": true
+        },
+        {
+          "name": "navigation-and-perception-unit-7",
+          "pass": true
+        },
+        {
+          "name": "navigation-and-perception-unit-8",
+          "pass": true
+        },
+        {
+          "name": "navigation-and-perception-unit-9",
+          "pass": true
+        },
+        {
+          "name": "navigation-and-perception-unit-10",
+          "pass": true
+        },
+        {
+          "name": "navigation-and-perception-unit-11",
+          "pass": true
+        }
+      ],
+      "output": "TAP version 13\n# Subtest: local and world coordinates round-trip for all district rotations\nok 1 - local and world coordinates round-trip for all district rotations\n  ---\n  duration_ms: 0.6049\n  type: 'test'\n  ...\n# Subtest: round hut does not treat its corner as an interior\nok 2 - round hut does not treat its corner as an interior\n  ---\n  duration_ms: 0.1147\n  type: 'test'\n  ...\n# Subtest: low pottery does not block a head-height sight ray\nok 3 - low pottery does not block a head-height sight ray\n  ---\n  duration_ms: 0.121\n  type: 'test'\n  ...\n# Subtest: window aperture transmits sight but its wall below does not\nok 4 - window aperture transmits sight but its wall below does not\n  ---\n  duration_ms: 0.0973\n  type: 'test'\n  ...\n# Subtest: navigation routes around solid walls without clipping its corners\nok 5 - navigation routes around solid walls without clipping its corners\n  ---\n  duration_ms: 2.9952\n  type: 'test'\n  ...\n# Subtest: a shut door blocks actual motion while a future open footprint is planned\nok 6 - a shut door blocks actual motion while a future open footprint is planned\n  ---\n  duration_ms: 0.1775\n  type: 'test'\n  ...\n# Subtest: residents have limited range and a forward field of view\nok 7 - residents have limited range and a forward field of view\n  ---\n  duration_ms: 0.1198\n  type: 'test'\n  ...\n# Subtest: unseen events do not enter the observation memory\nok 8 - unseen events do not enter the observation memory\n  ---\n  duration_ms: 0.1893\n  type: 'test'\n  ...\n# Subtest: observations remain bounded and local\nok 9 - observations remain bounded and local\n  ---\n  duration_ms: 0.4637\n  type: 'test'\n  ...\n# Subtest: contact replanning leaves personal space without moving through a neighbor\nok 10 - contact replanning leaves personal space without moving through a neighbor\n  ---\n  duration_ms: 0.1896\n  type: 'test'\n  ...\n# Subtest: household access is ordered and releases after leaving its doorway\nok 11 - household access is ordered and releases after leaving its doorway\n  ---\n  duration_ms: 0.1889\n  type: 'test'\n  ...\n1..11\n# tests 11\n# suites 0\n# pass 11\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 58.4723\n"
+    },
+    "traffic": {
+      "version": "0.6.0",
+      "checks": [
+        {
+          "name": "capital-50ms-ten-minute-traffic",
+          "pass": true
+        },
+        {
+          "name": "capital-60hz-ten-minute-traffic",
+          "pass": true
+        },
+        {
+          "name": "capital-variable-ten-minute-traffic",
+          "pass": true
+        },
+        {
+          "name": "bronze-50ms-ten-minute-traffic",
+          "pass": true
+        },
+        {
+          "name": "bronze-60hz-ten-minute-traffic",
+          "pass": true
+        },
+        {
+          "name": "bronze-variable-ten-minute-traffic",
+          "pass": true
+        },
+        {
+          "name": "neolithic-50ms-ten-minute-traffic",
+          "pass": true
+        },
+        {
+          "name": "neolithic-60hz-ten-minute-traffic",
+          "pass": true
+        },
+        {
+          "name": "neolithic-variable-ten-minute-traffic",
+          "pass": true
+        }
+      ],
+      "scenarios": [
+        {
+          "era": "capital",
+          "variant": "50ms",
+          "steps": 12000,
+          "overlaps": 0,
+          "pairs": 0,
+          "stages": [
+            {
+              "time": 120.04999999999532,
+              "arrivals": [
+                3,
+                3,
+                4,
+                4,
+                4,
+                2
+              ],
+              "work": [
+                1,
+                0,
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            {
+              "time": 240.00000000002032,
+              "arrivals": [
+                7,
+                7,
+                7,
+                8,
+                7,
+                4
+              ],
+              "work": [
+                2,
+                1,
+                1,
+                2,
+                2,
+                1
+              ]
+            },
+            {
+              "time": 360.0000000000476,
+              "arrivals": [
+                10,
+                11,
+                12,
+                11,
+                10,
+                8
+              ],
+              "work": [
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ]
+            },
+            {
+              "time": 480.00000000007486,
+              "arrivals": [
+                14,
+                13,
+                15,
+                16,
+                14,
+                12
+              ],
+              "work": [
+                3,
+                2,
+                3,
+                3,
+                3,
+                3
+              ]
+            },
+            {
+              "time": 600.000000000002,
+              "arrivals": [
+                18,
+                18,
+                19,
+                19,
+                18,
+                14
+              ],
+              "work": [
+                4,
+                3,
+                4,
+                4,
+                4,
+                3
+              ]
+            }
+          ],
+          "stats": {
+            "arrivals": 106,
+            "entries": 43,
+            "work": 22,
+            "conversations": 6,
+            "observations": 233,
+            "doorOpens": 85,
+            "blockedSteps": 2317
+          },
+          "agents": [
+            {
+              "id": "capital-resident-0",
+              "name": "Fĩ̀rū",
+              "x": -5.4915190849960815,
+              "z": -14.131559924195281,
+              "yaw": 3.264881543951698,
+              "state": "visit",
+              "speed": 0,
+              "room": "capital-room-1",
+              "entries": 8,
+              "arrivals": 18,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 348.88780119200595
+            },
+            {
+              "id": "capital-resident-1",
+              "name": "Rā",
+              "x": 3.1021835002043834,
+              "z": 7.953102632743231,
+              "yaw": 7.078287473976008,
+              "state": "social",
+              "speed": 0,
+              "room": null,
+              "entries": 7,
+              "arrivals": 18,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 315.75039173553944
+            },
+            {
+              "id": "capital-resident-2",
+              "name": "Žūru",
+              "x": 1.2871656661043347,
+              "z": -14.529091020143957,
+              "yaw": 3.0835325980274457,
+              "state": "work",
+              "speed": 0,
+              "room": "capital-room-2",
+              "entries": 8,
+              "arrivals": 19,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 305.4080634390955
+            },
+            {
+              "id": "capital-resident-3",
+              "name": "Hlī̀nìw",
+              "x": 9.40950740261964,
+              "z": -0.10033804408736316,
+              "yaw": -3.858244374301472,
+              "state": "walking",
+              "speed": 0.9500000000000072,
+              "room": null,
+              "entries": 7,
+              "arrivals": 19,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 310.8994058823128
+            },
+            {
+              "id": "capital-resident-4",
+              "name": "Šìyšīsī́šī",
+              "x": -0.7452093308827683,
+              "z": 1.4504446475362875,
+              "yaw": 6.186811697071843,
+              "state": "waiting to visit",
+              "speed": 0,
+              "room": null,
+              "entries": 7,
+              "arrivals": 18,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 321.887477099641
+            },
+            {
+              "id": "capital-resident-5",
+              "name": "Šī̀vū",
+              "x": -10.366496537816948,
+              "z": -9.49566176063723,
+              "yaw": -2.882817752697361,
+              "state": "walking",
+              "speed": 0.9499999999999786,
+              "room": null,
+              "entries": 6,
+              "arrivals": 14,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 289.8368206304669
+            }
+          ]
+        },
+        {
+          "era": "capital",
+          "variant": "60hz",
+          "steps": 36001,
+          "overlaps": 0,
+          "pairs": 0,
+          "stages": [
+            {
+              "time": 120.01666666666114,
+              "arrivals": [
+                3,
+                3,
+                4,
+                4,
+                4,
+                2
+              ],
+              "work": [
+                1,
+                0,
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            {
+              "time": 240.00000000008313,
+              "arrivals": [
+                7,
+                8,
+                7,
+                5,
+                5,
+                4
+              ],
+              "work": [
+                2,
+                1,
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            {
+              "time": 360.00000000000125,
+              "arrivals": [
+                11,
+                11,
+                12,
+                9,
+                8,
+                8
+              ],
+              "work": [
+                3,
+                2,
+                2,
+                2,
+                2,
+                2
+              ]
+            },
+            {
+              "time": 480.01666666655876,
+              "arrivals": [
+                14,
+                12,
+                12,
+                14,
+                10,
+                10
+              ],
+              "work": [
+                3,
+                2,
+                2,
+                3,
+                2,
+                2
+              ]
+            },
+            {
+              "time": 600.0166666664496,
+              "arrivals": [
+                17,
+                14,
+                15,
+                16,
+                14,
+                14
+              ],
+              "work": [
+                4,
+                2,
+                3,
+                3,
+                3,
+                3
+              ]
+            }
+          ],
+          "stats": {
+            "arrivals": 90,
+            "entries": 38,
+            "work": 18,
+            "conversations": 6,
+            "observations": 221,
+            "doorOpens": 74,
+            "blockedSteps": 30875
+          },
+          "agents": [
+            {
+              "id": "capital-resident-0",
+              "name": "Fĩ̀rū",
+              "x": -1.0399416874495884,
+              "z": 5.450192210326959,
+              "yaw": 1.5731688145106726,
+              "state": "waiting to visit",
+              "speed": 0,
+              "room": null,
+              "entries": 7,
+              "arrivals": 17,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 327.92375747259166
+            },
+            {
+              "id": "capital-resident-1",
+              "name": "Rā",
+              "x": -5.491857359285552,
+              "z": -14.133356647554514,
+              "yaw": 3.2631723809581414,
+              "state": "rest",
+              "speed": 0,
+              "room": "capital-room-1",
+              "entries": 6,
+              "arrivals": 14,
+              "work": 2,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 251.12021694328791
+            },
+            {
+              "id": "capital-resident-2",
+              "name": "Žūru",
+              "x": 5.458746784266722,
+              "z": -11.841038581898875,
+              "yaw": 2.8876769152072175,
+              "state": "walking",
+              "speed": 0.9500000000000062,
+              "room": "capital-room-3",
+              "entries": 7,
+              "arrivals": 15,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 268.9426968853096
+            },
+            {
+              "id": "capital-resident-3",
+              "name": "Hlī̀nìw",
+              "x": 3.640145831258723,
+              "z": 1.4445960975019876,
+              "yaw": 11.939322724392122,
+              "state": "waiting to visit",
+              "speed": 0,
+              "room": null,
+              "entries": 6,
+              "arrivals": 16,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 260.9384707243261
+            },
+            {
+              "id": "capital-resident-4",
+              "name": "Šìyšīsī́šī",
+              "x": -6.4675825178157496,
+              "z": -2.9885988693397074,
+              "yaw": 0.7811577565364496,
+              "state": "walking",
+              "speed": 0.9500000000000105,
+              "room": null,
+              "entries": 6,
+              "arrivals": 14,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 262.13250063941524
+            },
+            {
+              "id": "capital-resident-5",
+              "name": "Šī̀vū",
+              "x": -2.9119744102990963,
+              "z": 0.7025592120140005,
+              "yaw": -2.4580870016848237,
+              "state": "walking",
+              "speed": 0.9499999999999976,
+              "room": null,
+              "entries": 6,
+              "arrivals": 14,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 276.24504640162655
+            }
+          ]
+        },
+        {
+          "era": "capital",
+          "variant": "variable",
+          "steps": 24001,
+          "overlaps": 0,
+          "pairs": 0,
+          "stages": [
+            {
+              "time": 120.0000000000054,
+              "arrivals": [
+                3,
+                3,
+                4,
+                4,
+                4,
+                2
+              ],
+              "work": [
+                1,
+                0,
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            {
+              "time": 240.01199999999972,
+              "arrivals": [
+                7,
+                7,
+                7,
+                8,
+                7,
+                4
+              ],
+              "work": [
+                2,
+                1,
+                1,
+                2,
+                2,
+                1
+              ]
+            },
+            {
+              "time": 360.01199999996334,
+              "arrivals": [
+                10,
+                11,
+                12,
+                11,
+                10,
+                8
+              ],
+              "work": [
+                2,
+                2,
+                2,
+                2,
+                2,
+                2
+              ]
+            },
+            {
+              "time": 480.0119999999224,
+              "arrivals": [
+                14,
+                13,
+                15,
+                15,
+                14,
+                12
+              ],
+              "work": [
+                3,
+                2,
+                3,
+                3,
+                3,
+                3
+              ]
+            },
+            {
+              "time": 600.0119999998315,
+              "arrivals": [
+                18,
+                16,
+                19,
+                19,
+                18,
+                14
+              ],
+              "work": [
+                4,
+                3,
+                4,
+                4,
+                4,
+                3
+              ]
+            }
+          ],
+          "stats": {
+            "arrivals": 104,
+            "entries": 42,
+            "work": 22,
+            "conversations": 6,
+            "observations": 235,
+            "doorOpens": 85,
+            "blockedSteps": 7500
+          },
+          "agents": [
+            {
+              "id": "capital-resident-0",
+              "name": "Fĩ̀rū",
+              "x": -5.396050752626378,
+              "z": -10.447211226440961,
+              "yaw": 6.309675740768586,
+              "state": "walking",
+              "speed": 0.9499999999999387,
+              "room": null,
+              "entries": 8,
+              "arrivals": 18,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 351.6100924337822
+            },
+            {
+              "id": "capital-resident-1",
+              "name": "Rā",
+              "x": -0.6717211384731031,
+              "z": -0.26055620730571466,
+              "yaw": 9.28710743521051,
+              "state": "walking",
+              "speed": 0,
+              "room": null,
+              "entries": 6,
+              "arrivals": 16,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 276.82201427095526
+            },
+            {
+              "id": "capital-resident-2",
+              "name": "Žūru",
+              "x": -0.8504661456568209,
+              "z": -0.7749187286580623,
+              "yaw": 6.3757606473947375,
+              "state": "walking",
+              "speed": 0,
+              "room": null,
+              "entries": 8,
+              "arrivals": 19,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 319.68645922227466
+            },
+            {
+              "id": "capital-resident-3",
+              "name": "Hlī̀nìw",
+              "x": 11.486167085729056,
+              "z": -8.232867595265331,
+              "yaw": -3.144218918016981,
+              "state": "walking",
+              "speed": 0,
+              "room": null,
+              "entries": 7,
+              "arrivals": 19,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 319.21216277185243
+            },
+            {
+              "id": "capital-resident-4",
+              "name": "Šìyšīsī́šī",
+              "x": -1.4783551212025074,
+              "z": 1.4369387575780384,
+              "yaw": 5.952549124304874,
+              "state": "waiting to visit",
+              "speed": 0,
+              "room": null,
+              "entries": 7,
+              "arrivals": 18,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 321.2519493710851
+            },
+            {
+              "id": "capital-resident-5",
+              "name": "Šī̀vū",
+              "x": -1.866153118193242,
+              "z": 1.8159475400887424,
+              "yaw": -2.449633023713166,
+              "state": "walking",
+              "speed": 0.9499999999999968,
+              "room": null,
+              "entries": 6,
+              "arrivals": 14,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 276.4254797665801
+            }
+          ]
+        },
+        {
+          "era": "bronze",
+          "variant": "50ms",
+          "steps": 12000,
+          "overlaps": 0,
+          "pairs": 0,
+          "stages": [
+            {
+              "time": 120.04999999999532,
+              "arrivals": [
+                3,
+                3,
+                3,
+                4,
+                4,
+                2
+              ],
+              "work": [
+                1,
+                0,
+                0,
+                1,
+                1,
+                1
+              ]
+            },
+            {
+              "time": 240.00000000002032,
+              "arrivals": [
+                7,
+                8,
+                5,
+                8,
+                8,
+                4
+              ],
+              "work": [
+                2,
+                1,
+                1,
+                2,
+                2,
+                1
+              ]
+            },
+            {
+              "time": 360.0000000000476,
+              "arrivals": [
+                11,
+                11,
+                9,
+                11,
+                10,
+                8
+              ],
+              "work": [
+                3,
+                2,
+                2,
+                2,
+                2,
+                2
+              ]
+            },
+            {
+              "time": 480.00000000007486,
+              "arrivals": [
+                14,
+                15,
+                12,
+                15,
+                14,
+                12
+              ],
+              "work": [
+                3,
+                3,
+                2,
+                3,
+                3,
+                3
+              ]
+            },
+            {
+              "time": 600.000000000002,
+              "arrivals": [
+                18,
+                18,
+                16,
+                19,
+                18,
+                16
+              ],
+              "work": [
+                4,
+                3,
+                3,
+                4,
+                4,
+                4
+              ]
+            }
+          ],
+          "stats": {
+            "arrivals": 105,
+            "entries": 43,
+            "work": 22,
+            "conversations": 8,
+            "observations": 282,
+            "doorOpens": 86,
+            "blockedSteps": 3195
+          },
+          "agents": [
+            {
+              "id": "bronze-resident-0",
+              "name": "Žī́f",
+              "x": -0.2308933514509277,
+              "z": -11.117267638973999,
+              "yaw": -0.11298003704859903,
+              "state": "walking",
+              "speed": 0.950000000000016,
+              "room": "bronze-room-1",
+              "entries": 8,
+              "arrivals": 18,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 315.20202885413136
+            },
+            {
+              "id": "bronze-resident-1",
+              "name": "Naixòw",
+              "x": 3.1628830494859974,
+              "z": 7.965655701501312,
+              "yaw": -1.5917173665145976,
+              "state": "waiting to visit",
+              "speed": 0,
+              "room": null,
+              "entries": 7,
+              "arrivals": 18,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 290.2863390343701
+            },
+            {
+              "id": "bronze-resident-2",
+              "name": "Imís",
+              "x": -10.205801280134137,
+              "z": 4.446916841211142,
+              "yaw": 7.778913183243644,
+              "state": "walking",
+              "speed": 0.7099999999999901,
+              "room": null,
+              "entries": 7,
+              "arrivals": 16,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 246.86306598556723
+            },
+            {
+              "id": "bronze-resident-3",
+              "name": "Nalìw",
+              "x": 2.7762386998570516,
+              "z": 7.577548349056976,
+              "yaw": 1.8928357944975378,
+              "state": "walking",
+              "speed": 0.7095600006777667,
+              "room": null,
+              "entries": 7,
+              "arrivals": 19,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 262.74098756543515
+            },
+            {
+              "id": "bronze-resident-4",
+              "name": "Žīmū́šro",
+              "x": -1.4637593386919918,
+              "z": 1.5354672688059787,
+              "yaw": 3.9377757122577943,
+              "state": "waiting to visit",
+              "speed": 0,
+              "room": null,
+              "entries": 7,
+              "arrivals": 18,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 262.83591689245117
+            },
+            {
+              "id": "bronze-resident-5",
+              "name": "Imṹš",
+              "x": -7.4143468423430114,
+              "z": -5.488711904501127,
+              "yaw": 7.140198424790743,
+              "state": "walking",
+              "speed": 0.9499999999999975,
+              "room": null,
+              "entries": 7,
+              "arrivals": 16,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 259.20478245460475
+            }
+          ]
+        },
+        {
+          "era": "bronze",
+          "variant": "60hz",
+          "steps": 36001,
+          "overlaps": 0,
+          "pairs": 0,
+          "stages": [
+            {
+              "time": 120.01666666666114,
+              "arrivals": [
+                3,
+                3,
+                4,
+                4,
+                4,
+                2
+              ],
+              "work": [
+                1,
+                0,
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            {
+              "time": 240.00000000008313,
+              "arrivals": [
+                7,
+                7,
+                5,
+                8,
+                8,
+                4
+              ],
+              "work": [
+                2,
+                1,
+                1,
+                2,
+                2,
+                1
+              ]
+            },
+            {
+              "time": 360.00000000000125,
+              "arrivals": [
+                11,
+                11,
+                9,
+                11,
+                11,
+                7
+              ],
+              "work": [
+                3,
+                2,
+                2,
+                2,
+                2,
+                2
+              ]
+            },
+            {
+              "time": 480.01666666655876,
+              "arrivals": [
+                14,
+                15,
+                12,
+                15,
+                15,
+                11
+              ],
+              "work": [
+                3,
+                3,
+                2,
+                3,
+                3,
+                3
+              ]
+            },
+            {
+              "time": 600.0166666664496,
+              "arrivals": [
+                18,
+                18,
+                16,
+                18,
+                19,
+                14
+              ],
+              "work": [
+                4,
+                3,
+                3,
+                4,
+                4,
+                3
+              ]
+            }
+          ],
+          "stats": {
+            "arrivals": 103,
+            "entries": 43,
+            "work": 21,
+            "conversations": 10,
+            "observations": 260,
+            "doorOpens": 85,
+            "blockedSteps": 9633
+          },
+          "agents": [
+            {
+              "id": "bronze-resident-0",
+              "name": "Žī́f",
+              "x": -1.0255894252686903,
+              "z": -4.102789971244805,
+              "yaw": 6.1701082687697095,
+              "state": "walking",
+              "speed": 0.950000000000025,
+              "room": null,
+              "entries": 8,
+              "arrivals": 18,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 319.15300721196
+            },
+            {
+              "id": "bronze-resident-1",
+              "name": "Naixòw",
+              "x": 2.373778110792918,
+              "z": 7.62721084247083,
+              "yaw": 9.538263095064991,
+              "state": "walking",
+              "speed": 0.9500000000000026,
+              "room": null,
+              "entries": 7,
+              "arrivals": 18,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 291.0604209542401
+            },
+            {
+              "id": "bronze-resident-2",
+              "name": "Imís",
+              "x": -16.131793369041805,
+              "z": 4.000536825566303,
+              "yaw": 4.70451856552262,
+              "state": "visit",
+              "speed": 0,
+              "room": "bronze-room-3",
+              "entries": 7,
+              "arrivals": 16,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 239.58287905531174
+            },
+            {
+              "id": "bronze-resident-3",
+              "name": "Nalìw",
+              "x": 2.8870073220509207,
+              "z": 7.422371435625717,
+              "yaw": 0.9688329826041979,
+              "state": "walking",
+              "speed": 0.710000000000018,
+              "room": null,
+              "entries": 7,
+              "arrivals": 18,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 263.63100252126895
+            },
+            {
+              "id": "bronze-resident-4",
+              "name": "Žīmū́šro",
+              "x": -4.663766517579621,
+              "z": 1.8085775897982181,
+              "yaw": 7.064823436326128,
+              "state": "walking",
+              "speed": 0.9499999999999978,
+              "room": null,
+              "entries": 8,
+              "arrivals": 19,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 292.1980023563943
+            },
+            {
+              "id": "bronze-resident-5",
+              "name": "Imṹš",
+              "x": -3.2988388201148773,
+              "z": 0.3405617672529533,
+              "yaw": -2.440136773244288,
+              "state": "walking",
+              "speed": 0.9500000000000076,
+              "room": null,
+              "entries": 6,
+              "arrivals": 14,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 235.2947024193924
+            }
+          ]
+        },
+        {
+          "era": "bronze",
+          "variant": "variable",
+          "steps": 24001,
+          "overlaps": 0,
+          "pairs": 0,
+          "stages": [
+            {
+              "time": 120.0000000000054,
+              "arrivals": [
+                3,
+                3,
+                4,
+                4,
+                4,
+                2
+              ],
+              "work": [
+                1,
+                0,
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            {
+              "time": 240.01199999999972,
+              "arrivals": [
+                7,
+                8,
+                5,
+                8,
+                8,
+                4
+              ],
+              "work": [
+                2,
+                1,
+                1,
+                2,
+                2,
+                1
+              ]
+            },
+            {
+              "time": 360.01199999996334,
+              "arrivals": [
+                11,
+                11,
+                9,
+                11,
+                12,
+                7
+              ],
+              "work": [
+                3,
+                2,
+                2,
+                2,
+                3,
+                2
+              ]
+            },
+            {
+              "time": 480.0119999999224,
+              "arrivals": [
+                14,
+                15,
+                12,
+                15,
+                15,
+                11
+              ],
+              "work": [
+                3,
+                3,
+                2,
+                3,
+                3,
+                3
+              ]
+            },
+            {
+              "time": 600.0119999998315,
+              "arrivals": [
+                19,
+                18,
+                16,
+                19,
+                20,
+                14
+              ],
+              "work": [
+                4,
+                3,
+                3,
+                4,
+                4,
+                3
+              ]
+            }
+          ],
+          "stats": {
+            "arrivals": 106,
+            "entries": 43,
+            "work": 21,
+            "conversations": 9,
+            "observations": 262,
+            "doorOpens": 87,
+            "blockedSteps": 4821
+          },
+          "agents": [
+            {
+              "id": "bronze-resident-0",
+              "name": "Žī́f",
+              "x": -2.3925716419512755,
+              "z": 7.9345625345524065,
+              "yaw": 2.6421615273837866,
+              "state": "social",
+              "speed": 0,
+              "room": null,
+              "entries": 8,
+              "arrivals": 19,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 330.9996524522379
+            },
+            {
+              "id": "bronze-resident-1",
+              "name": "Naixòw",
+              "x": 0.9681473093090943,
+              "z": -4.792636032462745,
+              "yaw": 9.539427646145958,
+              "state": "walking",
+              "speed": 0.9499999999999921,
+              "room": null,
+              "entries": 7,
+              "arrivals": 18,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 303.44451350009626
+            },
+            {
+              "id": "bronze-resident-2",
+              "name": "Imís",
+              "x": -10.823232972825673,
+              "z": 4.400312860682458,
+              "yaw": 7.778787628931631,
+              "state": "walking",
+              "speed": 0.7100000000000004,
+              "room": null,
+              "entries": 7,
+              "arrivals": 16,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 244.97537211016842
+            },
+            {
+              "id": "bronze-resident-3",
+              "name": "Nalìw",
+              "x": 3.128673220689202,
+              "z": 7.945874485531933,
+              "yaw": 0.37534450217163956,
+              "state": "social",
+              "speed": 0,
+              "room": null,
+              "entries": 7,
+              "arrivals": 19,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 263.76563497378174
+            },
+            {
+              "id": "bronze-resident-4",
+              "name": "Žīmū́šro",
+              "x": -1.0415531991421996,
+              "z": 5.458192618993862,
+              "yaw": -0.49943112620600644,
+              "state": "social",
+              "speed": 0,
+              "room": null,
+              "entries": 8,
+              "arrivals": 20,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 297.04729801997354
+            },
+            {
+              "id": "bronze-resident-5",
+              "name": "Imṹš",
+              "x": -8.465328964074091,
+              "z": -5.773555265346637,
+              "yaw": 3.8423795632989046,
+              "state": "walking",
+              "speed": 0,
+              "room": null,
+              "entries": 6,
+              "arrivals": 14,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 243.71063900174173
+            }
+          ]
+        },
+        {
+          "era": "neolithic",
+          "variant": "50ms",
+          "steps": 12000,
+          "overlaps": 0,
+          "pairs": 0,
+          "stages": [
+            {
+              "time": 120.04999999999532,
+              "arrivals": [
+                4,
+                3,
+                4,
+                4,
+                4,
+                2
+              ],
+              "work": [
+                1,
+                0,
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            {
+              "time": 240.00000000002032,
+              "arrivals": [
+                7,
+                8,
+                7,
+                8,
+                9,
+                4
+              ],
+              "work": [
+                2,
+                1,
+                1,
+                2,
+                2,
+                1
+              ]
+            },
+            {
+              "time": 360.0000000000476,
+              "arrivals": [
+                11,
+                12,
+                11,
+                14,
+                13,
+                7
+              ],
+              "work": [
+                3,
+                2,
+                2,
+                3,
+                3,
+                2
+              ]
+            },
+            {
+              "time": 480.00000000007486,
+              "arrivals": [
+                14,
+                15,
+                15,
+                19,
+                18,
+                11
+              ],
+              "work": [
+                3,
+                3,
+                3,
+                4,
+                4,
+                3
+              ]
+            },
+            {
+              "time": 600.000000000002,
+              "arrivals": [
+                19,
+                19,
+                20,
+                24,
+                22,
+                14
+              ],
+              "work": [
+                4,
+                3,
+                4,
+                5,
+                5,
+                3
+              ]
+            }
+          ],
+          "stats": {
+            "arrivals": 118,
+            "entries": 49,
+            "work": 24,
+            "conversations": 7,
+            "observations": 332,
+            "doorOpens": 95,
+            "blockedSteps": 2316
+          },
+          "agents": [
+            {
+              "id": "neolithic-resident-0",
+              "name": "Þa",
+              "x": -2.3775175700954434,
+              "z": 7.950699894935359,
+              "yaw": 1.5797802915035108,
+              "state": "social",
+              "speed": 0,
+              "room": null,
+              "entries": 8,
+              "arrivals": 19,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 319.89650065077245
+            },
+            {
+              "id": "neolithic-resident-1",
+              "name": "Kay",
+              "x": 0.00029313933740456293,
+              "z": -13.16064911174495,
+              "yaw": -3.1341434211028427,
+              "state": "rest",
+              "speed": 0,
+              "room": "neolithic-room-1",
+              "entries": 8,
+              "arrivals": 19,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 295.7298464975341
+            },
+            {
+              "id": "neolithic-resident-2",
+              "name": "Miw",
+              "x": -1.603240403837536,
+              "z": 7.943743629047504,
+              "yaw": -1.5618123620862825,
+              "state": "social",
+              "speed": 0,
+              "room": null,
+              "entries": 8,
+              "arrivals": 20,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 270.1565179002242
+            },
+            {
+              "id": "neolithic-resident-3",
+              "name": "Nulū",
+              "x": 3.107202251601062,
+              "z": 7.9672494613604545,
+              "yaw": 0.9176129044299668,
+              "state": "waiting to visit",
+              "speed": 0,
+              "room": null,
+              "entries": 9,
+              "arrivals": 24,
+              "work": 5,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 296.958786354811
+            },
+            {
+              "id": "neolithic-resident-4",
+              "name": "Sĩ",
+              "x": 14.52765016459079,
+              "z": 5.691695409238433,
+              "yaw": 1.481656911844303,
+              "state": "work",
+              "speed": 0,
+              "room": "neolithic-room-4",
+              "entries": 9,
+              "arrivals": 22,
+              "work": 5,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 281.5861088215098
+            },
+            {
+              "id": "neolithic-resident-5",
+              "name": "Numiw",
+              "x": -9.985863398343763,
+              "z": -9.042766153135238,
+              "yaw": -2.864833131402867,
+              "state": "walking",
+              "speed": 0.7099999999999901,
+              "room": "neolithic-room-0",
+              "entries": 7,
+              "arrivals": 14,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 239.3116782145572
+            }
+          ]
+        },
+        {
+          "era": "neolithic",
+          "variant": "60hz",
+          "steps": 36001,
+          "overlaps": 0,
+          "pairs": 0,
+          "stages": [
+            {
+              "time": 120.01666666666114,
+              "arrivals": [
+                4,
+                3,
+                4,
+                4,
+                4,
+                2
+              ],
+              "work": [
+                1,
+                0,
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            {
+              "time": 240.00000000008313,
+              "arrivals": [
+                8,
+                8,
+                8,
+                8,
+                9,
+                4
+              ],
+              "work": [
+                2,
+                1,
+                1,
+                2,
+                2,
+                1
+              ]
+            },
+            {
+              "time": 360.00000000000125,
+              "arrivals": [
+                11,
+                12,
+                12,
+                12,
+                13,
+                7
+              ],
+              "work": [
+                3,
+                2,
+                2,
+                2,
+                3,
+                2
+              ]
+            },
+            {
+              "time": 480.01666666655876,
+              "arrivals": [
+                14,
+                15,
+                16,
+                16,
+                17,
+                11
+              ],
+              "work": [
+                3,
+                3,
+                3,
+                3,
+                4,
+                3
+              ]
+            },
+            {
+              "time": 600.0166666664496,
+              "arrivals": [
+                18,
+                18,
+                19,
+                19,
+                20,
+                14
+              ],
+              "work": [
+                4,
+                3,
+                4,
+                4,
+                4,
+                3
+              ]
+            }
+          ],
+          "stats": {
+            "arrivals": 108,
+            "entries": 44,
+            "work": 22,
+            "conversations": 6,
+            "observations": 287,
+            "doorOpens": 87,
+            "blockedSteps": 17088
+          },
+          "agents": [
+            {
+              "id": "neolithic-resident-0",
+              "name": "Þa",
+              "x": 0.04788650189706519,
+              "z": -12.163454810071318,
+              "yaw": 0.049298783091286644,
+              "state": "walking",
+              "speed": 0.9500000000000215,
+              "room": "neolithic-room-1",
+              "entries": 8,
+              "arrivals": 18,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 299.8550677702928
+            },
+            {
+              "id": "neolithic-resident-1",
+              "name": "Kay",
+              "x": 3.1753938985249763,
+              "z": 7.9323112309156265,
+              "yaw": 12.207462527759736,
+              "state": "waiting to visit",
+              "speed": 0,
+              "room": null,
+              "entries": 7,
+              "arrivals": 18,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 275.6196247096165
+            },
+            {
+              "id": "neolithic-resident-2",
+              "name": "Miw",
+              "x": 2.596246200332083,
+              "z": 2.349448394311783,
+              "yaw": 5.559165555755906,
+              "state": "walking",
+              "speed": 0.9499999999999922,
+              "room": null,
+              "entries": 8,
+              "arrivals": 19,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 263.77492181570005
+            },
+            {
+              "id": "neolithic-resident-3",
+              "name": "Nulū",
+              "x": 2.754116624602858,
+              "z": 7.592213070227013,
+              "yaw": -4.353617586656603,
+              "state": "walking",
+              "speed": 0,
+              "room": null,
+              "entries": 7,
+              "arrivals": 19,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 235.00691978919662
+            },
+            {
+              "id": "neolithic-resident-4",
+              "name": "Sĩ",
+              "x": -1.0635652333689882,
+              "z": 5.462880642648974,
+              "yaw": 1.5844015481354528,
+              "state": "waiting to visit",
+              "speed": 0,
+              "room": null,
+              "entries": 8,
+              "arrivals": 20,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 264.9427244947804
+            },
+            {
+              "id": "neolithic-resident-5",
+              "name": "Numiw",
+              "x": -6.468544743119487,
+              "z": -2.7333390236751813,
+              "yaw": -2.4005595764682974,
+              "state": "walking",
+              "speed": 0.7099999999999999,
+              "room": null,
+              "entries": 6,
+              "arrivals": 14,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 231.80688848600715
+            }
+          ]
+        },
+        {
+          "era": "neolithic",
+          "variant": "variable",
+          "steps": 24001,
+          "overlaps": 0,
+          "pairs": 0,
+          "stages": [
+            {
+              "time": 120.0000000000054,
+              "arrivals": [
+                4,
+                3,
+                4,
+                4,
+                4,
+                2
+              ],
+              "work": [
+                1,
+                0,
+                1,
+                1,
+                1,
+                1
+              ]
+            },
+            {
+              "time": 240.01199999999972,
+              "arrivals": [
+                8,
+                8,
+                6,
+                6,
+                9,
+                4
+              ],
+              "work": [
+                2,
+                1,
+                1,
+                1,
+                2,
+                1
+              ]
+            },
+            {
+              "time": 360.01199999996334,
+              "arrivals": [
+                11,
+                12,
+                11,
+                11,
+                13,
+                8
+              ],
+              "work": [
+                3,
+                2,
+                2,
+                2,
+                3,
+                2
+              ]
+            },
+            {
+              "time": 480.0119999999224,
+              "arrivals": [
+                14,
+                16,
+                15,
+                15,
+                18,
+                12
+              ],
+              "work": [
+                3,
+                3,
+                3,
+                3,
+                4,
+                3
+              ]
+            },
+            {
+              "time": 600.0119999998315,
+              "arrivals": [
+                19,
+                18,
+                20,
+                19,
+                22,
+                15
+              ],
+              "work": [
+                4,
+                3,
+                4,
+                4,
+                5,
+                3
+              ]
+            }
+          ],
+          "stats": {
+            "arrivals": 113,
+            "entries": 46,
+            "work": 23,
+            "conversations": 6,
+            "observations": 293,
+            "doorOpens": 90,
+            "blockedSteps": 10974
+          },
+          "agents": [
+            {
+              "id": "neolithic-resident-0",
+              "name": "Þa",
+              "x": -1.6255010198751363,
+              "z": 7.933100685329134,
+              "yaw": -1.5268437714671803,
+              "state": "social",
+              "speed": 0,
+              "room": null,
+              "entries": 8,
+              "arrivals": 19,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 318.7573344210786
+            },
+            {
+              "id": "neolithic-resident-1",
+              "name": "Kay",
+              "x": 0.7265330567108537,
+              "z": -6.011652602207081,
+              "yaw": 9.538219142313292,
+              "state": "walking",
+              "speed": 0.9500000000000166,
+              "room": null,
+              "entries": 7,
+              "arrivals": 18,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 290.6926645549517
+            },
+            {
+              "id": "neolithic-resident-2",
+              "name": "Miw",
+              "x": -2.369769604709614,
+              "z": 7.9658342727418905,
+              "yaw": 1.614748882122613,
+              "state": "social",
+              "speed": 0,
+              "room": null,
+              "entries": 8,
+              "arrivals": 20,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 276.10336354797715
+            },
+            {
+              "id": "neolithic-resident-3",
+              "name": "Nulū",
+              "x": 3.127103179717977,
+              "z": 7.970931760844553,
+              "yaw": 0.6671908948643558,
+              "state": "waiting to visit",
+              "speed": 0,
+              "room": null,
+              "entries": 7,
+              "arrivals": 19,
+              "work": 4,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 238.08288543040484
+            },
+            {
+              "id": "neolithic-resident-4",
+              "name": "Sĩ",
+              "x": 14.525572286559086,
+              "z": 5.6850751499570755,
+              "yaw": 1.4719113108098805,
+              "state": "work",
+              "speed": 0,
+              "room": "neolithic-room-4",
+              "entries": 9,
+              "arrivals": 22,
+              "work": 5,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 283.99489459894
+            },
+            {
+              "id": "neolithic-resident-5",
+              "name": "Numiw",
+              "x": -10.009577490016461,
+              "z": -9.126952596019539,
+              "yaw": -2.8622342804211587,
+              "state": "rest",
+              "speed": 0,
+              "room": "neolithic-room-0",
+              "entries": 7,
+              "arrivals": 15,
+              "work": 3,
+              "memories": 12,
+              "noticed": false,
+              "distanceWalked": 238.21480928832796
+            }
+          ]
+        }
+      ],
+      "pass": true
+    },
     "archive_desktop": {
-      "version": "0.4.0",
+      "version": "0.6.0",
       "checks": [
         {
           "name": "offline-home-04",
@@ -182,12 +2178,12 @@
           "archivedNPCs": 0,
           "grass": 2600,
           "colliders": 927,
-          "time": 0.4138872222222239,
+          "time": 0.41384222222222383,
           "errors": [],
           "render": {
-            "frame": 80,
-            "calls": 54,
-            "triangles": 1262952,
+            "frame": 79,
+            "calls": 55,
+            "triangles": 1262954,
             "points": 1040,
             "lines": 0
           },
@@ -224,12 +2220,12 @@
           "archivedNPCs": 0,
           "grass": 2600,
           "colliders": 93,
-          "time": 0.4138888888888902,
+          "time": 0.41393527777777944,
           "errors": [],
           "render": {
             "frame": 80,
-            "calls": 51,
-            "triangles": 1119284,
+            "calls": 53,
+            "triangles": 1119288,
             "points": 979,
             "lines": 0
           },
@@ -266,12 +2262,12 @@
           "archivedNPCs": 0,
           "grass": 2600,
           "colliders": 45,
-          "time": 0.4139350000000016,
+          "time": 0.41393500000000166,
           "errors": [],
           "render": {
-            "frame": 81,
-            "calls": 42,
-            "triangles": 648798,
+            "frame": 80,
+            "calls": 45,
+            "triangles": 648804,
             "points": 952,
             "lines": 0
           },
@@ -330,7 +2326,7 @@
         "portraits": 8
       },
       "pass": true,
-      "tested_html_sha256": "c1424082f75028ddc3eb20ab50cfd3af4d4390b2c587a535cdaa4e17f6a230a4"
+      "tested_html_sha256": "591346e8fec87395f5e395b35d83f27fd06bd5714865c713de25a8775b7c4385"
     },
     "archive_touch": {
       "checks": [
@@ -410,153 +2406,1717 @@
       ],
       "pass": true
     },
-    "courtyard_desktop": {
-      "version": "0.5.0",
+    "interiors": {
+      "version": "0.6.0",
       "checks": [
         {
-          "name": "language-neutral-main-interface",
+          "name": "capital-five-interiors-six-residents",
           "pass": true
         },
         {
-          "name": "playable-district-and-eleven-asset-sets",
+          "name": "capital-room-0-door-entry-storage-work",
           "pass": true
         },
         {
-          "name": "four-walkable-viewpoints",
+          "name": "capital-room-1-door-entry-storage-work",
           "pass": true
         },
         {
-          "name": "keyboard-movement",
+          "name": "capital-room-2-door-entry-storage-work",
           "pass": true
         },
         {
-          "name": "mouse-look",
+          "name": "capital-room-3-door-entry-storage-work",
           "pass": true
         },
         {
-          "name": "walls-fountain-and-invalid-destination-collision",
+          "name": "capital-room-4-door-entry-storage-work",
           "pass": true
         },
         {
-          "name": "paused-player-does-not-move",
+          "name": "capital-door-window-wall-and-view-direction",
+          "pass": true,
+          "detail": {
+            "closed": false,
+            "open": true,
+            "back": false,
+            "throughWindow": true,
+            "throughWall": false
+          }
+        },
+        {
+          "name": "capital-four-minute-resident-routines",
+          "pass": true,
+          "detail": {
+            "arrivals": 40,
+            "entries": 18,
+            "work": 9,
+            "conversations": 2,
+            "observations": 95,
+            "doorOpens": 34,
+            "blockedSteps": 1192
+          }
+        },
+        {
+          "name": "capital-local-memory-dialogue",
           "pass": true
         },
         {
-          "name": "lighting-and-quality-controls",
+          "name": "bronze-five-interiors-six-residents",
           "pass": true
         },
         {
-          "name": "clean-photo-view-restores-controls",
+          "name": "bronze-room-0-door-entry-storage-work",
           "pass": true
         },
         {
-          "name": "district-to-preserved-atlas-record",
+          "name": "bronze-room-1-door-entry-storage-work",
           "pass": true
         },
         {
-          "name": "district-disposed-on-exit",
+          "name": "bronze-room-2-door-entry-storage-work",
           "pass": true
         },
         {
-          "name": "no-desktop-errors-or-third-party-runtime",
+          "name": "bronze-room-3-door-entry-storage-work",
+          "pass": true
+        },
+        {
+          "name": "bronze-room-4-door-entry-storage-work",
+          "pass": true
+        },
+        {
+          "name": "bronze-door-window-wall-and-view-direction",
+          "pass": true,
+          "detail": {
+            "closed": false,
+            "open": true,
+            "back": false,
+            "throughWindow": true,
+            "throughWall": false
+          }
+        },
+        {
+          "name": "bronze-four-minute-resident-routines",
+          "pass": true,
+          "detail": {
+            "arrivals": 39,
+            "entries": 16,
+            "work": 9,
+            "conversations": 3,
+            "observations": 98,
+            "doorOpens": 32,
+            "blockedSteps": 1737
+          }
+        },
+        {
+          "name": "bronze-local-memory-dialogue",
+          "pass": true
+        },
+        {
+          "name": "neolithic-five-interiors-six-residents",
+          "pass": true
+        },
+        {
+          "name": "neolithic-room-0-door-entry-storage-work",
+          "pass": true
+        },
+        {
+          "name": "neolithic-room-1-door-entry-storage-work",
+          "pass": true
+        },
+        {
+          "name": "neolithic-room-2-door-entry-storage-work",
+          "pass": true
+        },
+        {
+          "name": "neolithic-room-3-door-entry-storage-work",
+          "pass": true
+        },
+        {
+          "name": "neolithic-room-4-door-entry-storage-work",
+          "pass": true
+        },
+        {
+          "name": "neolithic-door-window-wall-and-view-direction",
+          "pass": true,
+          "detail": {
+            "closed": false,
+            "open": true,
+            "back": false,
+            "throughWindow": true,
+            "throughWall": false
+          }
+        },
+        {
+          "name": "neolithic-four-minute-resident-routines",
+          "pass": true,
+          "detail": {
+            "arrivals": 44,
+            "entries": 20,
+            "work": 9,
+            "conversations": 2,
+            "observations": 124,
+            "doorOpens": 37,
+            "blockedSteps": 1608
+          }
+        },
+        {
+          "name": "neolithic-local-memory-dialogue",
+          "pass": true
+        },
+        {
+          "name": "no-runtime-or-shader-errors",
           "pass": true
         }
       ],
       "errors": [],
       "consoleErrors": [],
-      "externalRequests": [],
-      "viewpoints": [
+      "districts": [
         {
-          "name": "entrance",
-          "player": {
-            "x": 6.8,
-            "z": 7.8,
-            "y": 1.68,
-            "yaw": 0.55,
-            "pitch": -0.018
-          }
+          "era": "capital",
+          "state": {
+            "time": 240.09000000002035,
+            "stats": {
+              "arrivals": 40,
+              "entries": 18,
+              "work": 9,
+              "conversations": 2,
+              "observations": 95,
+              "doorOpens": 34,
+              "blockedSteps": 1192
+            },
+            "nav": {
+              "searches": 46,
+              "failures": 0
+            },
+            "householdOwners": {
+              "capital-room-3": "capital-resident-3",
+              "capital-room-2": "capital-resident-2",
+              "capital-room-0": "capital-resident-5",
+              "capital-room-1": "capital-resident-0"
+            },
+            "agents": [
+              {
+                "id": "capital-resident-0",
+                "name": "Fĩ̀rū",
+                "x": -2.145584564758518,
+                "z": 0.8250232409268952,
+                "yaw": 3.376792098817152,
+                "state": "walking",
+                "speed": 0.9499999999999986,
+                "room": null,
+                "entries": 3,
+                "arrivals": 7,
+                "work": 2,
+                "memories": 12,
+                "noticed": false,
+                "distanceWalked": 145.4909243337391
+              },
+              {
+                "id": "capital-resident-1",
+                "name": "Rā",
+                "x": 1.3738482324978372,
+                "z": 6.92067498126466,
+                "yaw": 7.043334106040936,
+                "state": "walking",
+                "speed": 0.9499999999999926,
+                "room": null,
+                "entries": 3,
+                "arrivals": 7,
+                "work": 1,
+                "memories": 12,
+                "noticed": false,
+                "distanceWalked": 131.7017168103372
+              },
+              {
+                "id": "capital-resident-2",
+                "name": "Žūru",
+                "x": -0.2141425309891615,
+                "z": -11.933835838914229,
+                "yaw": 3.047376824666105,
+                "state": "walking",
+                "speed": 0.9499999999999882,
+                "room": "capital-room-2",
+                "entries": 4,
+                "arrivals": 7,
+                "work": 1,
+                "memories": 12,
+                "noticed": false,
+                "distanceWalked": 137.67496677452314
+              },
+              {
+                "id": "capital-resident-3",
+                "name": "Hlī̀nìw",
+                "x": 6.788233811274459,
+                "z": -14.529753866260972,
+                "yaw": 3.085110836336204,
+                "state": "work",
+                "speed": 0,
+                "room": "capital-room-3",
+                "entries": 3,
+                "arrivals": 8,
+                "work": 2,
+                "memories": 12,
+                "noticed": false,
+                "distanceWalked": 108.8625110824763
+              },
+              {
+                "id": "capital-resident-4",
+                "name": "Šìyšīsī́šī",
+                "x": 8.459342867192685,
+                "z": -7.492111660396646,
+                "yaw": 5.062275176641922,
+                "state": "walking",
+                "speed": 0.9499999999999988,
+                "room": null,
+                "entries": 3,
+                "arrivals": 7,
+                "work": 2,
+                "memories": 12,
+                "noticed": false,
+                "distanceWalked": 124.39555763702687
+              },
+              {
+                "id": "capital-resident-5",
+                "name": "Šī̀vū",
+                "x": -5.033345491918113,
+                "z": -1.902838306676415,
+                "yaw": -2.4580216659803464,
+                "state": "walking",
+                "speed": 0.9500000000000001,
+                "room": null,
+                "entries": 2,
+                "arrivals": 4,
+                "work": 1,
+                "memories": 11,
+                "noticed": false,
+                "distanceWalked": 99.22401572249113
+              }
+            ],
+            "doors": [
+              {
+                "id": "capital-room-0-door",
+                "angle": 0,
+                "target": 0,
+                "requests": 8
+              },
+              {
+                "id": "capital-room-1-door",
+                "angle": 0,
+                "target": 0,
+                "requests": 6
+              },
+              {
+                "id": "capital-room-2-door",
+                "angle": 1.5079644737231006,
+                "target": 1.5079644737231006,
+                "requests": 7
+              },
+              {
+                "id": "capital-room-3-door",
+                "angle": 0,
+                "target": 0,
+                "requests": 7
+              },
+              {
+                "id": "capital-room-4-door",
+                "angle": 1.5079644737231006,
+                "target": 1.5079644737231006,
+                "requests": 6
+              }
+            ],
+            "events": [
+              {
+                "id": 50,
+                "time": 153.49000000000066,
+                "action": "opened",
+                "actor": "capital-resident-1",
+                "name": "Rā",
+                "subject": "Pottery workshop door",
+                "x": -5.5,
+                "z": -10.465,
+                "y": 1.4
+              },
+              {
+                "id": 51,
+                "time": 156.09000000000125,
+                "action": "left",
+                "actor": "capital-resident-1",
+                "name": "Rā",
+                "subject": "Pottery workshop",
+                "x": -4.97779689760813,
+                "z": -10.760285930752797,
+                "y": 1.4
+              },
+              {
+                "id": 52,
+                "time": 161.29000000000244,
+                "action": "opened",
+                "actor": "capital-resident-2",
+                "name": "Žūru",
+                "subject": "Merchant’s storeroom door",
+                "x": 5.5,
+                "z": -10.465,
+                "y": 1.4
+              },
+              {
+                "id": 53,
+                "time": 164.54000000000318,
+                "action": "entered",
+                "actor": "capital-resident-2",
+                "name": "Žūru",
+                "subject": "Merchant’s storeroom",
+                "x": 5.199342139420831,
+                "z": -10.835316958636398,
+                "y": 1.4
+              },
+              {
+                "id": 54,
+                "time": 167.6900000000039,
+                "action": "opened",
+                "actor": "capital-resident-0",
+                "name": "Fĩ̀rū",
+                "subject": "Weaver’s home door",
+                "x": -11,
+                "z": -10.465,
+                "y": 1.4
+              },
+              {
+                "id": 55,
+                "time": 170.99000000000464,
+                "action": "entered",
+                "actor": "capital-resident-0",
+                "name": "Fĩ̀rū",
+                "subject": "Weaver’s home",
+                "x": -10.592387924204381,
+                "z": -10.832605021768687,
+                "y": 1.4
+              },
+              {
+                "id": 56,
+                "time": 176.4900000000059,
+                "action": "opened",
+                "actor": "capital-resident-2",
+                "name": "Žūru",
+                "subject": "Merchant’s storeroom door",
+                "x": 5.5,
+                "z": -10.465,
+                "y": 1.4
+              },
+              {
+                "id": 57,
+                "time": 176.74000000000595,
+                "action": "opened",
+                "actor": "capital-resident-5",
+                "name": "Šī̀vū",
+                "subject": "Pottery workshop door",
+                "x": -5.5,
+                "z": -10.465,
+                "y": 1.4
+              },
+              {
+                "id": 58,
+                "time": 179.1900000000065,
+                "action": "left",
+                "actor": "capital-resident-2",
+                "name": "Žūru",
+                "subject": "Merchant’s storeroom",
+                "x": 5.245079798326261,
+                "z": -10.769134020640823,
+                "y": 1.4
+              },
+              {
+                "id": 59,
+                "time": 180.0400000000067,
+                "action": "entered",
+                "actor": "capital-resident-5",
+                "name": "Šī̀vū",
+                "subject": "Pottery workshop",
+                "x": -5.089706835363657,
+                "z": -10.808122562564924,
+                "y": 1.4
+              },
+              {
+                "id": 60,
+                "time": 183.19000000000742,
+                "action": "worked at",
+                "actor": "capital-resident-0",
+                "name": "Fĩ̀rū",
+                "subject": "grinding bench",
+                "x": -9.733905443201879,
+                "z": -14.52181825984156,
+                "y": 1.4
+              },
+              {
+                "id": 61,
+                "time": 191.99000000000942,
+                "action": "opened",
+                "actor": "capital-resident-5",
+                "name": "Šī̀vū",
+                "subject": "Pottery workshop door",
+                "x": -5.5,
+                "z": -10.465,
+                "y": 1.4
+              },
+              {
+                "id": 62,
+                "time": 193.09000000000967,
+                "action": "opened",
+                "actor": "capital-resident-0",
+                "name": "Fĩ̀rū",
+                "subject": "Weaver’s home door",
+                "x": -11,
+                "z": -10.465,
+                "y": 1.4
+              },
+              {
+                "id": 63,
+                "time": 194.64000000001002,
+                "action": "left",
+                "actor": "capital-resident-5",
+                "name": "Šī̀vū",
+                "subject": "Pottery workshop",
+                "x": -5.13847524269576,
+                "z": -10.782405202052926,
+                "y": 1.4
+              },
+              {
+                "id": 64,
+                "time": 195.69000000001026,
+                "action": "left",
+                "actor": "capital-resident-0",
+                "name": "Fĩ̀rū",
+                "subject": "Weaver’s home",
+                "x": -10.492027771925116,
+                "z": -10.757604245871274,
+                "y": 1.4
+              },
+              {
+                "id": 65,
+                "time": 202.69000000001185,
+                "action": "opened",
+                "actor": "capital-resident-1",
+                "name": "Rā",
+                "subject": "Assembly room door",
+                "x": 0,
+                "z": -10.465,
+                "y": 1.4
+              },
+              {
+                "id": 66,
+                "time": 206.0400000000126,
+                "action": "entered",
+                "actor": "capital-resident-1",
+                "name": "Rā",
+                "subject": "Assembly room",
+                "x": -0.1286529009316602,
+                "z": -10.834193896018405,
+                "y": 1.4
+              },
+              {
+                "id": 67,
+                "time": 206.99000000001283,
+                "action": "opened",
+                "actor": "capital-resident-4",
+                "name": "Šìyšīsī́šī",
+                "subject": "Household kitchen door",
+                "x": 11,
+                "z": -10.465,
+                "y": 1.4
+              },
+              {
+                "id": 68,
+                "time": 210.24000000001357,
+                "action": "entered",
+                "actor": "capital-resident-4",
+                "name": "Šìyšīsī́šī",
+                "subject": "Household kitchen",
+                "x": 10.696794486292713,
+                "z": -10.828640942993287,
+                "y": 1.4
+              },
+              {
+                "id": 69,
+                "time": 216.79000000001506,
+                "action": "spoke with",
+                "actor": "capital-resident-0",
+                "name": "Fĩ̀rū",
+                "subject": "Šī̀vū",
+                "x": -1.0360831860802968,
+                "z": 5.454994939288613,
+                "y": 1.4
+              },
+              {
+                "id": 70,
+                "time": 217.8400000000153,
+                "action": "opened",
+                "actor": "capital-resident-3",
+                "name": "Hlī̀nìw",
+                "subject": "Merchant’s storeroom door",
+                "x": 5.5,
+                "z": -10.465,
+                "y": 1.4
+              },
+              {
+                "id": 71,
+                "time": 217.8900000000153,
+                "action": "opened",
+                "actor": "capital-resident-1",
+                "name": "Rā",
+                "subject": "Assembly room door",
+                "x": 0,
+                "z": -10.465,
+                "y": 1.4
+              },
+              {
+                "id": 72,
+                "time": 220.59000000001592,
+                "action": "left",
+                "actor": "capital-resident-1",
+                "name": "Rā",
+                "subject": "Assembly room",
+                "x": -0.08985749041502672,
+                "z": -10.76611630351224,
+                "y": 1.4
+              },
+              {
+                "id": 73,
+                "time": 221.14000000001604,
+                "action": "entered",
+                "actor": "capital-resident-3",
+                "name": "Hlī̀nìw",
+                "subject": "Merchant’s storeroom",
+                "x": 5.259118749453386,
+                "z": -10.80611635707612,
+                "y": 1.4
+              },
+              {
+                "id": 74,
+                "time": 222.54000000001636,
+                "action": "worked at",
+                "actor": "capital-resident-4",
+                "name": "Šìyšīsī́šī",
+                "subject": "grinding bench",
+                "x": 12.279967468989113,
+                "z": -14.527072531795747,
+                "y": 1.4
+              },
+              {
+                "id": 75,
+                "time": 232.4400000000186,
+                "action": "opened",
+                "actor": "capital-resident-4",
+                "name": "Šìyšīsī́šī",
+                "subject": "Household kitchen door",
+                "x": 11,
+                "z": -10.465,
+                "y": 1.4
+              },
+              {
+                "id": 76,
+                "time": 233.39000000001883,
+                "action": "worked at",
+                "actor": "capital-resident-3",
+                "name": "Hlī̀nìw",
+                "subject": "grinding bench",
+                "x": 6.788233811274459,
+                "z": -14.529753866260972,
+                "y": 1.4
+              },
+              {
+                "id": 77,
+                "time": 235.0400000000192,
+                "action": "left",
+                "actor": "capital-resident-4",
+                "name": "Šìyšīsī́šī",
+                "subject": "Household kitchen",
+                "x": 11.384420880463466,
+                "z": -10.789357591344734,
+                "y": 1.4
+              },
+              {
+                "id": 78,
+                "time": 235.59000000001933,
+                "action": "opened",
+                "actor": "capital-resident-2",
+                "name": "Žūru",
+                "subject": "Assembly room door",
+                "x": 0,
+                "z": -10.465,
+                "y": 1.4
+              },
+              {
+                "id": 79,
+                "time": 238.9400000000201,
+                "action": "entered",
+                "actor": "capital-resident-2",
+                "name": "Žūru",
+                "subject": "Assembly room",
+                "x": -0.3169211120294967,
+                "z": -10.846181108184249,
+                "y": 1.4
+              }
+            ]
+          },
+          "penetrations": 0,
+          "maxSpeed": 0.950000000000021,
+          "witnessed": 10
         },
         {
-          "name": "market",
-          "player": {
-            "x": -2,
-            "z": 7.5,
-            "y": 1.68,
-            "yaw": 0.5,
-            "pitch": -0.02
-          }
+          "era": "bronze",
+          "state": {
+            "time": 240.09000000002035,
+            "stats": {
+              "arrivals": 39,
+              "entries": 16,
+              "work": 9,
+              "conversations": 3,
+              "observations": 98,
+              "doorOpens": 32,
+              "blockedSteps": 1737
+            },
+            "nav": {
+              "searches": 44,
+              "failures": 0
+            },
+            "householdOwners": {
+              "bronze-room-3": "bronze-resident-3",
+              "bronze-room-0": "bronze-resident-5",
+              "bronze-room-1": "bronze-resident-0"
+            },
+            "agents": [
+              {
+                "id": "bronze-resident-0",
+                "name": "Žī́f",
+                "x": -1.0592728219863206,
+                "z": 4.433828072729376,
+                "yaw": 3.178506791365796,
+                "state": "walking",
+                "speed": 0.9500000000000032,
+                "room": null,
+                "entries": 3,
+                "arrivals": 7,
+                "work": 2,
+                "memories": 12,
+                "noticed": false,
+                "distanceWalked": 125.83268883086295
+              },
+              {
+                "id": "bronze-resident-1",
+                "name": "Naixòw",
+                "x": 9.0608669178593,
+                "z": -2.0877665576088695,
+                "yaw": 12.463182147051164,
+                "state": "walking",
+                "speed": 0.9499999999999962,
+                "room": null,
+                "entries": 3,
+                "arrivals": 7,
+                "work": 1,
+                "memories": 12,
+                "noticed": false,
+                "distanceWalked": 112.35556158457372
+              },
+              {
+                "id": "bronze-resident-2",
+                "name": "Imís",
+                "x": -1.6262513705547028,
+                "z": 7.96409208387145,
+                "yaw": 5.698854509206857,
+                "state": "waiting to visit",
+                "speed": 0,
+                "room": null,
+                "entries": 2,
+                "arrivals": 5,
+                "work": 1,
+                "memories": 11,
+                "noticed": false,
+                "distanceWalked": 75.12926027565818
+              },
+              {
+                "id": "bronze-resident-3",
+                "name": "Nalìw",
+                "x": -14.350535870832175,
+                "z": 3.0461973948317826,
+                "yaw": 1.246632690559995,
+                "state": "walking",
+                "speed": 0.7099999999999853,
+                "room": "bronze-room-3",
+                "entries": 3,
+                "arrivals": 8,
+                "work": 2,
+                "memories": 12,
+                "noticed": false,
+                "distanceWalked": 101.85914386443763
+              },
+              {
+                "id": "bronze-resident-4",
+                "name": "Žīmū́šro",
+                "x": -1.4636724488177641,
+                "z": 1.535550597418157,
+                "yaw": 3.937799714005573,
+                "state": "social",
+                "speed": 0,
+                "room": null,
+                "entries": 3,
+                "arrivals": 8,
+                "work": 2,
+                "memories": 12,
+                "noticed": false,
+                "distanceWalked": 113.36518121805598
+              },
+              {
+                "id": "bronze-resident-5",
+                "name": "Imṹš",
+                "x": -0.2609908005521836,
+                "z": 3.2336022432910116,
+                "yaw": -2.4072266538372995,
+                "state": "walking",
+                "speed": 0.9500000000000026,
+                "room": null,
+                "entries": 2,
+                "arrivals": 4,
+                "work": 1,
+                "memories": 12,
+                "noticed": false,
+                "distanceWalked": 78.32988727399115
+              }
+            ],
+            "doors": [
+              {
+                "id": "bronze-room-0-door",
+                "angle": 0,
+                "target": 0,
+                "requests": 8
+              },
+              {
+                "id": "bronze-room-1-door",
+                "angle": 0,
+                "target": 0,
+                "requests": 6
+              },
+              {
+                "id": "bronze-room-2-door",
+                "angle": 1.5079644737231006,
+                "target": 1.5079644737231006,
+                "requests": 6
+              },
+              {
+                "id": "bronze-room-3-door",
+                "angle": 1.5079644737231006,
+                "target": 1.5079644737231006,
+                "requests": 6
+              },
+              {
+                "id": "bronze-room-4-door",
+                "angle": 0,
+                "target": 0,
+                "requests": 6
+              }
+            ],
+            "events": [
+              {
+                "id": 46,
+                "time": 147.58999999999932,
+                "action": "entered",
+                "actor": "bronze-resident-1",
+                "name": "Naixòw",
+                "subject": "Pottery workshop",
+                "x": 0.38699660166120303,
+                "z": -9.808210020610188,
+                "y": 1.4
+              },
+              {
+                "id": 47,
+                "time": 149.03999999999965,
+                "action": "entered",
+                "actor": "bronze-resident-3",
+                "name": "Nalìw",
+                "subject": "Community room",
+                "x": 12.826888695231537,
+                "z": 4.412265035156079,
+                "y": 1.4
+              },
+              {
+                "id": 48,
+                "time": 160.2900000000022,
+                "action": "worked at",
+                "actor": "bronze-resident-1",
+                "name": "Naixòw",
+                "subject": "pottery bench",
+                "x": 1.6971967486123467,
+                "z": -13.528472229711815,
+                "y": 1.4
+              },
+              {
+                "id": 49,
+                "time": 162.54000000000272,
+                "action": "opened",
+                "actor": "bronze-resident-3",
+                "name": "Nalìw",
+                "subject": "Community room door",
+                "x": 12.465,
+                "z": 4,
+                "y": 1.4
+              },
+              {
+                "id": 50,
+                "time": 165.89000000000348,
+                "action": "left",
+                "actor": "bronze-resident-3",
+                "name": "Nalìw",
+                "subject": "Community room",
+                "x": 12.796124739091953,
+                "z": 3.7311078445458854,
+                "y": 1.4
+              },
+              {
+                "id": 51,
+                "time": 170.29000000000448,
+                "action": "opened",
+                "actor": "bronze-resident-1",
+                "name": "Naixòw",
+                "subject": "Pottery workshop door",
+                "x": 0,
+                "z": -9.465,
+                "y": 1.4
+              },
+              {
+                "id": 52,
+                "time": 172.89000000000507,
+                "action": "left",
+                "actor": "bronze-resident-1",
+                "name": "Naixòw",
+                "subject": "Pottery workshop",
+                "x": 0.5103809614396689,
+                "z": -9.754814464383848,
+                "y": 1.4
+              },
+              {
+                "id": 53,
+                "time": 174.49000000000544,
+                "action": "opened",
+                "actor": "bronze-resident-0",
+                "name": "Žī́f",
+                "subject": "River household door",
+                "x": -10,
+                "z": -7.465,
+                "y": 1.4
+              },
+              {
+                "id": 54,
+                "time": 177.74000000000618,
+                "action": "entered",
+                "actor": "bronze-resident-0",
+                "name": "Žī́f",
+                "subject": "River household",
+                "x": -9.583732536886911,
+                "z": -7.833229843018113,
+                "y": 1.4
+              },
+              {
+                "id": 55,
+                "time": 185.09000000000785,
+                "action": "opened",
+                "actor": "bronze-resident-4",
+                "name": "Žīmū́šro",
+                "subject": "Community room door",
+                "x": 12.465,
+                "z": 4,
+                "y": 1.4
+              },
+              {
+                "id": 56,
+                "time": 186.6900000000082,
+                "action": "opened",
+                "actor": "bronze-resident-5",
+                "name": "Imṹš",
+                "subject": "Pottery workshop door",
+                "x": 0,
+                "z": -9.465,
+                "y": 1.4
+              },
+              {
+                "id": 57,
+                "time": 188.4400000000086,
+                "action": "entered",
+                "actor": "bronze-resident-4",
+                "name": "Žīmū́šro",
+                "subject": "Community room",
+                "x": 12.83734651517371,
+                "z": 4.452330286511267,
+                "y": 1.4
+              },
+              {
+                "id": 58,
+                "time": 189.99000000000896,
+                "action": "entered",
+                "actor": "bronze-resident-5",
+                "name": "Imṹš",
+                "subject": "Pottery workshop",
+                "x": 0.40701181565060274,
+                "z": -9.841117146808514,
+                "y": 1.4
+              },
+              {
+                "id": 59,
+                "time": 190.39000000000905,
+                "action": "worked at",
+                "actor": "bronze-resident-0",
+                "name": "Žī́f",
+                "subject": "grinding bench",
+                "x": -8.30401373959951,
+                "z": -11.52738149225532,
+                "y": 1.4
+              },
+              {
+                "id": 60,
+                "time": 200.39000000001133,
+                "action": "opened",
+                "actor": "bronze-resident-0",
+                "name": "Žī́f",
+                "subject": "River household door",
+                "x": -10,
+                "z": -7.465,
+                "y": 1.4
+              },
+              {
+                "id": 61,
+                "time": 201.09000000001149,
+                "action": "worked at",
+                "actor": "bronze-resident-4",
+                "name": "Žīmū́šro",
+                "subject": "grinding bench",
+                "x": 16.527158181738344,
+                "z": 5.695114086475997,
+                "y": 1.4
+              },
+              {
+                "id": 62,
+                "time": 201.84000000001166,
+                "action": "opened",
+                "actor": "bronze-resident-5",
+                "name": "Imṹš",
+                "subject": "Pottery workshop door",
+                "x": 0,
+                "z": -9.465,
+                "y": 1.4
+              },
+              {
+                "id": 63,
+                "time": 202.99000000001192,
+                "action": "left",
+                "actor": "bronze-resident-0",
+                "name": "Žī́f",
+                "subject": "River household",
+                "x": -9.490067576776385,
+                "z": -7.753931108030415,
+                "y": 1.4
+              },
+              {
+                "id": 64,
+                "time": 204.54000000001227,
+                "action": "left",
+                "actor": "bronze-resident-5",
+                "name": "Imṹš",
+                "subject": "Pottery workshop",
+                "x": 0.32251620996174224,
+                "z": -9.760818237008694,
+                "y": 1.4
+              },
+              {
+                "id": 65,
+                "time": 209.69000000001344,
+                "action": "opened",
+                "actor": "bronze-resident-3",
+                "name": "Nalìw",
+                "subject": "Weaving house door",
+                "x": -12.465,
+                "z": 4,
+                "y": 1.4
+              },
+              {
+                "id": 66,
+                "time": 211.09000000001376,
+                "action": "opened",
+                "actor": "bronze-resident-4",
+                "name": "Žīmū́šro",
+                "subject": "Community room door",
+                "x": 12.465,
+                "z": 4,
+                "y": 1.4
+              },
+              {
+                "id": 67,
+                "time": 213.69000000001435,
+                "action": "left",
+                "actor": "bronze-resident-4",
+                "name": "Žīmū́šro",
+                "subject": "Community room",
+                "x": 12.753806292796037,
+                "z": 4.509656038249987,
+                "y": 1.4
+              },
+              {
+                "id": 68,
+                "time": 214.04000000001443,
+                "action": "entered",
+                "actor": "bronze-resident-3",
+                "name": "Nalìw",
+                "subject": "Weaving house",
+                "x": -12.823672221867618,
+                "z": 3.573131240895946,
+                "y": 1.4
+              },
+              {
+                "id": 69,
+                "time": 216.0900000000149,
+                "action": "opened",
+                "actor": "bronze-resident-1",
+                "name": "Naixòw",
+                "subject": "Grain store door",
+                "x": 10,
+                "z": -7.465,
+                "y": 1.4
+              },
+              {
+                "id": 70,
+                "time": 219.54000000001568,
+                "action": "entered",
+                "actor": "bronze-resident-1",
+                "name": "Naixòw",
+                "subject": "Grain store",
+                "x": 9.982520049580561,
+                "z": -7.829340801555686,
+                "y": 1.4
+              },
+              {
+                "id": 71,
+                "time": 220.79000000001597,
+                "action": "spoke with",
+                "actor": "bronze-resident-0",
+                "name": "Žī́f",
+                "subject": "Imṹš",
+                "x": -1.0206659596458878,
+                "z": 5.479208708601924,
+                "y": 1.4
+              },
+              {
+                "id": 72,
+                "time": 228.49000000001772,
+                "action": "worked at",
+                "actor": "bronze-resident-3",
+                "name": "Nalìw",
+                "subject": "grinding bench",
+                "x": -16.524711314641156,
+                "z": 2.3156381392043515,
+                "y": 1.4
+              },
+              {
+                "id": 73,
+                "time": 231.39000000001838,
+                "action": "opened",
+                "actor": "bronze-resident-1",
+                "name": "Naixòw",
+                "subject": "Grain store door",
+                "x": 10,
+                "z": -7.465,
+                "y": 1.4
+              },
+              {
+                "id": 74,
+                "time": 234.090000000019,
+                "action": "left",
+                "actor": "bronze-resident-1",
+                "name": "Naixòw",
+                "subject": "Grain store",
+                "x": 9.64799793757074,
+                "z": -7.75744707468321,
+                "y": 1.4
+              },
+              {
+                "id": 75,
+                "time": 239.24000000002016,
+                "action": "opened",
+                "actor": "bronze-resident-3",
+                "name": "Nalìw",
+                "subject": "Weaving house door",
+                "x": -12.465,
+                "z": 4,
+                "y": 1.4
+              }
+            ]
+          },
+          "penetrations": 0,
+          "maxSpeed": 0.9500000000000339,
+          "witnessed": 16
         },
         {
-          "name": "fountain",
-          "player": {
-            "x": 5.4,
-            "z": 3.8,
-            "y": 1.68,
-            "yaw": 0.6,
-            "pitch": -0.02
-          }
-        },
-        {
-          "name": "arcade",
-          "player": {
-            "x": -5.5,
-            "z": -5.8,
-            "y": 1.68,
-            "yaw": -0.25,
-            "pitch": 0.025
-          }
+          "era": "neolithic",
+          "state": {
+            "time": 240.09000000002035,
+            "stats": {
+              "arrivals": 44,
+              "entries": 20,
+              "work": 9,
+              "conversations": 2,
+              "observations": 124,
+              "doorOpens": 37,
+              "blockedSteps": 1608
+            },
+            "nav": {
+              "searches": 53,
+              "failures": 0
+            },
+            "householdOwners": {
+              "neolithic-room-1": "neolithic-resident-0",
+              "neolithic-room-2": "neolithic-resident-2",
+              "neolithic-room-0": "neolithic-resident-4"
+            },
+            "agents": [
+              {
+                "id": "neolithic-resident-0",
+                "name": "Þa",
+                "x": -0.13994217592942015,
+                "z": -10.938649222937347,
+                "yaw": 3.010495978461933,
+                "state": "walking",
+                "speed": 0.9499999999999943,
+                "room": "neolithic-room-1",
+                "entries": 4,
+                "arrivals": 7,
+                "work": 2,
+                "memories": 12,
+                "noticed": false,
+                "distanceWalked": 134.20561120708038
+              },
+              {
+                "id": "neolithic-resident-1",
+                "name": "Kay",
+                "x": 2.420771684296568,
+                "z": 7.960265341832049,
+                "yaw": 12.084681344126883,
+                "state": "waiting to visit",
+                "speed": 0,
+                "room": null,
+                "entries": 3,
+                "arrivals": 8,
+                "work": 1,
+                "memories": 12,
+                "noticed": false,
+                "distanceWalked": 116.65394763851299
+              },
+              {
+                "id": "neolithic-resident-2",
+                "name": "Miw",
+                "x": 10.018403486639716,
+                "z": -9.125142811163128,
+                "yaw": 2.9847330494826787,
+                "state": "rest",
+                "speed": 0,
+                "room": "neolithic-room-2",
+                "entries": 4,
+                "arrivals": 8,
+                "work": 1,
+                "memories": 12,
+                "noticed": false,
+                "distanceWalked": 111.71867361506418
+              },
+              {
+                "id": "neolithic-resident-3",
+                "name": "Nulū",
+                "x": 2.4018584354280788,
+                "z": 7.4035917006962535,
+                "yaw": 0.9176330162335449,
+                "state": "walking",
+                "speed": 0.379999999999998,
+                "room": null,
+                "entries": 3,
+                "arrivals": 8,
+                "work": 2,
+                "memories": 12,
+                "noticed": false,
+                "distanceWalked": 109.71799555111292
+              },
+              {
+                "id": "neolithic-resident-4",
+                "name": "Sĩ",
+                "x": -10.014399396296914,
+                "z": -9.14374502742255,
+                "yaw": -2.862316967375507,
+                "state": "visit",
+                "speed": 0,
+                "room": "neolithic-room-0",
+                "entries": 4,
+                "arrivals": 9,
+                "work": 2,
+                "memories": 12,
+                "noticed": false,
+                "distanceWalked": 115.47513530337625
+              },
+              {
+                "id": "neolithic-resident-5",
+                "name": "Numiw",
+                "x": 1.0032478687708304,
+                "z": 5.459238819889266,
+                "yaw": -0.0795124499491324,
+                "state": "waiting to visit",
+                "speed": 0,
+                "room": null,
+                "entries": 2,
+                "arrivals": 4,
+                "work": 1,
+                "memories": 12,
+                "noticed": false,
+                "distanceWalked": 72.70606165622803
+              }
+            ],
+            "doors": [
+              {
+                "id": "neolithic-room-0-door",
+                "angle": 1.5079644737231006,
+                "target": 1.5079644737231006,
+                "requests": 9
+              },
+              {
+                "id": "neolithic-room-1-door",
+                "angle": 1.5079644737231006,
+                "target": 1.5079644737231006,
+                "requests": 7
+              },
+              {
+                "id": "neolithic-room-2-door",
+                "angle": 1.5079644737231006,
+                "target": 1.5079644737231006,
+                "requests": 7
+              },
+              {
+                "id": "neolithic-room-3-door",
+                "angle": 0,
+                "target": 0,
+                "requests": 8
+              },
+              {
+                "id": "neolithic-room-4-door",
+                "angle": 0,
+                "target": 0,
+                "requests": 6
+              }
+            ],
+            "events": [
+              {
+                "id": 56,
+                "time": 152.14000000000036,
+                "action": "entered",
+                "actor": "neolithic-resident-2",
+                "name": "Miw",
+                "subject": "Boatmaker’s shelter",
+                "x": -10.828088926669501,
+                "z": 4.0791113687572444,
+                "y": 1.4
+              },
+              {
+                "id": 57,
+                "time": 154.940000000001,
+                "action": "entered",
+                "actor": "neolithic-resident-4",
+                "name": "Sĩ",
+                "subject": "Weaving shelter",
+                "x": 10.853656377328946,
+                "z": 4.547663108797086,
+                "y": 1.4
+              },
+              {
+                "id": 58,
+                "time": 163.14000000000286,
+                "action": "worked at",
+                "actor": "neolithic-resident-0",
+                "name": "Þa",
+                "subject": "grinding bench",
+                "x": -8.445718562746114,
+                "z": -9.770268037677607,
+                "y": 1.4
+              },
+              {
+                "id": 59,
+                "time": 163.740000000003,
+                "action": "opened",
+                "actor": "neolithic-resident-5",
+                "name": "Numiw",
+                "subject": "Shared granary door",
+                "x": 0,
+                "z": -9.265,
+                "y": 1.4
+              },
+              {
+                "id": 60,
+                "time": 164.04000000000306,
+                "action": "opened",
+                "actor": "neolithic-resident-2",
+                "name": "Miw",
+                "subject": "Boatmaker’s shelter door",
+                "x": -10.465,
+                "z": 4,
+                "y": 1.4
+              },
+              {
+                "id": 61,
+                "time": 166.69000000000366,
+                "action": "left",
+                "actor": "neolithic-resident-2",
+                "name": "Miw",
+                "subject": "Boatmaker’s shelter",
+                "x": -10.778485394301766,
+                "z": 4.361980630757821,
+                "y": 1.4
+              },
+              {
+                "id": 62,
+                "time": 167.64000000000388,
+                "action": "worked at",
+                "actor": "neolithic-resident-4",
+                "name": "Sĩ",
+                "subject": "grinding bench",
+                "x": 14.526652858929403,
+                "z": 5.693194188137902,
+                "y": 1.4
+              },
+              {
+                "id": 63,
+                "time": 167.89000000000394,
+                "action": "entered",
+                "actor": "neolithic-resident-5",
+                "name": "Numiw",
+                "subject": "Shared granary",
+                "x": 0.2576755845512585,
+                "z": -9.632552368203996,
+                "y": 1.4
+              },
+              {
+                "id": 64,
+                "time": 173.0400000000051,
+                "action": "opened",
+                "actor": "neolithic-resident-0",
+                "name": "Þa",
+                "subject": "Reed household door",
+                "x": -9.486680014953187,
+                "z": -5.603571347289694,
+                "y": 1.4
+              },
+              {
+                "id": 65,
+                "time": 175.49000000000567,
+                "action": "left",
+                "actor": "neolithic-resident-0",
+                "name": "Þa",
+                "subject": "Reed household",
+                "x": -9.027830166325783,
+                "z": -6.03212806402701,
+                "y": 1.4
+              },
+              {
+                "id": 66,
+                "time": 177.64000000000615,
+                "action": "opened",
+                "actor": "neolithic-resident-4",
+                "name": "Sĩ",
+                "subject": "Weaving shelter door",
+                "x": 10.465,
+                "z": 4,
+                "y": 1.4
+              },
+              {
+                "id": 67,
+                "time": 180.19000000000673,
+                "action": "left",
+                "actor": "neolithic-resident-4",
+                "name": "Sĩ",
+                "subject": "Weaving shelter",
+                "x": 10.805264522804265,
+                "z": 4.527305302818978,
+                "y": 1.4
+              },
+              {
+                "id": 68,
+                "time": 182.04000000000715,
+                "action": "opened",
+                "actor": "neolithic-resident-5",
+                "name": "Numiw",
+                "subject": "Shared granary door",
+                "x": 0,
+                "z": -9.265,
+                "y": 1.4
+              },
+              {
+                "id": 69,
+                "time": 185.44000000000793,
+                "action": "left",
+                "actor": "neolithic-resident-5",
+                "name": "Numiw",
+                "subject": "Shared granary",
+                "x": 0.17601879485847163,
+                "z": -9.576119966166344,
+                "y": 1.4
+              },
+              {
+                "id": 70,
+                "time": 188.04000000000852,
+                "action": "opened",
+                "actor": "neolithic-resident-1",
+                "name": "Kay",
+                "subject": "Healer’s shelter door",
+                "x": 9.486680014953187,
+                "z": -5.603571347289694,
+                "y": 1.4
+              },
+              {
+                "id": 71,
+                "time": 191.34000000000927,
+                "action": "entered",
+                "actor": "neolithic-resident-1",
+                "name": "Kay",
+                "subject": "Healer’s shelter",
+                "x": 9.483243816433536,
+                "z": -5.977429779905834,
+                "y": 1.4
+              },
+              {
+                "id": 72,
+                "time": 193.54000000000977,
+                "action": "spoke with",
+                "actor": "neolithic-resident-2",
+                "name": "Miw",
+                "subject": "Sĩ",
+                "x": -1.5212634277512131,
+                "z": 1.5187395052693469,
+                "y": 1.4
+              },
+              {
+                "id": 73,
+                "time": 195.24000000001016,
+                "action": "opened",
+                "actor": "neolithic-resident-3",
+                "name": "Nulū",
+                "subject": "Boatmaker’s shelter door",
+                "x": -10.465,
+                "z": 4,
+                "y": 1.4
+              },
+              {
+                "id": 74,
+                "time": 198.44000000001088,
+                "action": "entered",
+                "actor": "neolithic-resident-3",
+                "name": "Nulū",
+                "subject": "Boatmaker’s shelter",
+                "x": -10.882605148871546,
+                "z": 3.4611178599712833,
+                "y": 1.4
+              },
+              {
+                "id": 75,
+                "time": 203.04000000001193,
+                "action": "opened",
+                "actor": "neolithic-resident-1",
+                "name": "Kay",
+                "subject": "Healer’s shelter door",
+                "x": 9.486680014953187,
+                "z": -5.603571347289694,
+                "y": 1.4
+              },
+              {
+                "id": 76,
+                "time": 205.69000000001253,
+                "action": "left",
+                "actor": "neolithic-resident-1",
+                "name": "Kay",
+                "subject": "Healer’s shelter",
+                "x": 9.15151471103795,
+                "z": -5.991640765984279,
+                "y": 1.4
+              },
+              {
+                "id": 77,
+                "time": 211.14000000001377,
+                "action": "worked at",
+                "actor": "neolithic-resident-3",
+                "name": "Nulū",
+                "subject": "grinding bench",
+                "x": -14.527463202673466,
+                "z": 2.307637627081191,
+                "y": 1.4
+              },
+              {
+                "id": 78,
+                "time": 221.14000000001604,
+                "action": "opened",
+                "actor": "neolithic-resident-3",
+                "name": "Nulū",
+                "subject": "Boatmaker’s shelter door",
+                "x": -10.465,
+                "z": 4,
+                "y": 1.4
+              },
+              {
+                "id": 79,
+                "time": 223.69000000001662,
+                "action": "left",
+                "actor": "neolithic-resident-3",
+                "name": "Nulū",
+                "subject": "Boatmaker’s shelter",
+                "x": -10.829548542518694,
+                "z": 3.4247397214148045,
+                "y": 1.4
+              },
+              {
+                "id": 80,
+                "time": 229.89000000001803,
+                "action": "opened",
+                "actor": "neolithic-resident-4",
+                "name": "Sĩ",
+                "subject": "Reed household door",
+                "x": -9.486680014953187,
+                "z": -5.603571347289694,
+                "y": 1.4
+              },
+              {
+                "id": 81,
+                "time": 232.04000000001852,
+                "action": "opened",
+                "actor": "neolithic-resident-2",
+                "name": "Miw",
+                "subject": "Healer’s shelter door",
+                "x": 9.486680014953187,
+                "z": -5.603571347289694,
+                "y": 1.4
+              },
+              {
+                "id": 82,
+                "time": 233.04000000001875,
+                "action": "entered",
+                "actor": "neolithic-resident-4",
+                "name": "Sĩ",
+                "subject": "Reed household",
+                "x": -9.124019306808437,
+                "z": -6.038890232711115,
+                "y": 1.4
+              },
+              {
+                "id": 83,
+                "time": 235.39000000001928,
+                "action": "opened",
+                "actor": "neolithic-resident-0",
+                "name": "Þa",
+                "subject": "Shared granary door",
+                "x": 0,
+                "z": -9.265,
+                "y": 1.4
+              },
+              {
+                "id": 84,
+                "time": 235.54000000001932,
+                "action": "entered",
+                "actor": "neolithic-resident-2",
+                "name": "Miw",
+                "subject": "Healer’s shelter",
+                "x": 9.52124243349854,
+                "z": -5.981715201492518,
+                "y": 1.4
+              },
+              {
+                "id": 85,
+                "time": 238.69000000002004,
+                "action": "entered",
+                "actor": "neolithic-resident-0",
+                "name": "Þa",
+                "subject": "Shared granary",
+                "x": -0.3138017519277726,
+                "z": -9.62006177880114,
+                "y": 1.4
+              }
+            ]
+          },
+          "penetrations": 0,
+          "maxSpeed": 0.9500000000000173,
+          "witnessed": 26
         }
       ],
-      "pass": true,
-      "tested_html_sha256": "c1424082f75028ddc3eb20ab50cfd3af4d4390b2c587a535cdaa4e17f6a230a4"
+      "pass": true
     },
-    "courtyard_offline_touch": {
+    "district_ui": {
+      "version": "0.6.0",
       "checks": [
         {
-          "name": "complete-world-courtyard-works-offline",
+          "name": "offline-language-neutral-home",
           "pass": true
         },
         {
-          "name": "offline-exit-to-world",
+          "name": "offline-capital-correct-era-rooms-and-residents",
           "pass": true
         },
         {
-          "name": "touch-layout-and-controls",
+          "name": "offline-bronze-correct-era-rooms-and-residents",
           "pass": true
         },
         {
-          "name": "touch-joystick-moves-camera",
+          "name": "offline-neolithic-correct-era-rooms-and-residents",
           "pass": true
         },
         {
-          "name": "touch-look",
+          "name": "offline-district-selector",
           "pass": true
         },
         {
-          "name": "touch-pause-and-resume",
+          "name": "offline-era-correct-atlas-link",
           "pass": true
         },
         {
-          "name": "touch-viewpoint-light-and-quality",
+          "name": "complete-districts-work-with-zero-network",
           "pass": true
         },
         {
-          "name": "touch-provenance-panel",
+          "name": "touch-district-ui-layout",
           "pass": true
         },
         {
-          "name": "landscape-controls-fit",
+          "name": "touch-district-movement",
           "pass": true
         },
         {
-          "name": "no-offline-or-touch-script-errors",
+          "name": "touch-pause-freezes-residents",
+          "pass": true
+        },
+        {
+          "name": "touch-all-three-era-switches",
+          "pass": true
+        },
+        {
+          "name": "touch-landscape-controls-fit",
+          "pass": true
+        },
+        {
+          "name": "touch-opens-real-door",
+          "pass": true
+        },
+        {
+          "name": "touch-operates-storage-cover",
+          "pass": true
+        },
+        {
+          "name": "touch-memory-conversation-and-close",
+          "pass": true
+        },
+        {
+          "name": "no-district-offline-or-touch-script-errors",
           "pass": true
         }
       ],
       "errors": [],
       "offlineRequests": [],
+      "externalRequests": [],
       "pass": true,
-      "tested_html_sha256": "c1424082f75028ddc3eb20ab50cfd3af4d4390b2c587a535cdaa4e17f6a230a4"
+      "tested_html_sha256": "591346e8fec87395f5e395b35d83f27fd06bd5714865c713de25a8775b7c4385"
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "original_source_sha": {
     "walk": "29b4e734b064f5ea2b6dc3c6f7bdc5336247182d12c1a2e1fc6b6af37d171332",
     "planet": "3f816f25d4bd1eecb7f4b6ade9e4b04d57747673b293d1c4626b09b7da915bff",
@@ -12,9 +12,9 @@
     "scene-04.js": "2c018547d11b8ca2b6a5c0f6d6a20dc8577d24253efd5cee529500dbd2d199fc",
     "journey.js": "8ad8b8297243dae741aebac521bbe91f95109e6020e997cbe54c6c3e9e6cd99f",
     "walk-patch.js": "6fd60ec5a40e901e6251dd589e6b5d74d9fe908a5fcdd6ac428e41a6d0e87062",
-    "app.js": "f53f9d4685ee61eb0491c14e350a50d6bda135f8d9010871f4ee9c0970b0b307",
-    "index.html": "975fd98ed6675638002719ab50b26d88e0afd21e76de5c6511a06fb241be5999",
-    "style.css": "4dc68d98bb247a9aef5e1528f31ce695f0886e5efff8601dd5e9597a2bc08601"
+    "app.js": "6df9cf7133a08bc2a6ca230a32015ca36109665443c3b9686cff12b033dcd8b2",
+    "index.html": "82daefbc13e4094e48185b0d8b424feb6ba3d1c431cabfbb75f3db7a384bc13d",
+    "style.css": "8d712ac087016d0fc9f981d223a069536b33b08ec02e773d179139b85edbebc7"
   },
   "counts": {
     "javascriptSyntax": true,
@@ -25,19 +25,24 @@
     "deedTranslationMissing": 0
   },
   "courtyard": {
-    "asset_count": 11,
-    "runtime_bytes": 35727183,
+    "asset_count": 21,
+    "runtime_bytes": 40695903,
     "playable": true,
     "photorealism": "work-in-progress",
     "simulation_changed": false
   },
-  "tested_html_sha256": "c1424082f75028ddc3eb20ab50cfd3af4d4390b2c587a535cdaa4e17f6a230a4",
-  "checks_passed": 67,
-  "source_commit": "5c46e761969bcd93b69618fc9bb2250b1d743482",
-  "previous_release_commit": "f196f14677e0ff4614449745e88f896e5391aac8",
-  "previous_deployment_commit": "69d385f1c190c12ab06f34785a5dc2beb3e1c823",
-  "pull_request": 5,
-  "public_checks_passed": 15,
-  "hf_checks_passed": 7,
-  "merge_commit": "ff8ce58368c50a76709f1af7275622c8b40a8ef0"
+  "tested_html_sha256": "591346e8fec87395f5e395b35d83f27fd06bd5714865c713de25a8775b7c4385",
+  "checks_passed": 109,
+  "districts": {
+    "districts": 3,
+    "interiors_each": 5,
+    "residents_each": 6,
+    "rule_based": true,
+    "geometric_perception": true,
+    "history_changed": false
+  },
+  "source_commit": "ff301c061acd09845860821e8d8a0f55e2dd55e2",
+  "previous_release_commit": "5c46e761969bcd93b69618fc9bb2250b1d743482",
+  "previous_deployment_commit": "24e64849c8ac23acf31b41876f9fd4cb11552375",
+  "pull_request": 6
 }
